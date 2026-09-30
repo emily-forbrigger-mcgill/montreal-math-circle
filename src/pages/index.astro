@@ -7,14 +7,18 @@ import Layout from '../layouts/Layout.astro';
         <h1>Exploring Math from New Perspectives</h1>
         <p class="subtitle">Welcome to the Montreal Math Circle program website.</p>
     </header>
+    <section class="current-updates">
+        <h3>Math for All 2027</h3>
+        <a href="https://sites.google.com/view/mathforallnola/home" target="_blank" class="link-button">Visit Math for All 2027↗</a>
+    </section>
     <section class="quick-logistics">
         <div class="logistics-card">
-            <h3>When</h3>
-            <p>TBD!</p>
+            <h3>Dates</h3>
+            <p>April 2nd and 3rd</p>
         </div>
         <div class="logistics-card">
             <h3>Where</h3>
-            <p>McGill campus (somewhere!)</p>
+            <p>McGill campus (Burnside Building)</p>
         </div>
         <div class="logistics-card">
             <h3>Cost</h3>
@@ -42,14 +46,26 @@ import Layout from '../layouts/Layout.astro';
 <style>
     .hook-section {
         text-align: center;
-        padding: 3rem 1rem;
+        padding: 3rem 1rem 1rem 0.5rem;
         background: linear-gradient(to bottom, #f4f6f9, #ffffff);
         border-radius: 12px;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
-    .hook section h1 {
+    .hook-section h1 {
         font-size: 2.5rem;
         color: #cf3f37;
+        margin: 0 0 1rem 0;
+    }
+    .current-updates {
+        text-align: center;
+        padding: 2rem 1rem 0.5rem 1rem;
+        background: linear-gradient(to bottom, #871010, #f9f5f4);
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+    .current-updates h3 {
+        font-size: 2rem;
+        color: #fdfdfc;
         margin: 0 0 1rem 0;
     }
     .subtitle {
@@ -112,5 +128,17 @@ import Layout from '../layouts/Layout.astro';
         font-weight: bold;
         color: #888;
         font-size: 1.1rem;
+    }
+    .link-button {
+        display: block;
+        text-align: center;
+        background: #eef2f7;
+        color: #6a2303;
+        text-decoration: none;
+        padding: 0.6rem;
+        border-radius: 6px;
+        font-weight: bold;
+        margin-top: 1rem;
+        border: 1px solid #5f1a13;
     }
 </style>

@@ -1,0 +1,61 @@
+---
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="programs">
+<header class="header-columns">
+    <div class="offerings">
+       <h1>What We Offer</h1>
+    </div>
+    <div class="explain-offer">The Montreal Math Circle offers diverse programs for youth of all backgrounds in math. Explore options below.</div>
+</header>
+<section class="programs-grid">
+    <div class="programs-card">
+        <h1>Math for All</h1>
+    </div>
+</section>
+</Layout>
+
+<style>
+.header-columns {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+}
+.offerings {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: linear-gradient(to bottom, hsl(0, 75%, 9%), #da4747);
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+.offerings h1 {
+    font-size: 2.5rem;
+    color: #fbf3f2;
+    margin: 0 0 1rem 0;
+}
+.explain-offer {
+        text-align: left;
+        padding: 3rem 2rem 1rem 2rem;
+        background: linear-gradient(to bottom, #fcddd6, #ae6868);
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+.programs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+.programs-card {
+    text-align: left;
+    padding: 3rem 2rem 1rem 2rem;
+    background: linear-gradient(to bottom, #e37c7c, #f5c8c8);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.programs-card h1 {
+    color: white;
+
+}
+</style>

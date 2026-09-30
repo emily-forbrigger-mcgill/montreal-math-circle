@@ -1,0 +1,25 @@
+---
+// src/pages/index.astro
+    import Layout from '../layouts/Layout.astro';
+---
+<Layout title="about">
+    <header class="our-story">
+        <h1>Our Story</h1>
+        <p>Why and how we're changing math in Montreal.</p>
+    </header>
+</Layout>
+
+<style>
+    .our-story {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: linear-gradient(to bottom, #f4f6f9, #ffffff);
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    .our-story h1 {
+        font-size: 2.5rem;
+        color: #cf3f37;
+        margin: 0 0 1rem 0;
+    }
+</style>

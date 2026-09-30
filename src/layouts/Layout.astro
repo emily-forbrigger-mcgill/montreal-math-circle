@@ -15,12 +15,19 @@ const { title } = Astro.props;
             <a href="/">Home</a>
             <a href="/schedule">Schedule</a>
             <a href="/resources">Resources</a>
+            <a href="/about">About</a>
+            <a href="/programs">Our Programs</a>
         </div>
     </nav>
     <main class="content-area">
         <slot /> <!-- Page content dynamically injects right here -->
     </main>
     <footer class="footer">
+        <div class="contact-footer">
+            <div class="email-list">aislinn.smith@montrealmathcircle.com<br>email2@montrealmathcircle.ca<br>email3@montrealmathcircle.ca</div>
+            <div></div>
+            <div></div>
+        </div>
         <p>© 2026 Montreal Math Circle.</p>
     </footer>
 </body>
@@ -33,5 +40,7 @@ const { title } = Astro.props;
     .content-area { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
     .navbar { display: flex; justify-content: space-between; background: var(--primary); color: white; padding: 1rem 2rem; }
     .navbar a { color: white; text-decoration: none; margin-left: 1.5rem; }
-    .footer { background: #e0948e; text-align: center; padding: 1rem; font-size: 0.9rem; }
+    .footer { background: #e0948e; text-align: center; padding: 0rem 0 1rem 0; font-size: 0.9rem; }
+    .contact-footer {display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;background: #bba9a7; text-align: center; padding: 1rem; font-size: 0.9rem; }
+    .email-list {text-align: left; padding-left: 1rem; line-height: 150%; color:#2f2523;}
 </style>

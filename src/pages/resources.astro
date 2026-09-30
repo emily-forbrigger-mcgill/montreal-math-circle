@@ -1,0 +1,108 @@
+---
+// Import our global page shell to keep our navigation menu attached
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Resources">
+    <!-- Main Page Header -->
+    <header class="page-header">
+        <h1>Problem Sets & Materials</h1>
+        <p>Review past handouts, math challenge questions, and solutions.</p>
+    </header>
+
+    <!-- Essential Layout Grid: Automatically fits items onto rows -->
+    <div class="resource-grid">
+        
+        <!-- Document Card 1 -->
+        <div class="resource-card">
+            <span class="session-tag">Week 1</span>
+            <h3>Placeholder 1</h3>
+            <p>An introduction to something.</p>
+            <a href="#" class="download-link">📄 Download Handout (PDF)</a>
+        </div>
+
+        <!-- Document Card 2 -->
+        <div class="resource-card">
+            <span class="session-tag">Week 2</span>
+            <h3>Placeholder 2</h3>
+            <p>An introduction to something.</p>
+            <a href="#" class="download-link">📄 Download Handout (PDF)</a>
+        </div>
+
+        <!-- Document Card 3 -->
+        <div class="resource-card">
+            <span class="session-tag">Week 3</span>
+            <h3>Placeholder 3</h3>
+            <p>An introduction to something.</p>
+            <a href="#" class="download-link">📄 Download Handout (PDF)</a>
+        </div>
+
+    </div>
+</Layout>
+
+<style>
+    /* Header layout */
+    h1 { color: #003366; margin: 0 0 0.5rem 0; }
+    .page-header { margin-bottom: 2.5rem; }
+
+    /* The Auto-fitting Card Grid System */
+    .resource-grid {
+        display: grid;
+        /* Automatically fits as many columns as possible that are at least 300px wide */
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    /* Card styling */
+    .resource-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Keeps the download button aligned at the bottom */
+    }
+
+    .session-tag {
+        background: #eef2f7;
+        color: #003366;
+        font-weight: bold;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        width: fit-content;
+    }
+
+    .resource-card h3 {
+        margin: 0.75rem 0 0.5rem 0;
+        font-size: 1.2rem;
+        color: #222;
+    }
+
+    .resource-card p {
+        color: #555;
+        font-size: 0.95rem;
+        margin: 0 0 1.5rem 0;
+        line-height: 1.5;
+    }
+
+    /* Interactive Download button formatting */
+    .download-link {
+        background: #f8fafc;
+        border: 1px solid #003366;
+        color: #003366;
+        text-align: center;
+        text-decoration: none;
+        padding: 0.6rem;
+        border-radius: 6px;
+        font-weight: bold;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .download-link:hover {
+        background: #003366;
+        color: white;
+    }
+</style>

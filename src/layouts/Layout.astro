@@ -1,0 +1,37 @@
+---
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | Montreal Math Circle</title>
+</head>
+<body class="site-wrapper">
+    <nav class="navbar">
+        <div class="logo">Montreal Math Circle</div>
+        <div class="links">
+            <a href="/">Home</a>
+            <a href="/schedule">Schedule</a>
+            <a href="/resources">Resources</a>
+        </div>
+    </nav>
+    <main class="content-area">
+        <slot /> <!-- Page content dynamically injects right here -->
+    </main>
+    <footer class="footer">
+        <p>© 2026 Montreal Math Circle.</p>
+    </footer>
+</body>
+</html>
+
+<style>
+    :root { --primary: #cf4137; --dark: #222222; }
+    body { margin: 0; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif, sans-serif; color: var(--dark); }
+    .site-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+    .content-area { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+    .navbar { display: flex; justify-content: space-between; background: var(--primary); color: white; padding: 1rem 2rem; }
+    .navbar a { color: white; text-decoration: none; margin-left: 1.5rem; }
+    .footer { background: #e0948e; text-align: center; padding: 1rem; font-size: 0.9rem; }
+</style>

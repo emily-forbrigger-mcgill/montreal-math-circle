@@ -1,0 +1,116 @@
+---
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Home">
+    <header class="hook-section">
+        <h1>Exploring Math from New Perspectives</h1>
+        <p class="subtitle">Welcome to the Montreal Math Circle program website.</p>
+    </header>
+    <section class="quick-logistics">
+        <div class="logistics-card">
+            <h3>When</h3>
+            <p>TBD!</p>
+        </div>
+        <div class="logistics-card">
+            <h3>Where</h3>
+            <p>McGill campus (somewhere!)</p>
+        </div>
+        <div class="logistics-card">
+            <h3>Cost</h3>
+            <p><strong>100% Free</strong></p>
+        </div>
+    </section>
+    <section class="info-grid">
+        <article class="info-block">
+            <h2>For Students</h2>
+            <p>Why you should join...</p>
+        </article>
+        <article class="info-block">
+            <h2>For Parents</h2>
+            <p>Why you should register your kid...</p>
+        </article>
+    </section>
+    <section class="sponsor-footer">
+        <p class="sponsor-title">Supported By Our University Partners</p>
+        <div class="logo-strip">
+            <span class="logo-placeholder">Department of Mathematics</span>
+        </div>
+    </section>
+</Layout>
+
+<style>
+    .hook-section {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: linear-gradient(to bottom, #f4f6f9, #ffffff);
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    .hook section h1 {
+        font-size: 2.5rem;
+        color: #cf3f37;
+        margin: 0 0 1rem 0;
+    }
+    .subtitle {
+        font-size: 1.2rem;
+        color: #5f4a49;
+        max-width: 800px;
+        margin: 0 auto 2rem auto;
+    }
+
+    .quick-logistics {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    .logistics-card {
+        background: #f5e1de;
+        border-top: 4px solid #cf4137;
+        padding: 1.5rem;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .logistics-card h3 { margin: 0 0 0.5rem 0; color: #a85342; }
+    .logistics-card p { margin: 0; color: #201c1c; line-height: 1.5; }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+    @media (min-width: 768px) {
+        .info-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .info-block h2 { color: #003366; border-bottom: 2px solid #eef2f7; padding-bottom: 0.5rem; }
+    .info-block p { color: #333; line-height: 1.6; }
+
+    .sponsor-footer {
+        text-align: center;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 2rem;
+        margin-top: 2rem;
+    }
+    .sponsor-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #777;
+        margin-bottom: 1.5rem;
+    }
+    .logo-strip {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        flex-wrap: wrap;
+    }
+    .logo-placeholder {
+        font-weight: bold;
+        color: #888;
+        font-size: 1.1rem;
+    }
+</style>

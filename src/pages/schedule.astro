@@ -1,0 +1,105 @@
+---
+// Import our global page shell (this keeps the navigation bar and footer attached)
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Schedule">
+    <!-- Main Page Header -->
+    <header class="page-header">
+        <h1>Circle Schedule & Logistics</h1>
+        <p>Sessions meet on TBD days!</p>
+    </header>
+
+    <!-- Essential Layout Stack -->
+    <div class="schedule-container">
+        
+        <!-- Left Side: Simple List of Dates -->
+        <main class="dates-list">
+            <h2>Upcoming Events</h2>
+            
+            <div class="date-row">
+                <span class="date-badge">April 2 or 3</span>
+                <div class="date-details">
+                    <h3>Math for All</h3>
+                    <p>Guest Speaker: TBD</p>
+                </div>
+            </div>
+            </div>
+        </main>
+
+        <!-- Right Side: Essential Logistics Box -->
+        <aside class="sidebar">
+            <div class="logistics-box">
+                <h2>📍 Location</h2>
+                <p><strong>Building:</strong> Probably Burnside</p>
+                <p><strong>Room:</strong> 9th-12th Floor, Somewhere</p>
+                <hr />
+                <p><strong>Parking:</strong> TBD.</p>
+                <a href="https://google.com" target="_blank" class="map-button">Open Google Maps ↗</a>
+            </div>
+        </aside>
+
+    </div>
+</Layout>
+
+<style>
+    /* Headers */
+    h1 { color: #003366; margin: 0 0 0.5rem 0; }
+    h2 { color: #003366; margin-top: 0; font-size: 1.5rem; }
+    .page-header { margin-bottom: 2.5rem; }
+
+    /* Layout structure: Stacks on mobile, side-by-side on desktop */
+    .schedule-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+    @media (min-width: 768px) {
+        .schedule-container {
+            grid-template-columns: 2fr 1fr; /* Left section is wider than the right */
+        }
+    }
+
+    /* Date Rows Layout */
+    .date-row {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .date-badge {
+        background: #003366;
+        color: white;
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        min-width: 60px;
+        text-align: center;
+    }
+    .date-details h3 { margin: 0 0 0.25rem 0; font-size: 1.2rem; }
+    .date-details p { margin: 0; color: #555; font-style: italic; }
+
+    /* Simple Logistics Box styling */
+    .logistics-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        border-radius: 8px;
+    }
+    .logistics-box hr { border: 0; border-top: 1px solid #e2e8f0; margin: 1rem 0; }
+    .logistics-box p { color: #333; line-height: 1.5; margin: 0.5rem 0; }
+    
+    .map-button {
+        display: block;
+        text-align: center;
+        background: #eef2f7;
+        color: #003366;
+        text-decoration: none;
+        padding: 0.6rem;
+        border-radius: 6px;
+        font-weight: bold;
+        margin-top: 1rem;
+        border: 1px solid #003366;
+    }
+</style>

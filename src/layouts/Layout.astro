@@ -110,7 +110,16 @@ const { title } = Astro.props;
     }
 
     .site-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
-    .content-area { flex: 1; padding: 2.5rem 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+    
+    /* Content Area - Responsive padding */
+    .content-area { 
+        flex: 1; 
+        padding: 2.5rem 1.5rem; 
+        max-width: 1200px; 
+        margin: 0 auto; 
+        width: 100%; 
+        box-sizing: border-box; 
+    }
     
     /* Navbar Layout */
     .navbar { 
@@ -183,13 +192,15 @@ const { title } = Astro.props;
     .bento-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 1.5rem;
-        margin: 2rem 0;
+        gap: 1.25rem;
+        margin: 1.5rem 0;
     }
 
     @media (min-width: 768px) {
         .bento-grid {
             grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
         .bento-card.featured {
             grid-column: span 2;
@@ -203,10 +214,16 @@ const { title } = Astro.props;
         background: #ffffff;
         border: 1px solid var(--border-color);
         border-radius: 12px;
-        padding: 1.75rem;
+        padding: 1.5rem;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         box-sizing: border-box;
+    }
+
+    @media (min-width: 768px) {
+        .bento-card {
+            padding: 1.75rem;
+        }
     }
 
     .bento-card:hover {
@@ -284,6 +301,7 @@ const { title } = Astro.props;
         text-decoration: none;
         font-size: 0.9rem;
         transition: color 0.2s ease;
+        word-break: break-word; /* Prevents long emails from overflowing screen width */
     }
 
     .footer-links a:hover, .email-list a:hover {
@@ -301,8 +319,14 @@ const { title } = Astro.props;
         color: #71717a;
     }
 
-    /* Mobile Responsive Header Styles */
+    /* Mobile Responsive Overrides */
     @media (max-width: 768px) {
+        /* Main Content Padding for Phones */
+        .content-area {
+            padding: 1.5rem 1rem;
+        }
+
+        /* Mobile Navigation Header */
         .menu-toggle {
             display: block;
         }
@@ -330,6 +354,29 @@ const { title } = Astro.props;
             margin-left: 0;
             padding: 0.4rem 0;
             text-align: right;
+        }
+
+        /* Footer Mobile Layout */
+        .footer {
+            padding: 2.5rem 1.25rem 1.25rem;
+        }
+
+        .footer-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .footer-col h4 {
+            margin-bottom: 0.6rem;
+        }
+
+        .footer-links li, .email-list li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-bottom {
+            margin-top: 2rem;
+            padding-top: 1.25rem;
         }
     }
 </style>

@@ -2,144 +2,404 @@
 // src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
 ---
+
 <Layout title="Home">
-    <header class="hook-section">
-        <h1>Exploring Math from New Perspectives</h1>
-        <p class="subtitle">Welcome to the Montreal Math Circle program website.</p>
+    <!-- Hero / Hook Header -->
+    <header class="hero-section">
+        <div class="hero-content">
+            <span class="meta-tag">Youth Math Initiative</span>
+            <h1>Exploring Math from New Perspectives</h1>
+            <p class="subtitle">
+                An interactive program connecting motivated high school and CEGEP students with advanced mathematical concepts, problem-solving workshops, and dynamic university mentors.
+            </p>
+            <div class="hero-cta-group">
+                <a href="#logistics" class="primary-btn">View Event Details</a>
+                <a href="/programs" class="secondary-btn">Explore Programs</a>
+            </div>
+        </div>
     </header>
-    <section class="current-updates">
-        <h3>Math for All 2027</h3>
-        <a href="https://sites.google.com/view/mathforallnola/home" target="_blank" class="link-button">Visit Math for All 2027↗</a>
-    </section>
-    <section class="quick-logistics">
-        <div class="logistics-card">
-            <h3>Dates</h3>
-            <p>April 2nd and 3rd</p>
+
+    <!-- Conference / Featured Event Highlight -->
+    <section class="banner-card">
+        <div class="banner-body">
+            <span class="meta-tag">Featured Event</span>
+            <h2>Math for All 2027</h2>
+            <p>
+                Join us for our flagship regional mathematics conference hosted in collaboration with researchers and educators.
+            </p>
         </div>
-        <div class="logistics-card">
-            <h3>Where</h3>
-            <p>McGill campus (Burnside Building)</p>
-        </div>
-        <div class="logistics-card">
-            <h3>Cost</h3>
-            <p><strong>100% Free</strong></p>
+        <div class="banner-action">
+            <a href="https://sites.google.com/view/mathforallnola/home" target="_blank" rel="noopener noreferrer" class="external-link">
+                Visit Conference Portal ↗
+            </a>
         </div>
     </section>
+
+    <!-- Logistics Block -->
+    <section id="logistics" class="logistics-section">
+        <h2 class="section-title">Logistics & Venue</h2>
+        
+        <div class="logistics-grid">
+            <div class="logistics-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </div>
+                <div class="card-details">
+                    <span class="logistics-label">Dates</span>
+                    <p class="logistics-value">April 2nd & 3rd, 2027</p>
+                    <span class="sub-text">2-Day Workshop Series</span>
+                </div>
+            </div>
+
+            <div class="logistics-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </div>
+                <div class="card-details">
+                    <span class="logistics-label">Location</span>
+                    <p class="logistics-value">Burnside Building</p>
+                    <span class="sub-text">McGill University Downtown Campus</span>
+                </div>
+            </div>
+
+            <div class="logistics-card highlight-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <div class="card-details">
+                    <span class="logistics-label">Admission</span>
+                    <p class="logistics-value">100% Free</p>
+                    <span class="sub-text">Open to all registered students</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Information Split Grid -->
     <section class="info-grid">
-        <article class="info-block">
-            <h2>For Students</h2>
-            <p>Why you should join...</p>
+        <article class="info-card">
+            <div class="card-header">
+                <h3>For Students</h3>
+            </div>
+            <p>
+                Dive deeper into topics rarely covered in standard high school curricula — from graph theory and knot theory to proof techniques. Experience non-competitive, creative mathematics in a collaborative, supportive setting.
+            </p>
+            <a href="/programs" class="text-link">Discover Student Sessions &rarr;</a>
         </article>
-        <article class="info-block">
-            <h2>For Parents</h2>
-            <p>Why you should register your kid...</p>
+
+        <article class="info-card">
+            <div class="card-header">
+                <h3>For Parents & Educators</h3>
+            </div>
+            <p>
+                Give your students direct exposure to university-level reasoning and undergraduate mentors in a safe academic environment. Workshops are designed to nurture curiosity, problem-solving stamina, and academic growth.
+            </p>
+            <a href="/about" class="text-link">Learn About Our Mentors &rarr;</a>
         </article>
     </section>
+
+    <!-- Sponsor / Partner Strip -->
     <section class="sponsor-footer">
-        <p class="sponsor-title">Supported By Our University Partners</p>
+        <p class="sponsor-title">Supported by Academic Partners</p>
         <div class="logo-strip">
-            <span class="logo-placeholder">Department of Mathematics</span>
+            <span class="partner-badge">Department of Mathematics & Statistics</span>
+            <span class="partner-badge">McGill University</span>
         </div>
     </section>
 </Layout>
 
 <style>
-    .hook-section {
-        text-align: center;
-        padding: 3rem 1rem 1rem 0.5rem;
-        background: linear-gradient(to bottom, #f4f6f9, #ffffff);
-        border-radius: 12px;
-        margin-bottom: 1rem;
-    }
-    .hook-section h1 {
-        font-size: 2.5rem;
-        color: #cf3f37;
-        margin: 0 0 1rem 0;
-    }
-    .current-updates {
-        text-align: center;
-        padding: 2rem 1rem 0.5rem 1rem;
-        background: linear-gradient(to bottom, #871010, #f9f5f4);
-        border-radius: 12px;
-        margin-bottom: 1rem;
-    }
-    .current-updates h3 {
-        font-size: 2rem;
-        color: #fdfdfc;
-        margin: 0 0 1rem 0;
-    }
-    .subtitle {
-        font-size: 1.2rem;
-        color: #5f4a49;
-        max-width: 800px;
-        margin: 0 auto 2rem auto;
+    /* Hero Header */
+    .hero-section {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 3rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     }
 
-    .quick-logistics {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+    .hero-content {
+        max-width: 780px;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem;
+        color: var(--dark);
+        margin: 0.75rem 0 1rem 0;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin: 0 0 1.75rem 0;
+    }
+
+    .hero-cta-group {
+        display: flex;
         gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .primary-btn {
+        background: var(--primary);
+        color: #ffffff;
+        padding: 0.75rem 1.4rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: opacity 0.2s;
+    }
+
+    .primary-btn:hover {
+        opacity: 0.9;
+    }
+
+    .secondary-btn {
+        background: #f1f5f9;
+        color: var(--dark);
+        padding: 0.75rem 1.4rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        border: 1px solid var(--border-color);
+        transition: background 0.2s;
+    }
+
+    .secondary-btn:hover {
+        background: #e2e8f0;
+    }
+
+    /* Featured Event Banner */
+    .banner-card {
+        background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 2rem;
+        margin-bottom: 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .banner-body h2 {
+        font-size: 1.6rem;
+        color: #ffffff;
+        margin: 0.5rem 0;
+    }
+
+    .banner-body p {
+        color: #a1a1aa;
+        margin: 0;
+        font-size: 0.95rem;
+        max-width: 550px;
+    }
+
+    .external-link {
+        background: var(--primary);
+        color: #ffffff;
+        text-decoration: none;
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        display: inline-block;
+        transition: transform 0.2s;
+    }
+
+    .external-link:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Logistics Section */
+    .logistics-section {
         margin-bottom: 3rem;
     }
 
-    
-    .logistics-card {
-        background: #f5e1de;
-        border-top: 4px solid #cf4137;
-        padding: 1.5rem;
-        border-radius: 0 0 8px 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    .section-title {
+        font-size: 1.4rem;
+        color: var(--dark);
+        margin-bottom: 1.25rem;
     }
 
-    .logistics-card h3 { margin: 0 0 0.5rem 0; color: #a85342; }
-    .logistics-card p { margin: 0; color: #201c1c; line-height: 1.5; }
+    .logistics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.25rem;
+    }
 
+    .logistics-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.4rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .logistics-card.highlight-card {
+        background: var(--primary-light);
+        border-color: rgba(168, 27, 36, 0.25);
+    }
+
+    .card-icon {
+        color: var(--primary);
+        background: #fdf2f2;
+        padding: 0.6rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .logistics-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .logistics-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin: 0.2rem 0;
+    }
+
+    .sub-text {
+        font-size: 0.82rem;
+        color: #64748b;
+    }
+
+    /* Info Grid Section */
     .info-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 2rem;
-        margin-bottom: 4rem;
+        gap: 1.5rem;
+        margin-bottom: 3.5rem;
     }
-    @media (min-width: 768px) {
-        .info-grid { grid-template-columns: 1fr 1fr; }
-    }
-    .info-block h2 { color: #003366; border-bottom: 2px solid #eef2f7; padding-bottom: 0.5rem; }
-    .info-block p { color: #333; line-height: 1.6; }
 
+    @media (min-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .info-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .info-card h3 {
+        font-size: 1.3rem;
+        color: var(--dark);
+        margin: 0 0 0.85rem 0;
+    }
+
+    .info-card p {
+        color: #475569;
+        line-height: 1.6;
+        margin: 0 0 1.5rem 0;
+        font-size: 0.95rem;
+    }
+
+    .text-link {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.92rem;
+    }
+
+    .text-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Sponsor & Partner Section */
     .sponsor-footer {
         text-align: center;
-        border-top: 1px solid #e2e8f0;
-        padding-top: 2rem;
-        margin-top: 2rem;
+        border-top: 1px solid var(--border-color);
+        padding-top: 2.5rem;
+        margin-top: 1rem;
     }
+
     .sponsor-title {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #777;
-        margin-bottom: 1.5rem;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: 1.25rem;
     }
+
     .logo-strip {
         display: flex;
         justify-content: center;
-        gap: 3rem;
+        gap: 1rem;
         flex-wrap: wrap;
     }
-    .logo-placeholder {
-        font-weight: bold;
-        color: #888;
-        font-size: 1.1rem;
+
+    .partner-badge {
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.88rem;
+        color: #334155;
+        font-weight: 500;
     }
-    .link-button {
-        display: block;
-        text-align: center;
-        background: #eef2f7;
-        color: #6a2303;
-        text-decoration: none;
-        padding: 0.6rem;
-        border-radius: 6px;
-        font-weight: bold;
-        margin-top: 1rem;
-        border: 1px solid #5f1a13;
+
+    /* Responsive Mobile Overrides */
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 1.75rem 1.25rem;
+        }
+
+        .hero-section h1 {
+            font-size: 1.85rem;
+        }
+
+        .subtitle {
+            font-size: 0.98rem;
+        }
+
+        .banner-card {
+            padding: 1.5rem 1.25rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .banner-body h2 {
+            font-size: 1.35rem;
+        }
+
+        .external-link {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+        }
     }
 </style>

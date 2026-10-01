@@ -7,6 +7,11 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} | Montreal Math Circle</title>
+    
+    <!-- Google Fonts Import (Space Grotesk + Plus Jakarta Sans + Fira Code) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="site-wrapper">
     <nav class="navbar">
@@ -26,16 +31,43 @@ const { title } = Astro.props;
             <a href="/programs">Our Programs</a>
         </div>
     </nav>
+    
     <main class="content-area">
         <slot /> <!-- Page content dynamically injects right here -->
     </main>
+
     <footer class="footer">
-        <div class="contact-footer">
-            <div class="email-list">aislinn.smith@montrealmathcircle.com<br>email2@montrealmathcircle.ca<br>email3@montrealmathcircle.ca</div>
-            <div></div>
-            <div></div>
+        <div class="footer-container">
+            <!-- Column 1: Organization Info -->
+            <div class="footer-col">
+                <div class="footer-brand">Montreal Math Circle</div>
+                <p class="affiliation">In collaboration with the McGill University Department of Mathematics & Statistics.</p>
+            </div>
+
+            <!-- Column 2: Quick Links -->
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <ul class="footer-links">
+                    <li><a href="/schedule">Schedule & Calendar</a></li>
+                    <li><a href="/programs">Our Programs</a></li>
+                    <li><a href="/resources">Learning Resources</a></li>
+                    <li><a href="/about">About Us</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Contact List -->
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <ul class="email-list">
+                    <li><a href="mailto:aislinn.smith@montrealmathcircle.com">aislinn.smith@montrealmathcircle.com</a></li>
+                    <li><a href="mailto:email2@montrealmathcircle.ca">email2@montrealmathcircle.ca</a></li>
+                    <li><a href="mailto:email3@montrealmathcircle.ca">email3@montrealmathcircle.ca</a></li>
+                </ul>
+            </div>
         </div>
-        <p>© 2026 Montreal Math Circle.</p>
+        <div class="footer-bottom">
+            <p>© 2026 Montreal Math Circle. All rights reserved.</p>
+        </div>
     </footer>
 
     <!-- Client-side script to handle menu toggle -->
@@ -51,17 +83,67 @@ const { title } = Astro.props;
 </body>
 </html>
 
-<style>
-    :root { --primary: #cf4137; --dark: #222222; }
-    body { margin: 0; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif, sans-serif; color: var(--dark); }
+<style is:global>
+    :root { 
+        --primary: #a81b24; /* McGill Burgundy / Red */
+        --primary-light: #fcf1f2;
+        --dark: #18181b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        
+        /* Font Variables */
+        --font-heading: 'Space Grotesk', system-ui, sans-serif;
+        --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+        --font-mono: 'Fira Code', monospace;
+    }
+
+    body { 
+        margin: 0; 
+        font-family: var(--font-body); 
+        color: var(--dark);
+        background-color: #fcfcfd;
+    }
+
+    /* Apply Heading Font across all headers & titles */
+    h1, h2, h3, h4, .logo, .footer-brand {
+        font-family: var(--font-heading);
+    }
+
     .site-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
-    .content-area { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+    .content-area { flex: 1; padding: 2.5rem 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
     
     /* Navbar Layout */
-    .navbar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 1rem 2rem; position: relative; }
-    .navbar a { color: white; text-decoration: none; margin-left: 1.5rem; }
+    .navbar { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        background: var(--primary); 
+        color: white; 
+        padding: 1.1rem 2rem; 
+        position: relative;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .logo {
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    .navbar a { 
+        color: white; 
+        text-decoration: none; 
+        margin-left: 1.75rem; 
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: opacity 0.2s;
+    }
+
+    .navbar a:hover {
+        opacity: 0.85;
+    }
     
-    /* Hamburger Menu Button (Hidden by default on Desktop) */
+    /* Hamburger Menu Button */
     .menu-toggle {
         display: none;
         background: transparent;
@@ -93,53 +175,161 @@ const { title } = Astro.props;
     .hamburger::before { transform: translateY(-8px); }
     .hamburger::after { transform: translateY(8px); }
 
-    /* Animated 'X' when open */
-    .menu-toggle.active .hamburger {
-        background: transparent;
+    .menu-toggle.active .hamburger { background: transparent; }
+    .menu-toggle.active .hamburger::before { transform: rotate(45deg); }
+    .menu-toggle.active .hamburger::after { transform: rotate(-45deg); }
+
+    /* Bento Grid Layout Utility */
+    .bento-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin: 2rem 0;
     }
 
-    .menu-toggle.active .hamburger::before {
-        transform: rotate(45deg);
+    @media (min-width: 768px) {
+        .bento-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .bento-card.featured {
+            grid-column: span 2;
+        }
+        .bento-card.full-width {
+            grid-column: span 3;
+        }
     }
 
-    .menu-toggle.active .hamburger::after {
-        transform: rotate(-45deg);
+    .bento-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.75rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    .bento-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+    }
+
+    /* Monospace Tag Style */
+    .meta-tag {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--primary);
+        background: var(--primary-light);
+        border: 1px solid rgba(168, 27, 36, 0.18);
+        padding: 0.25rem 0.55rem;
+        border-radius: 4px;
+        display: inline-block;
+        margin-right: 0.4rem;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.03em;
     }
 
     /* Footer Styles */
-    .footer { background: #e0948e; text-align: center; padding: 0rem 0 1rem 0; font-size: 0.9rem; }
-    .contact-footer { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; background: #bba9a7; text-align: center; padding: 1rem; font-size: 0.9rem; }
-    .email-list { text-align: left; padding-left: 1rem; line-height: 150%; color:#2f2523; }
+    .footer { 
+        background: #18181b; 
+        color: #f4f4f5; 
+        padding: 3.5rem 1.5rem 1.5rem; 
+        margin-top: auto; 
+    }
 
-    /* Mobile Responsive Styles */
+    .footer-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .footer-brand {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.75rem;
+    }
+
+    .footer-col h4 {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--primary-light);
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+
+    .affiliation {
+        font-size: 0.88rem;
+        color: #a1a1aa;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .footer-links, .email-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-links li, .email-list li {
+        margin-bottom: 0.6rem;
+    }
+
+    .footer-links a, .email-list a {
+        color: #d4d4d8;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover, .email-list a:hover {
+        color: #ffffff;
+        text-decoration: underline;
+    }
+
+    .footer-bottom {
+        max-width: 1200px;
+        margin: 3rem auto 0;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        font-size: 0.82rem;
+        color: #71717a;
+    }
+
+    /* Mobile Responsive Header Styles */
     @media (max-width: 768px) {
         .menu-toggle {
-            display: block; /* Show hamburger button on mobile */
+            display: block;
         }
 
         .links {
-            display: none; /* Hide default navbar links */
+            display: none;
             flex-direction: column;
             position: absolute;
             top: 100%;
             right: 0;
             background: var(--primary);
-            width: 200px;
-            padding: 1rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 220px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             border-bottom-left-radius: 8px;
             z-index: 99;
         }
 
         .links.active {
-            display: flex; /* Show menu when active */
+            display: flex;
         }
 
         .links a {
-            margin: 0.5rem 0;
+            margin: 0.6rem 0;
             margin-left: 0;
-            padding: 0.5rem;
-            text-align: right; /* Right align mobile menu items */
+            padding: 0.4rem 0;
+            text-align: right;
         }
     }
 </style>

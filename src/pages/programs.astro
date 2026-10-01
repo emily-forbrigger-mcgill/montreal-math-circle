@@ -10,8 +10,17 @@ import Layout from '../layouts/Layout.astro';
     <div class="explain-offer">The Montreal Math Circle offers diverse programs for youth of all backgrounds in math. Explore options below.</div>
 </header>
 <section class="programs-grid">
-    <div class="programs-card">
+    <div class="programs-card-title">
         <h1>Math for All</h1>
+    </div>
+    <div class="programs-card-text">
+        <p>In April 2027, we are hosting Math for All at McGill.</p>
+    </div>
+    <div class="programs-card-text">
+        <p>In the new academic year, we will begin hosting regular math circle sessions.</p>
+    </div>
+    <div class="programs-card-title">
+        <h1>Weekly Math Circles</h1>
     </div>
 </section>
 </Layout>
@@ -24,7 +33,7 @@ import Layout from '../layouts/Layout.astro';
 }
 .offerings {
         text-align: center;
-        padding: 3rem 1rem;
+        padding: 4rem 0rem;
         background: linear-gradient(to bottom, hsl(0, 75%, 9%), #da4747);
         border-radius: 12px;
         margin-bottom: 2rem;
@@ -46,16 +55,23 @@ import Layout from '../layouts/Layout.astro';
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
 }
-.programs-card {
-    text-align: left;
-    padding: 3rem 2rem 1rem 2rem;
+.programs-card-title {
+    padding: 1rem;
     background: linear-gradient(to bottom, #e37c7c, #f5c8c8);
     border-radius: 12px;
-    margin-bottom: 2rem;
+    padding: 2.45rem 0.5rem 0rem 0rem;
 }
 
-.programs-card h1 {
+.programs-card-title h1 {
     color: white;
+    text-align: center;
+}
 
+.programs-card-text {
+    text-align: left;
+    padding: 3rem 2rem 1rem 2rem;
+    background: linear-gradient(to bottom, #d09595, #ffffff);
+    border-radius: 12px;
+    margin-bottom: 2rem;
 }
 </style>

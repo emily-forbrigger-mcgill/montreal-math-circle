@@ -1,77 +1,329 @@
 ---
-// src/pages/index.astro
+// src/pages/programs.astro
 import Layout from '../layouts/Layout.astro';
 ---
-<Layout title="programs">
-<header class="header-columns">
-    <div class="offerings">
-       <h1>What We Offer</h1>
-    </div>
-    <div class="explain-offer">The Montreal Math Circle offers diverse programs for youth of all backgrounds in math. Explore options below.</div>
-</header>
-<section class="programs-grid">
-    <div class="programs-card-title">
-        <h1>Math for All</h1>
-    </div>
-    <div class="programs-card-text">
-        <p>In April 2027, we are hosting Math for All at McGill.</p>
-    </div>
-    <div class="programs-card-text">
-        <p>In the new academic year, we will begin hosting regular math circle sessions.</p>
-    </div>
-    <div class="programs-card-title">
-        <h1>Weekly Math Circles</h1>
-    </div>
-</section>
+
+<Layout title="Programs">
+    <!-- Page Header Section -->
+    <header class="header-columns">
+        <div class="offerings-banner">
+            <span class="meta-tag">[Program Overview]</span>
+            <h1>What We Offer</h1>
+        </div>
+        <div class="explain-offer">
+            <p>
+                The Montreal Math Circle offers diverse programs for youth of all backgrounds in math. Explore options below.
+            </p>
+        </div>
+    </header>
+
+    <!-- Programs Grid Section -->
+    <section class="programs-section">
+        <div class="programs-grid">
+            
+            <!-- Program Card 1: Math for All -->
+            <article class="program-card">
+                <div class="card-header">
+                    <span class="program-badge badge-event">[Annual Conference / Event]</span>
+                    <h2>Math for All</h2>
+                    <span class="program-date">April 2027 • McGill Campus</span>
+                </div>
+
+                <div class="card-body">
+                    <p class="program-description">
+                        In April 2027, we are hosting Math for All at McGill. [Insert additional conference details, keynote speaker overview, or workshop highlights here].
+                    </p>
+
+                    <div class="program-highlights">
+                        <h4>Program Highlights:</h4>
+                        <ul>
+                            <li>[Highlight 1: Guest lectures & workshops]</li>
+                            <li>[Highlight 2: Non-competitive problem solving]</li>
+                            <li>[Highlight 3: Free admission for registered students]</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <a href="https://sites.google.com/view/mathforallnola/home" target="_blank" rel="noopener noreferrer" class="cta-button primary-btn">
+                        Visit Math for All Portal ↗
+                    </a>
+                </div>
+            </article>
+
+            <!-- Program Card 2: Weekly Math Circles -->
+            <article class="program-card">
+                <div class="card-header">
+                    <span class="program-badge badge-recurring">[Recurring Workshop Series]</span>
+                    <h2>Weekly Math Circles</h2>
+                    <span class="program-date">[Academic Year Schedule / Frequency]</span>
+                </div>
+
+                <div class="card-body">
+                    <p class="program-description">
+                        In the new academic year, we will begin hosting regular math circle sessions. [Insert additional details on age group, weekly topics, or registration requirements here].
+                    </p>
+
+                    <div class="program-highlights">
+                        <h4>Program Highlights:</h4>
+                        <ul>
+                            <li>[Highlight 1: Hands-on exploration of advanced concepts]</li>
+                            <li>[Highlight 2: University student & faculty mentorship]</li>
+                            <li>[Highlight 3: Handouts & challenge problem sets]</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <a href="/schedule" class="cta-button secondary-btn">
+                        View Session Schedule &rarr;
+                    </a>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Bottom Registration Notice Placeholder -->
+    <section class="info-banner">
+        <div class="info-content">
+            <h3>[Registration & Eligibility Notice]</h3>
+            <p>[Insert details about registration deadlines, financial support/free admission, or target grade levels].</p>
+        </div>
+    </section>
 </Layout>
 
 <style>
-.header-columns {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 1rem;
-}
-.offerings {
+    /* Header Columns Layout */
+    .header-columns {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .header-columns {
+            grid-template-columns: 1fr 2fr;
+            align-items: center;
+        }
+    }
+
+    .offerings-banner {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2.5rem 1.75rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    }
+
+    .offerings-banner h1 {
+        font-size: 2.2rem;
+        color: var(--dark);
+        margin: 0.5rem 0 0 0;
+        letter-spacing: -0.02em;
+    }
+
+    .explain-offer {
+        background: var(--primary-light);
+        border: 1px solid rgba(168, 27, 36, 0.2);
+        border-radius: 12px;
+        padding: 2.25rem 2rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+    }
+
+    .explain-offer p {
+        color: var(--dark);
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    /* Programs Grid Section */
+    .programs-section {
+        margin-bottom: 3.5rem;
+    }
+
+    .programs-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .programs-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    /* Program Cards */
+    .program-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .program-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(168, 27, 36, 0.3);
+    }
+
+    .card-header {
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .program-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 0.75rem;
+    }
+
+    .badge-event {
+        background: var(--primary-light);
+        color: var(--primary);
+    }
+
+    .badge-recurring {
+        background: #f1f5f9;
+        color: #334155;
+    }
+
+    .card-header h2 {
+        font-size: 1.65rem;
+        color: var(--dark);
+        margin: 0 0 0.35rem 0;
+    }
+
+    .program-date {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    /* Card Body */
+    .program-description {
+        color: #475569;
+        font-size: 0.98rem;
+        line-height: 1.6;
+        margin: 0 0 1.5rem 0;
+    }
+
+    .program-highlights h4 {
+        font-size: 0.9rem;
+        color: var(--dark);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 0 0 0.75rem 0;
+    }
+
+    .program-highlights ul {
+        margin: 0 0 2rem 0;
+        padding-left: 1.25rem;
+        color: #475569;
+        font-size: 0.92rem;
+    }
+
+    .program-highlights li {
+        margin-bottom: 0.5rem;
+        line-height: 1.5;
+    }
+
+    /* Card Footer & Buttons */
+    .card-footer {
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .cta-button {
+        display: block;
         text-align: center;
-        padding: 4rem 0rem;
-        background: linear-gradient(to bottom, hsl(0, 75%, 9%), #da4747);
-        border-radius: 12px;
-        margin-bottom: 2rem;
+        text-decoration: none;
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
     }
-.offerings h1 {
-    font-size: 2.5rem;
-    color: #fbf3f2;
-    margin: 0 0 1rem 0;
-}
-.explain-offer {
-        text-align: left;
-        padding: 3rem 2rem 1rem 2rem;
-        background: linear-gradient(to bottom, #fcddd6, #ae6868);
-        border-radius: 12px;
-        margin-bottom: 2rem;
+
+    .primary-btn {
+        background: var(--primary);
+        color: #ffffff;
+        border: 1px solid var(--primary);
     }
-.programs-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
-.programs-card-title {
-    padding: 1rem;
-    background: linear-gradient(to bottom, #e37c7c, #f5c8c8);
-    border-radius: 12px;
-    padding: 2.45rem 0.5rem 0rem 0rem;
-}
 
-.programs-card-title h1 {
-    color: white;
-    text-align: center;
-}
+    .primary-btn:hover {
+        opacity: 0.92;
+    }
 
-.programs-card-text {
-    text-align: left;
-    padding: 3rem 2rem 1rem 2rem;
-    background: linear-gradient(to bottom, #d09595, #ffffff);
-    border-radius: 12px;
-    margin-bottom: 2rem;
-}
+    .secondary-btn {
+        background: #f8fafc;
+        color: var(--dark);
+        border: 1px solid var(--border-color);
+    }
+
+    .secondary-btn:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+
+    /* Info Banner Footer */
+    .info-banner {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.75rem 2rem;
+        text-align: center;
+    }
+
+    .info-content h3 {
+        margin: 0 0 0.4rem 0;
+        font-size: 1.15rem;
+        color: var(--dark);
+    }
+
+    .info-content p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+    }
+
+    /* Mobile Responsive Overrides */
+    @media (max-width: 768px) {
+        .offerings-banner {
+            padding: 1.75rem 1.25rem;
+        }
+
+        .offerings-banner h1 {
+            font-size: 1.85rem;
+        }
+
+        .explain-offer {
+            padding: 1.5rem 1.25rem;
+        }
+
+        .explain-offer p {
+            font-size: 1rem;
+        }
+
+        .program-card {
+            padding: 1.5rem;
+        }
+    }
 </style>

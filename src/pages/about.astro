@@ -1,25 +1,288 @@
 ---
-// src/pages/index.astro
-    import Layout from '../layouts/Layout.astro';
+// src/pages/about.astro
+import Layout from '../layouts/Layout.astro';
 ---
-<Layout title="about">
+
+<Layout title="About">
+    <!-- Hero / Header Section -->
     <header class="our-story">
-        <h1>Our Story</h1>
-        <p>Why and how we're changing math in Montreal.</p>
+        <div class="story-content">
+            <span class="meta-tag">[About Us / Our Mission]</span>
+            <h1>Our Story</h1>
+            <p class="subtitle">
+                [Insert mission statement or overview of why and how we are changing math education in Montreal].
+            </p>
+        </div>
     </header>
+
+    <!-- Mission & Core Values Grid -->
+    <section class="about-grid">
+        <article class="about-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            </div>
+            <h3>[Our Mission]</h3>
+            <p>[Insert details about core educational goals, accessibility initiatives, or non-competitive problem-solving focus].</p>
+        </article>
+
+        <article class="about-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <h3>[Community & Mentorship]</h3>
+            <p>[Insert details about university mentorship programs, high school/CEGEP involvement, and workshop culture].</p>
+        </article>
+    </section>
+
+    <!-- Meet the Team Section -->
+    <section class="team-section">
+        <div class="section-header">
+            <span class="meta-tag">Leadership & Mentors</span>
+            <h2>Meet the Team</h2>
+            <p class="section-subtitle">[Insert brief description about the organizers, faculty advisors, and student mentors].</p>
+        </div>
+
+        <div class="team-grid">
+            <!-- Team Member 1 -->
+            <article class="team-card">
+                <div class="avatar-placeholder">
+                    <span>[Photo]</span>
+                </div>
+                <div class="team-info">
+                    <h3>[Member Name 1]</h3>
+                    <span class="team-role">[Role / Title]</span>
+                    <p class="team-bio">[Brief bio / academic background / research interests or circle responsibilities].</p>
+                    <div class="team-links">
+                        <a href="#" class="team-link">[Email / Website]</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Team Member 2 -->
+            <article class="team-card">
+                <div class="avatar-placeholder">
+                    <span>[Photo]</span>
+                </div>
+                <div class="team-info">
+                    <h3>[Member Name 2]</h3>
+                    <span class="team-role">[Role / Title]</span>
+                    <p class="team-bio">[Brief bio / academic background / research interests or circle responsibilities].</p>
+                    <div class="team-links">
+                        <a href="#" class="team-link">[Email / Website]</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Team Member 3 -->
+            <article class="team-card">
+                <div class="avatar-placeholder">
+                    <span>[Photo]</span>
+                </div>
+                <div class="team-info">
+                    <h3>[Member Name 3]</h3>
+                    <span class="team-role">[Role / Title]</span>
+                    <p class="team-bio">[Brief bio / academic background / research interests or circle responsibilities].</p>
+                    <div class="team-links">
+                        <a href="#" class="team-link">[Email / Website]</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
 </Layout>
 
 <style>
+    /* Hero Story Header */
     .our-story {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 3.5rem 2rem;
+        margin-bottom: 2.5rem;
         text-align: center;
-        padding: 3rem 1rem;
-        background: linear-gradient(to bottom, #f4f6f9, #ffffff);
-        border-radius: 12px;
-        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     }
+
+    .story-content {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
     .our-story h1 {
         font-size: 2.5rem;
-        color: #cf3f37;
-        margin: 0 0 1rem 0;
+        color: var(--dark);
+        margin: 0.75rem 0 1rem 0;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* About Mission Grid */
+    .about-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3.5rem;
+    }
+
+    .about-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.75rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .card-icon {
+        color: var(--primary);
+        background: var(--primary-light);
+        padding: 0.6rem;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .about-card h3 {
+        margin: 0 0 0.6rem 0;
+        font-size: 1.25rem;
+        color: var(--dark);
+    }
+
+    .about-card p {
+        color: #475569;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Meet the Team Section */
+    .team-section {
+        margin-bottom: 4rem;
+    }
+
+    .section-header {
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto 2.5rem auto;
+    }
+
+    .section-header h2 {
+        font-size: 2rem;
+        color: var(--dark);
+        margin: 0.5rem 0;
+        letter-spacing: -0.01em;
+    }
+
+    .section-subtitle {
+        color: var(--text-muted);
+        font-size: 0.98rem;
+        margin: 0;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.75rem;
+    }
+
+    .team-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .team-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(168, 27, 36, 0.3);
+    }
+
+    .avatar-placeholder {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        border: 2px dashed #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+    }
+
+    .team-info h3 {
+        font-size: 1.18rem;
+        color: var(--dark);
+        margin: 0 0 0.25rem 0;
+    }
+
+    .team-role {
+        display: inline-block;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.85rem;
+    }
+
+    .team-bio {
+        font-size: 0.9rem;
+        color: #475569;
+        line-height: 1.55;
+        margin: 0 0 1.25rem 0;
+    }
+
+    .team-links {
+        border-top: 1px solid var(--border-color);
+        padding-top: 0.85rem;
+        width: 100%;
+    }
+
+    .team-link {
+        font-size: 0.85rem;
+        color: var(--dark);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .team-link:hover {
+        color: var(--primary);
+    }
+
+    /* Mobile Overrides */
+    @media (max-width: 768px) {
+        .our-story {
+            padding: 2rem 1.25rem;
+        }
+
+        .our-story h1 {
+            font-size: 1.85rem;
+        }
+
+        .subtitle {
+            font-size: 0.98rem;
+        }
+
+        .team-card {
+            padding: 1.25rem;
+        }
     }
 </style>

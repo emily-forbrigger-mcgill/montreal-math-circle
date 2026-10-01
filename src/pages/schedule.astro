@@ -6,37 +6,69 @@ import Layout from '../layouts/Layout.astro';
 <Layout title="Schedule">
     <!-- Main Page Header -->
     <header class="page-header">
-        <h1>Circle Schedule & Logistics</h1>
-        <p>Sessions meet on TBD days!</p>
+        <div class="header-content">
+            <span class="meta-tag">Event Overview</span>
+            <h1>Circle Schedule & Logistics</h1>
+            <p class="subtitle">Sessions meet on TBD days!</p>
+        </div>
     </header>
 
     <!-- Essential Layout Stack -->
     <div class="schedule-container">
         
-        <!-- Left Side: Simple List of Dates -->
+        <!-- Left Side: Interactive Timeline of Dates -->
         <main class="dates-list">
-            <h2>Upcoming Events</h2>
+            <h2 class="section-title">Upcoming Events</h2>
             
-            <div class="date-row">
-                <span class="date-badge">April 2 and 3, 2027</span>
-                <div class="date-details">
-                    <h3>Math for All 2027</h3>
-                    <p>Guest Speaker: TBD</p>
-                </div>
-            </div>
+            <div class="timeline">
+                <article class="timeline-card">
+                    <div class="timeline-badge-column">
+                        <span class="date-badge">April 2 and 3, 2027</span>
+                    </div>
+                    <div class="timeline-content">
+                        <h3>Math for All 2027</h3>
+                        <p class="speaker-text">Guest Speaker: TBD</p>
+                    </div>
+                </article>
             </div>
         </main>
 
         <!-- Right Side: Essential Logistics Box -->
         <aside class="sidebar">
             <div class="logistics-box">
-                <h2>📍 Location</h2>
-                <p><strong>Building:</strong> Probably Burnside</p>
-                <p><strong>Room:</strong> 9th-12th Floor, Somewhere</p>
-                <hr />
-                <p><strong>Parking:</strong> TBD.</p>
-                <a href="https://google.com" target="_blank" class="map-button">Open Google Maps ↗</a>
-                <a href="https://sites.google.com/view/mathforallnola/home" target="_blank" class="map-button">Visit Math for All 2027↗</a>
+                <div class="logistics-header">
+                    <span class="location-icon">📍</span>
+                    <h2>Location</h2>
+                </div>
+                
+                <div class="logistics-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Building:</span>
+                        <span class="detail-value">Probably Burnside</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Room:</span>
+                        <span class="detail-value">9th-12th Floor, Somewhere</span>
+                    </div>
+                </div>
+
+                <hr class="divider" />
+
+                <div class="logistics-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Parking:</span>
+                        <span class="detail-value">TBD.</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="https://google.com" target="_blank" rel="noopener noreferrer" class="map-button primary-btn">
+                        Open Google Maps ↗
+                    </a>
+                    <a href="https://sites.google.com/view/mathforallnola/home" target="_blank" rel="noopener noreferrer" class="map-button secondary-btn">
+                        Visit Math for All 2027↗
+                    </a>
+                </div>
             </div>
         </aside>
 
@@ -44,63 +76,216 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
-    /* Headers */
-    h1 { color: #003366; margin: 0 0 0.5rem 0; }
-    h2 { color: #003366; margin-top: 0; font-size: 1.5rem; }
-    .page-header { margin-bottom: 2.5rem; }
+    /* Header Section */
+    .page-header {
+        margin-bottom: 2.5rem;
+    }
 
-    /* Layout structure: Stacks on mobile, side-by-side on desktop */
+    .page-header h1 {
+        font-size: 2.25rem;
+        color: var(--dark);
+        margin: 0.6rem 0 0.5rem 0;
+        letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    /* Layout structure */
     .schedule-container {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 2.5rem;
+        gap: 2rem;
+        margin-bottom: 3rem;
     }
+
     @media (min-width: 768px) {
         .schedule-container {
-            grid-template-columns: 2fr 1fr; /* Left section is wider than the right */
+            grid-template-columns: 1.8fr 1.2fr;
+            align-items: start;
         }
     }
 
-    /* Date Rows Layout */
-    .date-row {
-        display: flex;
-        gap: 1.5rem;
-        align-items: center;
-        padding: 1rem 0;
-        border-bottom: 1px solid #e2e8f0;
+    .section-title {
+        font-size: 1.35rem;
+        color: var(--dark);
+        margin: 0 0 1.25rem 0;
     }
-    .date-badge {
-        background: #003366;
-        color: white;
-        font-weight: bold;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        min-width: 60px;
-        text-align: center;
-    }
-    .date-details h3 { margin: 0 0 0.25rem 0; font-size: 1.2rem; }
-    .date-details p { margin: 0; color: #555; font-style: italic; }
 
-    /* Simple Logistics Box styling */
-    .logistics-box {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        padding: 1.5rem;
-        border-radius: 8px;
+    /* Timeline Section Styling */
+    .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
     }
-    .logistics-box hr { border: 0; border-top: 1px solid #e2e8f0; margin: 1rem 0; }
-    .logistics-box p { color: #333; line-height: 1.5; margin: 0.5rem 0; }
-    
+
+    .timeline-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .timeline-card:hover {
+        border-color: rgba(168, 27, 36, 0.3);
+        transform: translateY(-2px);
+    }
+
+    @media (min-width: 480px) {
+        .timeline-card {
+            flex-direction: row;
+            align-items: center;
+            gap: 1.5rem;
+        }
+    }
+
+    .date-badge {
+        background: var(--primary);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.55rem 0.95rem;
+        border-radius: 8px;
+        display: inline-block;
+        white-space: nowrap;
+        box-shadow: 0 2px 6px rgba(168, 27, 36, 0.2);
+    }
+
+    .timeline-content h3 {
+        margin: 0 0 0.35rem 0;
+        font-size: 1.2rem;
+        color: var(--dark);
+    }
+
+    .speaker-text {
+        margin: 0;
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 0.95rem;
+    }
+
+    /* Logistics Box Styling */
+    .sidebar {
+        position: sticky;
+        top: 2rem;
+    }
+
+    .logistics-box {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.75rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    }
+
+    .logistics-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .logistics-header h2 {
+        color: var(--dark);
+        margin: 0;
+        font-size: 1.3rem;
+    }
+
+    .location-icon {
+        font-size: 1.2rem;
+    }
+
+    .logistics-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .detail-row {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+
+    @media (min-width: 400px) {
+        .detail-row {
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+    }
+
+    .detail-label {
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .detail-value {
+        color: #475569;
+    }
+
+    .divider {
+        border: 0;
+        border-top: 1px solid var(--border-color);
+        margin: 1.25rem 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
     .map-button {
         display: block;
         text-align: center;
-        background: #eef2f7;
-        color: #003366;
         text-decoration: none;
-        padding: 0.6rem;
-        border-radius: 6px;
-        font-weight: bold;
-        margin-top: 1rem;
-        border: 1px solid #003366;
+        padding: 0.65rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .primary-btn {
+        background: var(--primary);
+        color: #ffffff;
+        border: 1px solid var(--primary);
+    }
+
+    .primary-btn:hover {
+        opacity: 0.92;
+    }
+
+    .secondary-btn {
+        background: #f8fafc;
+        color: var(--dark);
+        border: 1px solid var(--border-color);
+    }
+
+    .secondary-btn:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+
+    /* Mobile Overrides */
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 1.85rem;
+        }
+
+        .logistics-box {
+            padding: 1.25rem;
+        }
     }
 </style>

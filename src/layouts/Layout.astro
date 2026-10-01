@@ -11,7 +11,14 @@ const { title } = Astro.props;
 <body class="site-wrapper">
     <nav class="navbar">
         <div class="logo">Montreal Math Circle</div>
-        <div class="links">
+        
+        <!-- Toggle Button for Mobile -->
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation menu">
+            <span class="hamburger"></span>
+        </button>
+
+        <!-- Navigation Links -->
+        <div class="links" id="nav-links">
             <a href="/">Home</a>
             <a href="/schedule">Schedule</a>
             <a href="/resources">Resources</a>
@@ -30,6 +37,17 @@ const { title } = Astro.props;
         </div>
         <p>© 2026 Montreal Math Circle.</p>
     </footer>
+
+    <!-- Client-side script to handle menu toggle -->
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const navLinks = document.getElementById('nav-links');
+
+        menuToggle?.addEventListener('click', () => {
+            navLinks?.classList.toggle('active');
+            menuToggle?.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>
 
@@ -38,9 +56,90 @@ const { title } = Astro.props;
     body { margin: 0; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif, sans-serif; color: var(--dark); }
     .site-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
     .content-area { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-    .navbar { display: flex; justify-content: space-between; background: var(--primary); color: white; padding: 1rem 2rem; }
+    
+    /* Navbar Layout */
+    .navbar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 1rem 2rem; position: relative; }
     .navbar a { color: white; text-decoration: none; margin-left: 1.5rem; }
+    
+    /* Hamburger Menu Button (Hidden by default on Desktop) */
+    .menu-toggle {
+        display: none;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        z-index: 100;
+    }
+
+    .hamburger {
+        display: block;
+        width: 25px;
+        height: 3px;
+        background: white;
+        position: relative;
+        transition: background 0.3s ease-in-out;
+    }
+
+    .hamburger::before,
+    .hamburger::after {
+        content: '';
+        position: absolute;
+        width: 25px;
+        height: 3px;
+        background: white;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .hamburger::before { transform: translateY(-8px); }
+    .hamburger::after { transform: translateY(8px); }
+
+    /* Animated 'X' when open */
+    .menu-toggle.active .hamburger {
+        background: transparent;
+    }
+
+    .menu-toggle.active .hamburger::before {
+        transform: rotate(45deg);
+    }
+
+    .menu-toggle.active .hamburger::after {
+        transform: rotate(-45deg);
+    }
+
+    /* Footer Styles */
     .footer { background: #e0948e; text-align: center; padding: 0rem 0 1rem 0; font-size: 0.9rem; }
-    .contact-footer {display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;background: #bba9a7; text-align: center; padding: 1rem; font-size: 0.9rem; }
-    .email-list {text-align: left; padding-left: 1rem; line-height: 150%; color:#2f2523;}
+    .contact-footer { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; background: #bba9a7; text-align: center; padding: 1rem; font-size: 0.9rem; }
+    .email-list { text-align: left; padding-left: 1rem; line-height: 150%; color:#2f2523; }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+        .menu-toggle {
+            display: block; /* Show hamburger button on mobile */
+        }
+
+        .links {
+            display: none; /* Hide default navbar links */
+            flex-direction: column;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--primary);
+            width: 200px;
+            padding: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-bottom-left-radius: 8px;
+            z-index: 99;
+        }
+
+        .links.active {
+            display: flex; /* Show menu when active */
+        }
+
+        .links a {
+            margin: 0.5rem 0;
+            margin-left: 0;
+            padding: 0.5rem;
+            text-align: right; /* Right align mobile menu items */
+        }
+    }
 </style>

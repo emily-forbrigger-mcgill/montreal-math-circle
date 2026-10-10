@@ -15,8 +15,10 @@ const { title } = Astro.props;
 </head>
 <body class="site-wrapper">
     <nav class="navbar">
-        <img src="/mmc-logo-v1.png" alt="Montreal Math Circle Logo" class="site-logo" />
-        <div class="logo">Montreal Math Circle</div>
+        <a href="/" class="nav-brand">
+            <img src="/mmc-logo-v1.png" alt="Montreal Math Circle Logo" class="site-logo" />
+            <span class="logo">Montreal Math Circle</span>
+        </a>
         
         <!-- Toggle Button for Mobile -->
         <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation menu">
@@ -112,6 +114,31 @@ const { title } = Astro.props;
 
     .site-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
     
+    /* Navbar Brand Link Wrapper */
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: white;
+    }
+
+    .site-logo {
+        height: 38px;
+        width: auto;
+        display: block;
+        object-fit: contain;
+        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+    }
+
+    .logo {
+        font-size: 1.35rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin: 0 0.5rem 0 0;
+        white-space: nowrap;
+    }
+
     /* Content Area - Responsive padding */
     .content-area { 
         flex: 1; 
@@ -132,12 +159,6 @@ const { title } = Astro.props;
         padding: 1.1rem 2rem; 
         position: relative;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    }
-
-    .logo {
-        font-size: 1.25rem;
-        font-weight: 600;
-        letter-spacing: -0.01em;
     }
 
     .navbar a { 
@@ -302,7 +323,7 @@ const { title } = Astro.props;
         text-decoration: none;
         font-size: 0.9rem;
         transition: color 0.2s ease;
-        word-break: break-word; /* Prevents long emails from overflowing screen width */
+        word-break: break-word;
     }
 
     .footer-links a:hover, .email-list a:hover {
@@ -322,12 +343,10 @@ const { title } = Astro.props;
 
     /* Mobile Responsive Overrides */
     @media (max-width: 768px) {
-        /* Main Content Padding for Phones */
         .content-area {
             padding: 1.5rem 1rem;
         }
 
-        /* Mobile Navigation Header */
         .menu-toggle {
             display: block;
         }
@@ -357,7 +376,6 @@ const { title } = Astro.props;
             text-align: right;
         }
 
-        /* Footer Mobile Layout */
         .footer {
             padding: 2.5rem 1.25rem 1.25rem;
         }

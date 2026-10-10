@@ -8,6 +8,7 @@ const title = "Members | Montreal Math Circle";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+
     <style>
       body {
         margin: 0;
@@ -15,27 +16,62 @@ const title = "Members | Montreal Math Circle";
         background: #f5f7fa;
         color: #202b3c;
       }
+
       main {
-        max-width: 720px;
-        margin: 7vh auto;
+        max-width: 900px;
+        margin: 5vh auto;
         padding: 24px;
       }
+
+      h1 {
+        margin-bottom: 8px;
+      }
+
+      .subtitle {
+        color: #596579;
+        margin-bottom: 32px;
+      }
+
+      .sections {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
       .panel {
         background: white;
         border-radius: 12px;
-        padding: 28px;
-        margin-top: 24px;
+        padding: 26px;
         box-shadow: 0 4px 24px #172b4d12;
       }
+
+      .panel h2 {
+        margin-top: 0;
+      }
+
+      .panel p {
+        line-height: 1.6;
+        color: #596579;
+      }
+
       .button {
         display: inline-block;
         background: #203e65;
         color: white;
-        padding: 13px 18px;
+        padding: 12px 18px;
         border-radius: 6px;
         text-decoration: none;
-        margin-top: 12px;
+        margin-top: 8px;
       }
+
+      .button:hover {
+        background: #315785;
+      }
+
+      .logout-area {
+        margin-top: 28px;
+      }
+
       button {
         padding: 10px 16px;
         border: 1px solid #ccd3dd;
@@ -43,34 +79,80 @@ const title = "Members | Montreal Math Circle";
         background: white;
         cursor: pointer;
       }
+
+      #status:empty {
+        display: none;
+      }
+
+      @media (max-width: 600px) {
+        main {
+          margin: 2vh auto;
+          padding: 18px;
+        }
+
+        .sections {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
+
   <body>
     <main>
       <h1>Montreal Math Circle</h1>
-      <p>Members' area</p>
+      <p class="subtitle">Members' area</p>
 
-      <section class="panel" id="portal" hidden>
+      <section id="portal" hidden>
         <h2>Welcome, <span id="member-name"></span>!</h2>
-        <p>
-          Visit our Groups.io group to join discussions, read messages,
-          and keep up with announcements.
-        </p>
+        <p>Find discussions, shared resources, and upcoming events below.</p>
 
-        
-        <a
-          class="button"
-          href="https://groups.io/g/montrealmathcircle/messages?expanded=1"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Open our Groups.io group →
-        </a>
+        <div class="sections">
+          <section class="panel">
+            <h2>Discussion Board</h2>
+            <p>
+              Join conversations, read messages, and keep up with
+              Montreal Math Circle announcements.
+            </p>
+            <a
+              class="button"
+              href="https://groups.io/g/montrealmathcircle/messages?expanded=1"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Discussion Board →
+            </a>
+          </section>
 
+          <section class="panel">
+            <h2>Shared Files</h2>
+            <p>
+              Find documents, notes, and other resources shared
+              with Montreal Math Circle members.
+            </p>
 
-        <p style="margin-top: 24px">
+            <!-- Add links to your published files here. -->
+          </section>
+
+          <section class="panel">
+            <h2>Calendar</h2>
+            <p>
+              View upcoming meetings, activities, and other
+              Montreal Math Circle events.
+            </p>
+            <a
+              class="button"
+              href="https://groups.io/g/montrealmathcircle/calendar"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Calendar →
+            </a>
+          </section>
+        </div>
+
+        <div class="logout-area">
           <button id="logout" type="button">Sign out</button>
-        </p>
+        </div>
       </section>
 
       <p id="status" role="status" aria-live="polite">
@@ -124,8 +206,7 @@ const title = "Members | Montreal Math Circle";
 
             window.location.replace("/members/login");
           } catch {
-            status.textContent =
-              "Unable to sign out. Please try again.";
+            status.textContent = "Unable to sign out. Please try again.";
           }
         });
 
@@ -133,4 +214,5 @@ const title = "Members | Montreal Math Circle";
     </script>
   </body>
 </html>
+
 

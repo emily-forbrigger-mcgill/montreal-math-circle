@@ -11,10 +11,10 @@ const { title } = Astro.props;
     <!-- Favicon / Browser Tab Icon -->
     <link rel="icon" type="image/png" href="/mmc-logo-header.png" />
     
-    <!-- Google Fonts Import (Space Grotesk + Plus Jakarta Sans + Fira Code) -->
+    <!-- Google Fonts Import (Mali + Plus Jakarta Sans + Fira Code) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Mali:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body class="site-wrapper">
     <nav class="navbar">
@@ -93,12 +93,13 @@ const { title } = Astro.props;
     :root { 
         --primary: #a81b24; /* McGill Burgundy / Red */
         --primary-light: #fcf1f2;
+        --primary-accent: #f4d0d2;
         --dark: #18181b;
         --text-muted: #64748b;
         --border-color: #e2e8f0;
         
         /* Font Variables */
-        --font-heading: 'Space Grotesk', system-ui, sans-serif;
+        --font-heading: 'Mali', cursive, system-ui, sans-serif;
         --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
         --font-mono: 'Fira Code', monospace;
     }
@@ -106,13 +107,17 @@ const { title } = Astro.props;
     body { 
         margin: 0; 
         font-family: var(--font-body); 
+        font-size: 1rem;
         color: var(--dark);
-        background-color: #fcfcfd;
+        background-color: #fafbfc;
+        line-height: 1.6;
     }
 
     /* Apply Heading Font across all headers & titles */
     h1, h2, h3, h4, .logo, .footer-brand {
         font-family: var(--font-heading);
+        font-weight: 700;
+        text-transform: none;
     }
 
     .site-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
@@ -120,26 +125,30 @@ const { title } = Astro.props;
     /* Navbar Brand Link Wrapper */
     .nav-brand {
         display: flex;
+        flex-direction: row;
         align-items: center;
         gap: 0.75rem;
         text-decoration: none;
         color: white;
+        flex-shrink: 1;
+        min-width: 0;
     }
 
     .site-logo {
         height: 38px;
         width: auto;
         display: block;
+        flex-shrink: 0;
         object-fit: contain;
-        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
     }
 
     .logo {
-        font-size: 1.35rem;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-        margin: 0 0.5rem 0 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1;
         white-space: nowrap;
+        display: inline-block;
     }
 
     /* Content Area - Responsive padding */
@@ -155,13 +164,14 @@ const { title } = Astro.props;
     /* Navbar Layout */
     .navbar { 
         display: flex; 
+        flex-direction: row;
         justify-content: space-between; 
         align-items: center; 
         background: var(--primary); 
         color: white; 
-        padding: 1.1rem 2rem; 
+        padding: 1rem 1.5rem; 
         position: relative;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 12px rgba(168, 27, 36, 0.12);
     }
 
     .navbar a { 
@@ -185,6 +195,7 @@ const { title } = Astro.props;
         cursor: pointer;
         padding: 0.5rem;
         z-index: 100;
+        flex-shrink: 0;
     }
 
     .hamburger {
@@ -194,6 +205,7 @@ const { title } = Astro.props;
         background: white;
         position: relative;
         transition: background 0.3s ease-in-out;
+        border-radius: 2px;
     }
 
     .hamburger::before,
@@ -204,6 +216,7 @@ const { title } = Astro.props;
         height: 3px;
         background: white;
         transition: transform 0.3s ease-in-out;
+        border-radius: 2px;
     }
 
     .hamburger::before { transform: translateY(-8px); }
@@ -259,7 +272,7 @@ const { title } = Astro.props;
     /* Monospace Tag Style */
     .meta-tag {
         font-family: var(--font-mono);
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         font-weight: 500;
         color: var(--primary);
         background: var(--primary-light);
@@ -290,7 +303,7 @@ const { title } = Astro.props;
 
     .footer-brand {
         font-size: 1.25rem;
-        font-weight: 600;
+        font-weight: 700;
         color: #ffffff;
         margin-bottom: 0.75rem;
     }
@@ -299,7 +312,7 @@ const { title } = Astro.props;
         font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color: var(--primary-light);
+        color: var(--primary-accent);
         margin-top: 0;
         margin-bottom: 1rem;
     }
@@ -347,12 +360,12 @@ const { title } = Astro.props;
     /* Mobile Responsive Overrides */
     @media (max-width: 768px) {
         .navbar {
-            padding: 0.75rem 0.75rem; /* Removes side padding entirely from navbar to stick the logo to the left edge */
+            padding: 0.75rem 0.85rem;
         }
 
         .nav-brand {
-            gap: 0.4rem;
-            max-width: calc(100% - 45px);
+            gap: 0.5rem;
+            max-width: calc(100% - 40px);
         }
 
         .site-logo {
@@ -361,8 +374,9 @@ const { title } = Astro.props;
 
         .logo {
             font-size: 1.05rem;
-            white-space: normal; /* Fixes title wrapping */
-            line-height: 1.15;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .content-area {

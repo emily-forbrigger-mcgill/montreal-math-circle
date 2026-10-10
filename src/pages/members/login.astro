@@ -1,111 +1,73 @@
 
 ---
-const title = "Member Login | Montreal Math Circle";
+const apiUrl = "https://api.montrealmathcircle.com";
 ---
 
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f5f7fa;
-        color: #202b3c;
-      }
-      main {
-        max-width: 400px;
-        margin: 10vh auto;
-        padding: 32px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 24px #172b4d12;
-      }
-      h1 { font-size: 1.7rem; }
-      label { display: block; margin-top: 18px; }
-      input {
-        box-sizing: border-box;
-        width: 100%;
-        padding: 12px;
-        margin-top: 6px;
-        border: 1px solid #ccd3dd;
-        border-radius: 6px;
-        font-size: 1rem;
-      }
-      button {
-        width: 100%;
-        margin-top: 24px;
-        padding: 12px;
-        border: 0;
-        border-radius: 6px;
-        background: #203e65;
-        color: white;
-        font-size: 1rem;
-        cursor: pointer;
-      }
-      #message { margin-top: 16px; }
-    </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Member Login | Montreal Math Circle</title>
   </head>
+
   <body>
     <main>
-      <h1>Member Login</h1>
-      <p>Montreal Math Circle</p>
+      <h1>Montreal Math Circle</h1>
+      <h2>Member Login</h2>
+      <p>Enter your assigned username and the member password to continue.</p>
 
       <form id="login-form">
-        <label for="name">Your name</label>
-        <input id="name" name="name" autocomplete="username" required />
-
-        <label for="code">Access code</label>
+        <label for="username">Username</label>
         <input
-          id="code"
-          name="code"
+          id="username"
+          name="username"
+          type="text"
+          placeholder="jane.smith.mathcircle"
+          autocomplete="username"
+          required
+        />
+
+        <label for="password">Member password</label>
+        <input
+          id="password"
+          name="password"
           type="password"
           autocomplete="current-password"
           required
         />
 
-        <button type="submit">Sign in</button>
-        <p id="message" role="status" aria-live="polite"></p>
+        <button type="submit">Log in</button>
+        <p id="message" role="status"></p>
       </form>
     </main>
 
-    <script>
-      const form = document.querySelector<HTMLFormElement>("#login-form")!;
-      const message = document.querySelector<HTMLElement>("#message")!;
+    <script define:vars={{ apiUrl }}>
+      const form = document.querySelector("#login-form");
+      const message = document.querySelector("#message");
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        message.textContent = "Signing in…";
+        message.textContent = "Signing in...";
 
-        const name = (
-          document.querySelector<HTMLInputElement>("#name")!
-        ).value.trim();
-        const code = (
-          document.querySelector<HTMLInputElement>("#code")!
-        ).value;
+        const username = document.querySelector("#username").value.trim();
+        const password = document.querySelector("#password").value;
 
         try {
-          const response = await fetch(
-            "https://api.montrealmathcircle.com/login",
-            {
-              method: "POST",
-              credentials: "include",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ name, code }),
-            }
-          );
+          const response = await fetch(`${apiUrl}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ username, password }),
+          });
 
           const result = await response.json();
 
-          if (!response.ok || !result.success) {
+          if (response.ok && result.success) {
+            window.location.href = "/members/";
+          } else {
             message.textContent =
-              "Sign-in failed. Check your name and access code.";
-            return;
+              result.error || "Login failed. Check your username and password.";
           }
-
-          window.location.href = "/members/";
         } catch {
           message.textContent =
             "Unable to connect. Please try again later.";

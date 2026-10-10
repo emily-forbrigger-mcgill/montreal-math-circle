@@ -346,12 +346,32 @@ const { title } = Astro.props;
 
     /* Mobile Responsive Overrides */
     @media (max-width: 768px) {
+        .navbar {
+            padding: 0.75rem 0.75rem; /* Removes side padding entirely from navbar to stick the logo to the left edge */
+        }
+
+        .nav-brand {
+            gap: 0.4rem;
+            max-width: calc(100% - 45px);
+        }
+
+        .site-logo {
+            height: 30px;
+        }
+
+        .logo {
+            font-size: 1.05rem;
+            white-space: normal; /* Fixes title wrapping */
+            line-height: 1.15;
+        }
+
         .content-area {
             padding: 1.5rem 1rem;
         }
 
         .menu-toggle {
             display: block;
+            padding-right: 0.25rem;
         }
 
         .links {

@@ -8,91 +8,95 @@ const title = "Members | Montreal Math Circle";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
-
     <style>
-      body {
-        margin: 0;
+      :root {
         font-family: Arial, sans-serif;
-        background: #f5f7fa;
         color: #202b3c;
+        background: #f5f7fa;
       }
 
-      main {
-        max-width: 900px;
-        margin: 5vh auto;
-        padding: 24px;
-      }
+      * { box-sizing: border-box; }
 
-      h1 {
-        margin-bottom: 8px;
-      }
-
-      .subtitle {
-        color: #596579;
-        margin-bottom: 32px;
-      }
-
-      .sections {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px;
-      }
-
+      body { margin: 0; }
+      main { max-width: 1100px; margin: 4vh auto; padding: 24px; }
+      h1 { margin-bottom: 8px; }
+      h2 { margin-top: 0; }
+      .subtitle { color: #596579; margin-bottom: 28px; }
+      .muted { color: #596579; line-height: 1.6; }
+      .sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
       .panel {
         background: white;
         border-radius: 12px;
-        padding: 26px;
+        padding: 24px;
         box-shadow: 0 4px 24px #172b4d12;
+        min-width: 0;
       }
-
-      .panel h2 {
-        margin-top: 0;
-      }
-
-      .panel p {
-        line-height: 1.6;
-        color: #596579;
-      }
-
-      .button {
+      .panel p { color: #596579; line-height: 1.6; }
+      .wide { grid-column: 1 / -1; }
+      .button, button {
         display: inline-block;
         background: #203e65;
         color: white;
-        padding: 12px 18px;
+        padding: 11px 16px;
+        border: 0;
         border-radius: 6px;
         text-decoration: none;
-        margin-top: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
       }
-
-      .button:hover {
-        background: #315785;
+      .button:hover, button:hover { background: #315785; }
+      button:disabled { opacity: .55; cursor: wait; }
+      .secondary {
+        background: white;
+        color: #203e65;
+        border: 1px solid #ccd3dd;
       }
-
-      .logout-area {
-        margin-top: 28px;
-      }
-
-      button {
-        padding: 10px 16px;
+      .secondary:hover { background: #edf2f7; }
+      .danger { background: #a12828; }
+      .danger:hover { background: #821e1e; }
+      .field { display: grid; gap: 6px; margin: 14px 0; }
+      label { font-size: 14px; font-weight: 600; }
+      input, select {
+        width: 100%;
+        padding: 11px;
         border: 1px solid #ccd3dd;
         border-radius: 6px;
+        font: inherit;
         background: white;
-        cursor: pointer;
       }
-
-      #status:empty {
-        display: none;
+      input[type="checkbox"] { width: auto; }
+      .checkrow { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+      .checkrow label { font-weight: 400; }
+      .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+      .item {
+        padding: 14px 0;
+        border-top: 1px solid #e1e6ed;
+        overflow-wrap: anywhere;
       }
-
-      @media (max-width: 600px) {
-        main {
-          margin: 2vh auto;
-          padding: 18px;
-        }
-
-        .sections {
-          grid-template-columns: 1fr;
-        }
+      .item:first-child { border-top: 0; }
+      .item-title { font-weight: 700; margin-bottom: 6px; }
+      .meta { color: #596579; font-size: 13px; line-height: 1.6; }
+      .badge {
+        display: inline-block;
+        border-radius: 20px;
+        background: #edf2f7;
+        color: #334155;
+        padding: 4px 9px;
+        font-size: 12px;
+        margin: 3px 0;
+      }
+      .notice { margin: 16px 0; padding: 12px; border-radius: 6px; background: #edf2f7; line-height: 1.5; }
+      .notice:empty { display: none; }
+      .logout-area { margin-top: 26px; }
+      #status:empty { display: none; }
+      .hidden { display: none !important; }
+      .small { font-size: 13px; }
+      @media (max-width: 680px) {
+        main { margin: 2vh auto; padding: 16px; }
+        .sections { grid-template-columns: 1fr; }
+        .wide { grid-column: auto; }
+        .panel { padding: 20px; }
       }
     </style>
   </head>
@@ -102,117 +106,588 @@ const title = "Members | Montreal Math Circle";
       <h1>Montreal Math Circle</h1>
       <p class="subtitle">Members' area</p>
 
-      <section id="portal" hidden>
+      <p id="status" class="notice" role="status" aria-live="polite">
+        Checking your sign-in…
+      </p>
+
+      <section id="portal" class="hidden">
         <h2>Welcome, <span id="member-name"></span>!</h2>
-        <p>Find discussions, shared resources, and upcoming events below.</p>
+        <p id="role-summary" class="muted"></p>
 
         <div class="sections">
           <section class="panel">
             <h2>Discussion Board</h2>
-            <p>
-              Join conversations, read messages, and keep up with
-              Montreal Math Circle announcements.
-            </p>
-            <a
-              class="button"
-              href="https://groups.io/g/montrealmathcircle/messages?expanded=1"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Discussion Board →
-            </a>
-          </section>
-
-          <section class="panel">
-            <h2>Shared Files</h2>
-            <p>
-              Find documents, notes, and other resources shared
-              with Montreal Math Circle members.
-            </p>
-
-            <!-- Add links to your published files here. -->
+            <p>Join conversations, read messages, and keep up with Montreal Math Circle announcements.</p>
+            <a class="button" href="https://groups.io/g/montrealmathcircle/messages?expanded=1" target="_blank" rel="noopener noreferrer">Discussion Board →</a>
           </section>
 
           <section class="panel">
             <h2>Calendar</h2>
-            <p>
-              View upcoming meetings, activities, and other
-              Montreal Math Circle events.
-            </p>
-            <a
-              class="button"
-              href="https://groups.io/g/montrealmathcircle/calendar"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View Calendar →
-            </a>
+            <p>View upcoming meetings, activities, and other Montreal Math Circle events.</p>
+            <a class="button" href="https://groups.io/g/montrealmathcircle/calendar" target="_blank" rel="noopener noreferrer">View Calendar →</a>
+          </section>
+
+          <section class="panel wide">
+            <h2>Shared Files</h2>
+            <p>Published documents and resources available to signed-in members.</p>
+            <div class="toolbar">
+              <button id="refresh-files" type="button">Refresh files</button>
+            </div>
+            <div id="published-files" aria-live="polite">Loading published files…</div>
+          </section>
+
+          <section id="upload-panel" class="panel hidden">
+            <h2>Submit a File</h2>
+            <p>Uploads are sent for publisher review before they become available to all members. Maximum file size: 20 MB.</p>
+            <form id="upload-form">
+              <div class="field">
+                <label for="upload-file">Choose a file</label>
+                <input id="upload-file" name="file" type="file" required />
+              </div>
+              <button id="upload-button" type="submit">Upload for review</button>
+            </form>
+            <div id="upload-status" class="notice" role="status" aria-live="polite"></div>
+          </section>
+
+          <section id="my-submissions-panel" class="panel hidden">
+            <h2>Submissions</h2>
+            <p>Track pending submissions and remove your own submissions that have not been published.</p>
+            <div id="my-submissions">Loading submissions…</div>
+          </section>
+
+          <section id="publisher-panel" class="panel wide hidden">
+            <h2>Publisher Review</h2>
+            <p>Review pending submissions. Publishing makes a file available to all signed-in members.</p>
+            <div class="toolbar">
+              <button id="refresh-review" type="button">Refresh submissions</button>
+            </div>
+            <div id="review-list">Loading submissions…</div>
+          </section>
+
+          <section id="admin-panel" class="panel wide hidden">
+            <h2>Account Management</h2>
+            <p>Create member accounts and assign permissions. New member accounts use the configured shared member password unless an individual password is added through a separately supported workflow.</p>
+
+            <h3>Create a member account</h3>
+            <form id="create-account-form">
+              <div class="field">
+                <label for="new-name">Member's full name</label>
+                <input id="new-name" name="name" required minlength="2" maxlength="100" />
+              </div>
+              <div class="field">
+                <label for="new-username">Username</label>
+                <input id="new-username" name="username" required maxlength="100" placeholder="first.last.mathcircle" pattern="[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle" />
+                <span class="meta">Use lowercase letters and numbers, optionally separated by dots or hyphens, ending in .mathcircle.</span>
+              </div>
+              <button id="create-account-button" type="submit">Create account</button>
+            </form>
+            <div id="create-account-status" class="notice" role="status" aria-live="polite"></div>
+
+            <hr />
+
+            <h3>Manage an existing account's roles</h3>
+            <p class="small">Enter the member's exact username. Role changes take effect on the server. This form does not list all accounts automatically because the current Worker has no member-list endpoint.</p>
+            <form id="role-form">
+              <div class="field">
+                <label for="target-username">Member username</label>
+                <input id="target-username" required maxlength="100" placeholder="first.last.mathcircle" pattern="[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle" />
+              </div>
+
+              <div class="checkrow">
+                <input id="role-contributor" type="checkbox" />
+                <label for="role-contributor">Contributor — upload and manage own unpublished submissions</label>
+              </div>
+              <div class="checkrow">
+                <input id="role-publisher" type="checkbox" />
+                <label for="role-publisher">Publisher — review submissions and manage files</label>
+              </div>
+              <div class="checkrow">
+                <input id="role-admin" type="checkbox" />
+                <label for="role-admin">Site administrator — manage accounts and roles</label>
+              </div>
+              <div class="toolbar">
+                <button id="save-roles-button" type="submit">Save selected roles</button>
+              </div>
+            </form>
+            <div id="role-status" class="notice" role="status" aria-live="polite"></div>
+
+            <hr />
+
+            <h3>Activate or deactivate a member</h3>
+            <form id="active-form">
+              <div class="field">
+                <label for="active-username">Member username</label>
+                <input id="active-username" required maxlength="100" placeholder="first.last.mathcircle" pattern="[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle" />
+              </div>
+              <div class="field">
+                <label for="active-value">Account status</label>
+                <select id="active-value">
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
+              <button id="save-active-button" type="submit">Update account status</button>
+            </form>
+            <div id="active-status" class="notice" role="status" aria-live="polite"></div>
           </section>
         </div>
 
         <div class="logout-area">
-          <button id="logout" type="button">Sign out</button>
+          <button id="logout" type="button" class="secondary">Sign out</button>
         </div>
       </section>
-
-      <p id="status" role="status" aria-live="polite">
-        Checking your sign-in…
-      </p>
     </main>
 
     <script>
-      const status = document.querySelector<HTMLElement>("#status")!;
-      const portal = document.querySelector<HTMLElement>("#portal")!;
-      const memberName = document.querySelector<HTMLElement>("#member-name")!;
+      const API = "https://api.montrealmathcircle.com";
+      const statusBox = document.querySelector("#status");
+      const portal = document.querySelector("#portal");
+      const memberName = document.querySelector("#member-name");
+      const roleSummary = document.querySelector("#role-summary");
+
+      let currentMember = null;
+      let roles = {
+        siteAdministrator: false,
+        filePublisher: false,
+        fileContributor: false
+      };
+
+      async function api(path, options = {}) {
+        const response = await fetch(API + path, {
+          credentials: "include",
+          ...options
+        });
+
+        const contentType = response.headers.get("content-type") || "";
+        let result = {};
+
+        if (contentType.includes("application/json")) {
+          result = await response.json();
+        }
+
+        if (!response.ok) {
+          throw new Error(result.error || `Request failed (${response.status})`);
+        }
+
+        return result;
+      }
+
+      function setMessage(id, message) {
+        const el = document.querySelector("#" + id);
+        if (el) el.textContent = message || "";
+      }
+
+      function addText(parent, tag, text, className) {
+        const el = document.createElement(tag);
+        el.textContent = text ?? "";
+        if (className) el.className = className;
+        parent.appendChild(el);
+        return el;
+      }
+
+      function addButton(parent, label, onClick, className = "secondary") {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.className = className;
+        button.addEventListener("click", onClick);
+        parent.appendChild(button);
+        return button;
+      }
+
+      function formatSize(bytes) {
+        if (!Number.isFinite(Number(bytes))) return "";
+        const n = Number(bytes);
+        if (n < 1024) return `${n} bytes`;
+        if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+        return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+      }
+
+      function formatDate(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+      }
+
+      async function loadPublishedFiles() {
+        const container = document.querySelector("#published-files");
+        container.replaceChildren();
+        addText(container, "p", "Loading published files…", "muted");
+
+        try {
+          const result = await api("/files/published");
+          container.replaceChildren();
+          const files = result.files || [];
+
+          if (!files.length) {
+            addText(container, "p", "No published files yet.", "muted");
+            return;
+          }
+
+          for (const file of files) {
+            const item = document.createElement("div");
+            item.className = "item";
+            addText(item, "div", file.filename || file.original_filename || "Untitled file", "item-title");
+
+            const details = [
+              file.ownerUsername ? `Submitted by ${file.ownerUsername}` : "",
+              formatSize(file.sizeBytes ?? file.size_bytes),
+              file.publishedAt || file.published_at
+                ? `Published ${formatDate(file.publishedAt || file.published_at)}`
+                : ""
+            ].filter(Boolean).join(" · ");
+
+            addText(item, "div", details, "meta");
+
+            const download = document.createElement("a");
+            download.className = "button";
+            download.textContent = "Download";
+            download.href = `${API}/files/download/${encodeURIComponent(file.id)}`;
+            download.setAttribute("aria-label", `Download ${file.filename || "file"}`);
+            item.appendChild(download);
+            container.appendChild(item);
+          }
+        } catch (error) {
+          container.replaceChildren();
+          addText(container, "p", `Could not load published files: ${error.message}`, "muted");
+        }
+      }
+
+      async function deleteSubmission(id, statusId, reloadFunction) {
+        if (!confirm("Delete this submission? This cannot be undone.")) return;
+
+        try {
+          await api(`/files/submissions/${encodeURIComponent(id)}`, {
+            method: "DELETE"
+          });
+          setMessage(statusId, "Submission deleted.");
+          await reloadFunction();
+          await loadPublishedFiles();
+        } catch (error) {
+          setMessage(statusId, error.message);
+        }
+      }
+
+      async function loadMySubmissions() {
+        const container = document.querySelector("#my-submissions");
+        container.replaceChildren();
+
+        try {
+          const result = await api("/files/submissions");
+          const submissions = result.submissions || [];
+
+          if (!submissions.length) {
+            addText(container, "p", "You have no pending submissions.", "muted");
+            return;
+          }
+
+          for (const submission of submissions) {
+            const item = document.createElement("div");
+            item.className = "item";
+            addText(item, "div", submission.filename || "Untitled file", "item-title");
+            addText(item, "span", submission.status || "pending", "badge");
+            addText(
+              item,
+              "div",
+              `${formatSize(submission.sizeBytes)} · Submitted ${formatDate(submission.createdAt)}`,
+              "meta"
+            );
+
+            if (submission.status !== "published") {
+              addButton(
+                item,
+                "Delete submission",
+                () => deleteSubmission(submission.id, "upload-status", loadMySubmissions),
+                "danger"
+              );
+            }
+
+            container.appendChild(item);
+          }
+        } catch (error) {
+          container.replaceChildren();
+          addText(container, "p", error.message, "muted");
+        }
+      }
+
+      async function loadReviewQueue() {
+        const container = document.querySelector("#review-list");
+        container.replaceChildren();
+
+        try {
+          const result = await api("/files/submissions");
+          const submissions = (result.submissions || []).filter(
+            submission => submission.status === "pending"
+          );
+
+          if (!submissions.length) {
+            addText(container, "p", "There are no pending submissions to review.", "muted");
+            return;
+          }
+
+          for (const submission of submissions) {
+            const item = document.createElement("div");
+            item.className = "item";
+            addText(item, "div", submission.filename || "Untitled file", "item-title");
+            addText(item, "div", `Submitted by ${submission.ownerUsername || "unknown"}`, "meta");
+            addText(
+              item,
+              "div",
+              `${formatSize(submission.sizeBytes)} · ${formatDate(submission.createdAt)}`,
+              "meta"
+            );
+
+            addButton(item, "Publish", async () => {
+              try {
+                await api(`/files/submissions/${submission.id}/publish`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: "{}"
+                });
+                setMessage("role-status", "");
+                await loadReviewQueue();
+                await loadPublishedFiles();
+                await loadMySubmissions();
+              } catch (error) {
+                alert(`Could not publish: ${error.message}`);
+              }
+            });
+
+            addButton(item, "Reject", async () => {
+              if (!confirm("Reject this submission?")) return;
+              try {
+                await api(`/files/submissions/${submission.id}/reject`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: "{}"
+                });
+                await loadReviewQueue();
+                await loadMySubmissions();
+              } catch (error) {
+                alert(`Could not reject: ${error.message}`);
+              }
+            }, "secondary");
+
+            addButton(
+              item,
+              "Delete",
+              () => deleteSubmission(submission.id, "role-status", loadReviewQueue),
+              "danger"
+            );
+
+            container.appendChild(item);
+          }
+        } catch (error) {
+          container.replaceChildren();
+          addText(container, "p", error.message, "muted");
+        }
+      }
 
       async function checkSession() {
         try {
-          const response = await fetch(
-            "https://api.montrealmathcircle.com/me",
-            { credentials: "include" }
-          );
+          const result = await api("/me");
 
-          const result = await response.json();
-
-          if (!response.ok || !result.signedIn) {
+          if (!result.signedIn || !result.member) {
             window.location.replace("/members/login");
             return;
           }
 
-          memberName.textContent = result.member.name;
-          portal.hidden = false;
-          status.textContent = "";
-        } catch {
-          status.textContent =
-            "Unable to verify your sign-in. Please refresh or try again later.";
+          currentMember = result.member;
+          roles = result.roles || roles;
+
+          memberName.textContent = currentMember.name;
+          roleSummary.textContent = [
+            roles.siteAdministrator ? "Site administrator" : "",
+            roles.filePublisher ? "File publisher" : "",
+            roles.fileContributor ? "File contributor" : ""
+          ].filter(Boolean).join(" · ") || "Member";
+
+          portal.classList.remove("hidden");
+          statusBox.textContent = "";
+
+          if (roles.fileContributor || roles.filePublisher) {
+            document.querySelector("#upload-panel").classList.remove("hidden");
+            document.querySelector("#my-submissions-panel").classList.remove("hidden");
+            await loadMySubmissions();
+          }
+
+          if (roles.filePublisher) {
+            document.querySelector("#publisher-panel").classList.remove("hidden");
+            await loadReviewQueue();
+          }
+
+          if (roles.siteAdministrator) {
+            document.querySelector("#admin-panel").classList.remove("hidden");
+          }
+
+          await loadPublishedFiles();
+        } catch (error) {
+          statusBox.textContent = `Unable to verify your sign-in: ${error.message}`;
         }
       }
 
-      document.querySelector<HTMLButtonElement>("#logout")!
-        .addEventListener("click", async () => {
-          try {
-            const response = await fetch(
-              "https://api.montrealmathcircle.com/logout",
-              {
-                method: "POST",
-                credentials: "include",
-              }
-            );
+      document.querySelector("#refresh-files").addEventListener("click", loadPublishedFiles);
 
-            if (!response.ok) {
-              status.textContent = "Sign-out failed. Please try again.";
-              return;
-            }
+      document.querySelector("#refresh-review").addEventListener("click", loadReviewQueue);
 
-            window.location.replace("/members/login");
-          } catch {
-            status.textContent = "Unable to sign out. Please try again.";
+      document.querySelector("#upload-form").addEventListener("submit", async event => {
+        event.preventDefault();
+        const input = document.querySelector("#upload-file");
+        const button = document.querySelector("#upload-button");
+        const file = input.files && input.files[0];
+
+        if (!file) {
+          setMessage("upload-status", "Choose a file first.");
+          return;
+        }
+
+        if (file.size > 20 * 1024 * 1024) {
+          setMessage("upload-status", "The maximum file size is 20 MB.");
+          return;
+        }
+
+        const form = new FormData();
+        form.append("file", file);
+        button.disabled = true;
+        setMessage("upload-status", "Uploading…");
+
+        try {
+          const result = await api("/files/upload", {
+            method: "POST",
+            body: form
+          });
+          setMessage(
+            "upload-status",
+            `Uploaded ${result.submission?.filename || file.name}. It is pending publisher review.`
+          );
+          input.value = "";
+          await loadMySubmissions();
+        } catch (error) {
+          setMessage("upload-status", `Upload failed: ${error.message}`);
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      document.querySelector("#create-account-form").addEventListener("submit", async event => {
+        event.preventDefault();
+        const button = document.querySelector("#create-account-button");
+        const name = document.querySelector("#new-name").value.trim();
+        const username = document.querySelector("#new-username").value.trim().toLowerCase();
+
+        button.disabled = true;
+        setMessage("create-account-status", "Creating account…");
+
+        try {
+          const result = await api("/admin/create-member-account", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, username })
+          });
+          setMessage(
+            "create-account-status",
+            `Created ${result.name} (${result.username}). The account uses the configured shared member password.`
+          );
+          document.querySelector("#create-account-form").reset();
+        } catch (error) {
+          setMessage("create-account-status", `Could not create account: ${error.message}`);
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      document.querySelector("#role-form").addEventListener("submit", async event => {
+        event.preventDefault();
+        const button = document.querySelector("#save-roles-button");
+        const username = document.querySelector("#target-username").value.trim().toLowerCase();
+        const selected = {
+          contributor: document.querySelector("#role-contributor").checked,
+          publisher: document.querySelector("#role-publisher").checked,
+          administrator: document.querySelector("#role-admin").checked
+        };
+
+        button.disabled = true;
+        setMessage("role-status", "Saving roles…");
+
+        try {
+          for (const [field, value] of Object.entries(selected)) {
+            const route = field === "contributor"
+              ? "/admin/set-file-contributor"
+              : field === "publisher"
+                ? "/admin/set-file-publisher"
+                : "/admin/set-site-administrator";
+
+            await api(route, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, [field]: value })
+            });
           }
-        });
+
+          setMessage("role-status", `Saved roles for ${username}.`);
+          if (username === currentMember.username) {
+            setMessage(
+              "role-status",
+              `Saved roles for your account. Refresh the page to update the visible controls.`
+            );
+          }
+        } catch (error) {
+          setMessage(
+            "role-status",
+            `Role update stopped: ${error.message}. Some earlier role changes may already have been saved. Review the account before trying again.`
+          );
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      document.querySelector("#active-form").addEventListener("submit", async event => {
+        event.preventDefault();
+        const button = document.querySelector("#save-active-button");
+        const username = document.querySelector("#active-username").value.trim().toLowerCase();
+        const active = document.querySelector("#active-value").value === "true";
+
+        if (!active && username === currentMember.username) {
+          if (!confirm("You are about to deactivate your own account and end future access. Continue only if another active administrator can restore access.")) {
+            return;
+          }
+        }
+
+        button.disabled = true;
+        setMessage("active-status", "Updating account…");
+
+        try {
+          await api("/admin/set-member-active", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, active })
+          });
+          setMessage("active-status", `Updated ${username}: ${active ? "active" : "inactive"}.`);
+          if (!active && username === currentMember.username) {
+            window.location.replace("/members/login");
+          }
+        } catch (error) {
+          setMessage("active-status", `Could not update account: ${error.message}`);
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      document.querySelector("#logout").addEventListener("click", async () => {
+        const button = document.querySelector("#logout");
+        button.disabled = true;
+
+        try {
+          await api("/logout", { method: "POST" });
+          window.location.replace("/members/login");
+        } catch (error) {
+          statusBox.textContent = `Sign-out failed: ${error.message}`;
+          button.disabled = false;
+        }
+      });
 
       checkSession();
     </script>
   </body>
 </html>
-
 

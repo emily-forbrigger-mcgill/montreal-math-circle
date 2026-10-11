@@ -888,6 +888,642 @@ export default {
     }
 
     // File routes require an active signed-in member.
+    
+    // IMPORTANT LINKS
+    // All signed-in members can view links.
+    // Only site administrators can manage links.
+
+    if (
+      path === "/important-links" ||
+      path.startsWith("/important-links/")
+    ) {
+      if (
+        ["POST", "DELETE"].includes(request.method) &&
+        !validFileRequestOrigin(request)
+      ) {
+        return json(
+          { error: "Invalid request origin" },
+          403,
+          request
+        );
+      }
+
+      let member;
+
+      try {
+        member = await getSignedInMember(request, env);
+      } catch (error) {
+        console.error("Important links session error:", error);
+        return json(
+          { error: "Could not verify session" },
+          500,
+          request
+        );
+      }
+
+      if (!member) {
+        return json(
+          { error: "Sign in required" },
+          401,
+          request
+        );
+      }
+
+      // View links: all signed-in members.
+      if (
+        path === "/important-links" &&
+        request.method === "GET"
+      ) {
+        try {
+          const result = await env.DB.prepare(`
+            SELECT
+              id,
+              title,
+              url,
+              description,
+              sort_order AS sortOrder
+            FROM important_links
+            ORDER BY sort_order ASC, id ASC
+          `).all();
+
+          return json(
+            { links: result.results || [] },
+            200,
+            request
+          );
+        } catch (error) {
+          console.error("Important links listing failed:", error);
+          return json(
+            { error: "Could not load important links" },
+            500,
+            request
+          );
+        }
+      }
+
+      if (!["POST", "DELETE"].includes(request.method)) {
+        return json(
+          { error: "Method not allowed" },
+          405,
+          request
+        );
+      }
+
+      // All management actions require administrator access.
+      try {
+        if (!await isSiteAdministrator(member.id, env)) {
+          return json(
+            { error: "Administrator permission required" },
+            403,
+            request
+          );
+        }
+      } catch (error) {
+        console.error("Important links permission error:", error);
+        return json(
+          { error: "Could not verify permissions" },
+          500,
+          request
+        );
+      }
+
+      // Reorder links.
+      if (
+        path === "/important-links/reorder" &&
+        request.method === "POST"
+      ) {
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const ids = parsed.body?.ids;
+
+        if (
+          !Array.isArray(ids) ||
+          !ids.every(id => Number.isSafeInteger(id) && id > 0) ||
+          new Set(ids).size !== ids.length ||
+          ids.length > 500
+        ) {
+          return json(
+            { error: "Provide an array of unique link IDs" },
+            400,
+            request
+          );
+        }
+
+        try {
+          const existing = await env.DB.prepare(
+            "SELECT id FROM important_links"
+          ).all();
+
+          const stored = (existing.results || []).map(
+            row => row.id
+          );
+
+          if (
+            stored.length !== ids.length ||
+            stored.some(id => !ids.includes(id))
+          ) {
+            return json(
+              {
+                error: "Link list changed; refresh and try again"
+              },
+              409,
+              request
+            );
+          }
+
+          if (ids.length) {
+            await env.DB.batch(
+              ids.map((id, index) =>
+                env.DB.prepare(`
+                  UPDATE important_links
+                  SET sort_order = ?
+                  WHERE id = ?
+                `).bind(index, id)
+              )
+            );
+          }
+
+          return json({ success: true }, 200, request);
+        } catch (error) {
+          console.error("Important links reorder failed:", error);
+          return json(
+            { error: "Could not reorder links" },
+            500,
+            request
+          );
+        }
+      }
+
+      const linkRoute = path.match(
+        /^\/important-links\/([0-9]+)$/
+      );
+
+      // Delete a link.
+      if (request.method === "DELETE" && linkRoute) {
+        try {
+          const result = await env.DB.prepare(`
+            DELETE FROM important_links
+            WHERE id = ?
+          `).bind(Number(linkRoute[1])).run();
+
+          if (!result.meta.changes) {
+            return json(
+              { error: "Link not found" },
+              404,
+              request
+            );
+          }
+
+          return json({ success: true }, 200, request);
+        } catch (error) {
+          console.error("Important link deletion failed:", error);
+          return json(
+            { error: "Could not delete link" },
+            500,
+            request
+          );
+        }
+      }
+
+      // Create or edit a link.
+      if (
+        request.method === "POST" &&
+        (path === "/important-links" || linkRoute)
+      ) {
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const body = parsed.body || {};
+
+        const title =
+          typeof body.title === "string"
+            ? body.title.trim()
+            : "";
+
+        const address =
+          typeof body.url === "string"
+            ? body.url.trim()
+            : "";
+
+        const description =
+          typeof body.description === "string"
+            ? body.description.trim()
+            : "";
+
+        if (
+          !title ||
+          title.length > 120 ||
+          /[\x00-\x1f\x7f]/.test(title) ||
+          !address ||
+          address.length > 2048 ||
+          description.length > 300 ||
+          /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(description)
+        ) {
+          return json(
+            {
+              error: "Invalid title, URL, or description"
+            },
+            400,
+            request
+          );
+        }
+
+        let parsedUrl;
+
+        try {
+          parsedUrl = new URL(address);
+        } catch {
+          // Invalid URLs are rejected below.
+        }
+
+        if (
+          !parsedUrl ||
+          !["https:", "http:"].includes(parsedUrl.protocol) ||
+          !parsedUrl.hostname ||
+          parsedUrl.username ||
+          parsedUrl.password
+        ) {
+          return json(
+            { error: "Provide a valid http or https URL" },
+            400,
+            request
+          );
+        }
+
+        try {
+          // Update existing link.
+          if (linkRoute) {
+            const result = await env.DB.prepare(`
+              UPDATE important_links
+              SET title = ?, url = ?, description = ?
+              WHERE id = ?
+            `).bind(
+              title,
+              address,
+              description,
+              Number(linkRoute[1])
+            ).run();
+
+            if (!result.meta.changes) {
+              return json(
+                { error: "Link not found" },
+                404,
+                request
+              );
+            }
+
+            return json({ success: true }, 200, request);
+          }
+
+          // Add new link at the end of the list.
+          const result = await env.DB.prepare(`
+            INSERT INTO important_links
+              (title, url, description, sort_order)
+            VALUES (
+              ?, ?, ?,
+              (
+                SELECT COALESCE(MAX(sort_order), -1) + 1
+                FROM important_links
+              )
+            )
+          `).bind(
+            title,
+            address,
+            description
+          ).run();
+
+          return json(
+            {
+              success: true,
+              link: { id: result.meta.last_row_id }
+            },
+            201,
+            request
+          );
+        } catch (error) {
+          console.error("Important link save failed:", error);
+          return json(
+            { error: "Could not save link" },
+            500,
+            request
+          );
+        }
+      }
+
+      return json(
+        { error: "Important links route not found" },
+        404,
+        request
+      );
+    }
+
+  
+    // MEMBER DIRECTORY
+    // Signed-in members can view.
+    // Only site administrators can manage entries.
+
+    if (
+      path === "/member-directory" ||
+      path.startsWith("/member-directory/")
+    ) {
+      if (
+        ["POST", "DELETE"].includes(request.method) &&
+        !validFileRequestOrigin(request)
+      ) {
+        return json({ error: "Invalid request origin" }, 403, request);
+      }
+
+      let member;
+
+      try {
+        member = await getSignedInMember(request, env);
+      } catch (error) {
+        console.error("Directory session error:", error);
+        return json({ error: "Could not verify session" }, 500, request);
+      }
+
+      if (!member) {
+        return json({ error: "Sign in required" }, 401, request);
+      }
+
+      // View the directory.
+      if (path === "/member-directory" && request.method === "GET") {
+        try {
+          const result = await env.DB.prepare(`
+            SELECT
+              id,
+              full_name AS fullName,
+              member_role AS memberRole,
+              email,
+              phone,
+              description,
+              sort_order AS sortOrder
+            FROM member_directory
+            ORDER BY sort_order ASC, id ASC
+          `).all();
+
+          return json(
+            { members: result.results || [] },
+            200,
+            request
+          );
+        } catch (error) {
+          console.error("Directory listing error:", error);
+          return json(
+            { error: "Could not load member directory" },
+            500,
+            request
+          );
+        }
+      }
+
+      if (!["POST", "DELETE"].includes(request.method)) {
+        return json({ error: "Method not allowed" }, 405, request);
+      }
+
+      // All changes require administrator permission.
+      try {
+        if (!await isSiteAdministrator(member.id, env)) {
+          return json(
+            { error: "Administrator permission required" },
+            403,
+            request
+          );
+        }
+      } catch (error) {
+        console.error("Directory permission error:", error);
+        return json(
+          { error: "Could not verify permissions" },
+          500,
+          request
+        );
+      }
+
+      // Change the order of entries.
+      if (
+        path === "/member-directory/reorder" &&
+        request.method === "POST"
+      ) {
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const ids = parsed.body?.ids;
+
+        if (
+          !Array.isArray(ids) ||
+          ids.length > 500 ||
+          !ids.every(id => Number.isSafeInteger(id) && id > 0) ||
+          new Set(ids).size !== ids.length
+        ) {
+          return json(
+            { error: "Invalid directory entry IDs" },
+            400,
+            request
+          );
+        }
+
+        try {
+          const existing = await env.DB.prepare(
+            "SELECT id FROM member_directory"
+          ).all();
+
+          const stored = (existing.results || []).map(row => row.id);
+
+          if (
+            stored.length !== ids.length ||
+            stored.some(id => !ids.includes(id))
+          ) {
+            return json(
+              { error: "Directory changed; refresh and try again" },
+              409,
+              request
+            );
+          }
+
+          if (ids.length) {
+            await env.DB.batch(
+              ids.map((id, index) =>
+                env.DB.prepare(`
+                  UPDATE member_directory
+                  SET sort_order = ?
+                  WHERE id = ?
+                `).bind(index, id)
+              )
+            );
+          }
+
+          return json({ success: true }, 200, request);
+        } catch (error) {
+          console.error("Directory reorder error:", error);
+          return json(
+            { error: "Could not reorder directory" },
+            500,
+            request
+          );
+        }
+      }
+
+      const match = path.match(/^\/member-directory\/([0-9]+)$/);
+
+      // Delete an entry.
+      if (request.method === "DELETE" && match) {
+        try {
+          const result = await env.DB.prepare(`
+            DELETE FROM member_directory WHERE id = ?
+          `).bind(Number(match[1])).run();
+
+          if (!result.meta.changes) {
+            return json(
+              { error: "Directory entry not found" },
+              404,
+              request
+            );
+          }
+
+          return json({ success: true }, 200, request);
+        } catch (error) {
+          console.error("Directory deletion error:", error);
+          return json(
+            { error: "Could not delete directory entry" },
+            500,
+            request
+          );
+        }
+      }
+
+      // Create or edit an entry.
+      if (
+        request.method === "POST" &&
+        (path === "/member-directory" || match)
+      ) {
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const body = parsed.body || {};
+
+        const fields = [
+          ["fullName", 120],
+          ["memberRole", 120],
+          ["email", 254],
+          ["phone", 60],
+          ["description", 500]
+        ];
+
+        const values = {};
+
+        for (const [field, maxLength] of fields) {
+          if (
+            body[field] !== undefined &&
+            typeof body[field] !== "string"
+          ) {
+            return json(
+              { error: `Invalid ${field}` },
+              400,
+              request
+            );
+          }
+
+          values[field] = (body[field] || "").trim();
+
+          if (
+            values[field].length > maxLength ||
+            /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(values[field])
+          ) {
+            return json(
+              { error: `Invalid ${field}` },
+              400,
+              request
+            );
+          }
+        }
+
+        if (!values.fullName) {
+          return json(
+            { error: "Full name is required" },
+            400,
+            request
+          );
+        }
+
+        if (
+          values.email &&
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)
+        ) {
+          return json(
+            { error: "Enter a valid email address" },
+            400,
+            request
+          );
+        }
+
+        try {
+          const parameters = [
+            values.fullName,
+            values.memberRole,
+            values.email,
+            values.phone,
+            values.description
+          ];
+
+          if (match) {
+            const result = await env.DB.prepare(`
+              UPDATE member_directory
+              SET full_name = ?,
+                  member_role = ?,
+                  email = ?,
+                  phone = ?,
+                  description = ?
+              WHERE id = ?
+            `).bind(...parameters, Number(match[1])).run();
+
+            if (!result.meta.changes) {
+              return json(
+                { error: "Directory entry not found" },
+                404,
+                request
+              );
+            }
+
+            return json({ success: true }, 200, request);
+          }
+
+          const result = await env.DB.prepare(`
+            INSERT INTO member_directory
+              (full_name, member_role, email, phone,
+               description, sort_order)
+            VALUES (
+              ?, ?, ?, ?, ?,
+              (SELECT COALESCE(MAX(sort_order), -1) + 1
+               FROM member_directory)
+            )
+          `).bind(...parameters).run();
+
+          return json(
+            {
+              success: true,
+              member: { id: result.meta.last_row_id }
+            },
+            201,
+            request
+          );
+        } catch (error) {
+          console.error("Directory save error:", error);
+          return json(
+            { error: "Could not save directory entry" },
+            500,
+            request
+          );
+        }
+      }
+
+      return json(
+        { error: "Member directory route not found" },
+        404,
+        request
+      );
+    }
+
 
     if (path.startsWith("/files/")) {
       if (

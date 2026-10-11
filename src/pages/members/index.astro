@@ -942,7 +942,7 @@ const title = "Members | Montreal Math Circle";
 
       let folders = [];
       let publishedFiles = [];
-      let selectedFolder = "all";
+      let selectedFolder = "none";
 
       async function loadPublishedFiles() {
         const container = document.querySelector("#published-files");
@@ -1061,7 +1061,15 @@ const title = "Members | Montreal Math Circle";
             container.appendChild(controls);
           }
         }
-
+        if (selectedFolder === "none") {
+  addText(
+    container,
+    "p",
+    "Select a folder above to view its documents.",
+    "muted"
+  );
+  return;
+}
         const visible = publishedFiles.filter(file =>
           selectedFolder === "all" ||
           (

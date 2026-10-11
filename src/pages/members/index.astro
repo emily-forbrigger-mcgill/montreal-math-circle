@@ -276,6 +276,79 @@ const title = "Members | Montreal Math Circle";
           max-width: none;
         }
       }
+    
+      /* Important Links section */
+
+      .links-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .link-entry {
+        border: 1px solid #ded7ed;
+        border-left: 4px solid #ad96cc;
+        border-radius: 9px;
+        padding: 13px 15px;
+        min-width: 0;
+      }
+
+      .link-entry a {
+        color: #a81b24;
+        font-weight: 700;
+        text-decoration: none;
+        overflow-wrap: anywhere;
+      }
+
+      .link-entry a:hover {
+        text-decoration: underline;
+      }
+
+      .link-description {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 5px;
+        line-height: 1.5;
+      }
+
+      .link-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 10px;
+      }
+
+      .link-actions button {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      #links-admin {
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #e8e0f1;
+      }
+
+      #links-form {
+        max-width: 650px;
+      }
+
+      #links-form textarea {
+        width: 100%;
+        min-height: 72px;
+        resize: vertical;
+        padding: 11px;
+        border: 1px solid #ccd3dd;
+        border-radius: 6px;
+        font: inherit;
+      }
+
+      .link-form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
     </style>
   </head>
 
@@ -304,6 +377,81 @@ const title = "Members | Montreal Math Circle";
             <p>View upcoming meetings, activities, and other Montreal Math Circle events.</p>
             <a class="button" href="https://groups.io/g/montrealmathcircle/calendar" target="_blank" rel="noopener noreferrer">View Calendar →</a>
           </section>
+           
+          <!-- Important Links: visible to all signed-in members -->
+          <section class="panel wide" id="important-links-panel">
+            <h2>Important Links</h2>
+            <p>Useful websites and resources for Montreal Math Circle members.</p>
+
+            <div
+              id="important-links-list"
+              class="links-list"
+              aria-live="polite"
+            >
+              Loading links…
+            </div>
+
+            <!-- Only administrators will see these controls -->
+            <div id="links-admin" class="hidden">
+              <h3 id="links-form-heading">Add an Important Link</h3>
+
+              <form id="links-form">
+                <div class="field">
+                  <label for="link-title">Link title</label>
+                  <input
+                    id="link-title"
+                    maxlength="120"
+                    required
+                    placeholder="e.g. Competition Resources"
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="link-url">Website address</label>
+                  <input
+                    id="link-url"
+                    type="url"
+                    maxlength="2048"
+                    required
+                    placeholder="https://example.com"
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="link-description">
+                    Description (optional)
+                  </label>
+                  <textarea
+                    id="link-description"
+                    maxlength="300"
+                    placeholder="A short description of this resource"
+                  ></textarea>
+                </div>
+
+                <div class="link-form-actions">
+                  <button id="save-link-button" type="submit">
+                    Add link
+                  </button>
+
+                  <button
+                    id="cancel-link-edit"
+                    type="button"
+                    class="secondary hidden"
+                  >
+                    Cancel edit
+                  </button>
+                </div>
+              </form>
+
+              <div
+                id="links-status"
+                class="notice"
+                role="status"
+                aria-live="polite"
+              ></div>
+            </div>
+          </section>
+
 
           <section class="panel wide">
             <h2>Shared Files</h2>
@@ -552,6 +700,245 @@ const title = "Members | Montreal Math Circle";
         const date = new Date(value);
         return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
       }
+      
+      // IMPORTANT LINKS
+      // All signed-in members can view links.
+      // Only site administrators can manage them.
+
+      let importantLinks = [];
+      let editingLinkId = null;
+
+      function resetLinkForm() {
+        editingLinkId = null;
+
+        document.querySelector("#links-form").reset();
+        document.querySelector("#links-form-heading").textContent =
+          "Add an Important Link";
+        document.querySelector("#save-link-button").textContent =
+          "Add link";
+        document.querySelector("#cancel-link-edit").classList.add("hidden");
+      }
+
+      function renderImportantLinks() {
+        const list = document.querySelector("#important-links-list");
+        list.replaceChildren();
+
+        if (!importantLinks.length) {
+          addText(
+            list,
+            "p",
+            "No important links have been added yet.",
+            "muted"
+          );
+          return;
+        }
+
+        for (const [index, link] of importantLinks.entries()) {
+          const entry = document.createElement("div");
+          entry.className = "link-entry";
+
+          const anchor = document.createElement("a");
+          anchor.textContent = `${link.title} ↗`;
+
+          try {
+            const parsed = new URL(link.url);
+
+            if (["https:", "http:"].includes(parsed.protocol)) {
+              anchor.href = parsed.href;
+              anchor.target = "_blank";
+              anchor.rel = "noopener noreferrer";
+            }
+          } catch {
+            // Invalid links are not clickable.
+          }
+
+          entry.appendChild(anchor);
+
+          if (link.description) {
+            addText(
+              entry,
+              "div",
+              link.description,
+              "link-description"
+            );
+          }
+
+          if (roles.siteAdministrator) {
+            const controls = document.createElement("div");
+            controls.className = "link-actions";
+
+            // Edit
+            addButton(controls, "Edit", () => {
+              editingLinkId = link.id;
+
+              document.querySelector("#link-title").value =
+                link.title;
+              document.querySelector("#link-url").value =
+                link.url;
+              document.querySelector("#link-description").value =
+                link.description || "";
+
+              document.querySelector("#links-form-heading").textContent =
+                "Edit Important Link";
+              document.querySelector("#save-link-button").textContent =
+                "Save changes";
+              document.querySelector("#cancel-link-edit")
+                .classList.remove("hidden");
+
+              document.querySelector("#links-admin").scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+              });
+
+              document.querySelector("#link-title").focus();
+            });
+
+            // Reorder
+            async function moveLink(otherIndex) {
+              const ids = importantLinks.map(item => item.id);
+
+              [ids[index], ids[otherIndex]] =
+                [ids[otherIndex], ids[index]];
+
+              try {
+                await api("/important-links/reorder", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({ ids })
+                });
+
+                await loadImportantLinks();
+                setMessage("links-status", "Link order updated.");
+              } catch (error) {
+                setMessage(
+                  "links-status",
+                  `Could not reorder links: ${error.message}`
+                );
+              }
+            }
+
+            const up = addButton(
+              controls,
+              "↑ Up",
+              () => moveLink(index - 1)
+            );
+            up.disabled = index === 0;
+
+            const down = addButton(
+              controls,
+              "↓ Down",
+              () => moveLink(index + 1)
+            );
+            down.disabled = index === importantLinks.length - 1;
+
+            // Delete
+            addButton(
+              controls,
+              "Delete",
+              async () => {
+                if (!confirm(
+                  `Delete important link "${link.title}"?`
+                )) return;
+
+                try {
+                  await api(
+                    `/important-links/${encodeURIComponent(link.id)}`,
+                    { method: "DELETE" }
+                  );
+
+                  if (editingLinkId === link.id) {
+                    resetLinkForm();
+                  }
+
+                  await loadImportantLinks();
+
+                  setMessage(
+                    "links-status",
+                    `Deleted "${link.title}".`
+                  );
+                } catch (error) {
+                  setMessage(
+                    "links-status",
+                    `Could not delete link: ${error.message}`
+                  );
+                }
+              },
+              "danger"
+            );
+
+            entry.appendChild(controls);
+          }
+
+          list.appendChild(entry);
+        }
+      }
+
+      async function loadImportantLinks() {
+        const list = document.querySelector("#important-links-list");
+
+        try {
+          const result = await api("/important-links");
+          importantLinks = result.links || [];
+          renderImportantLinks();
+        } catch (error) {
+          list.replaceChildren();
+          addText(
+            list,
+            "p",
+            `Could not load important links: ${error.message}`,
+            "muted"
+          );
+        }
+      }
+
+      document.querySelector("#cancel-link-edit")
+        .addEventListener("click", resetLinkForm);
+
+      document.querySelector("#links-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const title = document.querySelector("#link-title").value.trim();
+          const url = document.querySelector("#link-url").value.trim();
+          const description =
+            document.querySelector("#link-description").value.trim();
+
+          const button = document.querySelector("#save-link-button");
+
+          const wasEditing = editingLinkId !== null;
+          const route = wasEditing
+            ? `/important-links/${encodeURIComponent(editingLinkId)}`
+            : "/important-links";
+
+          button.disabled = true;
+
+          try {
+            await api(route, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ title, url, description })
+            });
+
+            resetLinkForm();
+            await loadImportantLinks();
+
+            setMessage(
+              "links-status",
+              wasEditing ? "Link updated." : "Link added."
+            );
+          } catch (error) {
+            setMessage(
+              "links-status",
+              `Could not save link: ${error.message}`
+            );
+          } finally {
+            button.disabled = false;
+          }
+        });
 
       let folders = [];
       let publishedFiles = [];
@@ -1028,9 +1415,13 @@ const title = "Members | Montreal Math Circle";
           if (roles.siteAdministrator) {
             document.querySelector("#admin-panel").classList.remove("hidden");
             document.querySelector("#folder-admin").classList.remove("hidden");
+            document.querySelector("#links-admin").classList.remove("hidden");
           }
 
-          await loadPublishedFiles();
+          await Promise.all([
+  loadPublishedFiles(),
+  loadImportantLinks()
+]);
         } catch (error) {
           statusBox.textContent = `Unable to verify your sign-in: ${error.message}`;
         }

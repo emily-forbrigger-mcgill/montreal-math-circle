@@ -1,3 +1,4 @@
+
 ---
 const title = "Members | Montreal Math Circle";
 ---
@@ -97,6 +98,14 @@ const title = "Members | Montreal Math Circle";
       #status:empty { display: none; }
       .hidden { display: none !important; }
       .small { font-size: 13px; }
+      .folder-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 16px 0; }
+      .folder-tile { text-align: left; background: #edf2f7; color: #203e65; border: 1px solid #ccd3dd; }
+      .folder-tile:hover { background: #dfeaf4; }
+      .folder-tile.selected { background: #203e65; color: white; }
+      .folder-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+      .folder-controls select { width: auto; max-width: 260px; }
+      #folder-form input { max-width: 400px; }
+      .folder-heading { margin-top: 22px; }
 
       @media (max-width: 680px) {
         main { margin: 2vh auto; padding: 16px; }
@@ -139,6 +148,16 @@ const title = "Members | Montreal Math Circle";
             <div class="toolbar">
               <button id="refresh-files" type="button">Refresh files</button>
             </div>
+            <div id="folder-admin" class="hidden">
+              <h3>Manage Document Folders</h3>
+              <form id="folder-form" class="toolbar">
+                <label for="folder-name">New folder name</label>
+                <input id="folder-name" maxlength="80" required placeholder="e.g. Number Theory" />
+                <button type="submit">Create folder</button>
+              </form>
+              <div id="folder-status" class="notice" role="status" aria-live="polite"></div>
+            </div>
+            <div id="folder-navigation" class="folder-grid" aria-label="Document folders"></div>
             <div id="published-files" aria-live="polite">Loading published files…</div>
           </section>
 
@@ -351,85 +370,165 @@ const title = "Members | Montreal Math Circle";
         return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
       }
 
+      let folders = [];
+      let publishedFiles = [];
+      let selectedFolder = "all";
+
       async function loadPublishedFiles() {
         const container = document.querySelector("#published-files");
         container.replaceChildren();
         addText(container, "p", "Loading published files…", "muted");
-
         try {
-          const result = await api("/files/published");
-          container.replaceChildren();
-          const files = result.files || [];
-
-          if (!files.length) {
-            addText(container, "p", "No published files yet.", "muted");
-            return;
+          const [folderResult, fileResult] = await Promise.all([
+            api("/files/folders"),
+            api("/files/published")
+          ]);
+          folders = folderResult.folders || [];
+          publishedFiles = fileResult.files || [];
+          if (selectedFolder !== "all" && selectedFolder !== "unfiled" &&
+              !folders.some(f => String(f.id) === selectedFolder)) {
+            selectedFolder = "all";
           }
-
-          for (const file of files) {
-            const item = document.createElement("div");
-            item.className = "item";
-
-            const filename = file.filename || file.original_filename || "Untitled file";
-            addText(item, "div", filename, "item-title");
-
-            const details = [
-              file.ownerUsername ? `Submitted by ${file.ownerUsername}` : "",
-              formatSize(file.sizeBytes ?? file.size_bytes),
-              file.publishedAt || file.published_at
-                ? `Published ${formatDate(file.publishedAt || file.published_at)}`
-                : ""
-            ].filter(Boolean).join(" · ");
-
-            addText(item, "div", details, "meta");
-
-            const download = document.createElement("a");
-            download.className = "button";
-            download.textContent = "Download";
-            download.href = `${API}/files/download/${encodeURIComponent(file.id)}`;
-            download.setAttribute("aria-label", `Download ${filename}`);
-            item.appendChild(download);
-
-            // Only site administrators see this button.
-            // The Worker must also enforce this permission server-side.
-            if (roles.siteAdministrator) {
-              addButton(
-                item,
-                "Delete published file",
-                async () => {
-                  if (!confirm(
-                    `Permanently delete "${filename}"? Members will no longer be able to download it. This cannot be undone.`
-                  )) {
-                    return;
-                  }
-
-                  try {
-                    await api(
-                      `/files/submissions/${encodeURIComponent(file.id)}`,
-                      { method: "DELETE" }
-                    );
-
-                    await loadPublishedFiles();
-                    await loadMySubmissions();
-                    await loadReviewQueue();
-
-                    setMessage(
-                      "role-status",
-                      `Deleted "${filename}".`
-                    );
-                  } catch (error) {
-                    alert(`Could not delete published file: ${error.message}`);
-                  }
-                },
-                "danger"
-              );
-            }
-
-            container.appendChild(item);
-          }
+          renderPublishedFiles();
         } catch (error) {
           container.replaceChildren();
           addText(container, "p", `Could not load published files: ${error.message}`, "muted");
+        }
+      }
+
+      function renderPublishedFiles() {
+        const nav = document.querySelector("#folder-navigation");
+        const container = document.querySelector("#published-files");
+        nav.replaceChildren();
+        container.replaceChildren();
+
+        function tile(id, label, count) {
+          const button = addButton(nav, `${label} (${count})`, () => {
+            selectedFolder = id;
+            renderPublishedFiles();
+          }, "folder-tile" + (selectedFolder === id ? " selected" : ""));
+          button.setAttribute("aria-pressed", String(selectedFolder === id));
+        }
+        tile("all", "📁 All documents", publishedFiles.length);
+        for (const folder of folders) {
+          const count = publishedFiles.filter(f => Number(f.folderId) === Number(folder.id) && f.folderId != null).length;
+          tile(String(folder.id), `📁 ${folder.name}`, count);
+        }
+        const unfiledCount = publishedFiles.filter(f => f.folderId == null).length;
+        tile("unfiled", "📄 Unfiled Documents", unfiledCount);
+
+        if (roles.siteAdministrator && selectedFolder !== "all" && selectedFolder !== "unfiled") {
+          const folder = folders.find(f => String(f.id) === selectedFolder);
+          if (folder) {
+            const controls = document.createElement("div");
+            controls.className = "folder-controls";
+            addButton(controls, "Rename this folder", async () => {
+              const name = prompt("New folder name:", folder.name);
+              if (name === null) return;
+              if (!name.trim() || name.trim().length > 80) {
+                setMessage("folder-status", "Folder names must be 1–80 characters.");
+                return;
+              }
+              try {
+                await api(`/files/folders/${folder.id}`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ name: name.trim() })
+                });
+                setMessage("folder-status", "Folder renamed.");
+                await loadPublishedFiles();
+              } catch (error) { setMessage("folder-status", error.message); }
+            });
+            addButton(controls, "Delete this folder", async () => {
+              if (!confirm(`Delete folder "${folder.name}"? Its files will become Unfiled; the files will NOT be deleted.`)) return;
+              try {
+                await api(`/files/folders/${folder.id}`, { method: "DELETE" });
+                selectedFolder = "unfiled";
+                setMessage("folder-status", "Folder deleted. Its files are now Unfiled.");
+                await loadPublishedFiles();
+              } catch (error) { setMessage("folder-status", error.message); }
+            }, "danger");
+            container.appendChild(controls);
+          }
+        }
+
+        const visible = publishedFiles.filter(file =>
+          selectedFolder === "all" ||
+          (selectedFolder === "unfiled" && file.folderId == null) ||
+          (selectedFolder !== "unfiled" && selectedFolder !== "all" && String(file.folderId) === selectedFolder)
+        );
+        const heading = selectedFolder === "all" ? "All Documents" :
+          selectedFolder === "unfiled" ? "Unfiled Documents" :
+          folders.find(f => String(f.id) === selectedFolder)?.name || "Documents";
+        addText(container, "h3", heading, "folder-heading");
+        if (!visible.length) {
+          addText(container, "p", "There are no published documents here yet.", "muted");
+          return;
+        }
+        for (const file of visible) {
+          const item = document.createElement("div");
+          item.className = "item";
+          const filename = file.filename || "Untitled file";
+          addText(item, "div", filename, "item-title");
+          const folderName = folders.find(f => Number(f.id) === Number(file.folderId) && file.folderId != null)?.name || "Unfiled";
+          const details = [
+            selectedFolder === "all" ? `Folder: ${folderName}` : "",
+            file.ownerUsername ? `Submitted by ${file.ownerUsername}` : "",
+            formatSize(file.sizeBytes),
+            file.publishedAt ? `Published ${formatDate(file.publishedAt)}` : ""
+          ].filter(Boolean).join(" · ");
+          addText(item, "div", details, "meta");
+          const actions = document.createElement("div");
+          actions.className = "folder-controls";
+          const download = document.createElement("a");
+          download.className = "button";
+          download.textContent = "Download";
+          download.href = `${API}/files/download/${encodeURIComponent(file.id)}`;
+          download.setAttribute("aria-label", `Download ${filename}`);
+          actions.appendChild(download);
+          if (roles.siteAdministrator) {
+            const select = document.createElement("select");
+            select.setAttribute("aria-label", `Folder for ${filename}`);
+            const unfiled = document.createElement("option");
+            unfiled.value = "";
+            unfiled.textContent = "Unfiled";
+            select.appendChild(unfiled);
+            for (const folder of folders) {
+              const option = document.createElement("option");
+              option.value = String(folder.id);
+              option.textContent = folder.name;
+              select.appendChild(option);
+            }
+            select.value = file.folderId == null ? "" : String(file.folderId);
+            const initial = select.value;
+            select.addEventListener("change", async () => {
+              select.disabled = true;
+              try {
+                await api(`/files/submissions/${encodeURIComponent(file.id)}/folder`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ folderId: select.value === "" ? null : Number(select.value) })
+                });
+                setMessage("folder-status", `Moved "${filename}".`);
+                await loadPublishedFiles();
+              } catch (error) {
+                select.value = initial;
+                setMessage("folder-status", `Could not move file: ${error.message}`);
+              } finally { select.disabled = false; }
+            });
+            actions.appendChild(select);
+            addButton(actions, "Delete published file", async () => {
+              if (!confirm(`Permanently delete "${filename}"? This cannot be undone.`)) return;
+              try {
+                await api(`/files/submissions/${encodeURIComponent(file.id)}`, { method: "DELETE" });
+                setMessage("folder-status", `Deleted "${filename}".`);
+                await loadPublishedFiles();
+                await loadMySubmissions();
+                await loadReviewQueue();
+              } catch (error) { setMessage("folder-status", `Could not delete file: ${error.message}`); }
+            }, "danger");
+          }
+          item.appendChild(actions);
+          container.appendChild(item);
         }
       }
 
@@ -602,6 +701,7 @@ const title = "Members | Montreal Math Circle";
 
           if (roles.siteAdministrator) {
             document.querySelector("#admin-panel").classList.remove("hidden");
+            document.querySelector("#folder-admin").classList.remove("hidden");
           }
 
           await loadPublishedFiles();
@@ -611,6 +711,26 @@ const title = "Members | Montreal Math Circle";
       }
 
       document.querySelector("#refresh-files").addEventListener("click", loadPublishedFiles);
+      document.querySelector("#folder-form").addEventListener("submit", async event => {
+        event.preventDefault();
+        const input = document.querySelector("#folder-name");
+        const name = input.value.trim();
+        if (!name || name.length > 80) {
+          setMessage("folder-status", "Folder names must be 1–80 characters.");
+          return;
+        }
+        try {
+          const result = await api("/files/folders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name })
+          });
+          input.value = "";
+          selectedFolder = String(result.folder.id);
+          setMessage("folder-status", `Created folder "${name}".`);
+          await loadPublishedFiles();
+        } catch (error) { setMessage("folder-status", `Could not create folder: ${error.message}`); }
+      });
       document.querySelector("#refresh-review").addEventListener("click", loadReviewQueue);
 
       document.querySelector("#upload-form").addEventListener("submit", async event => {
@@ -796,3 +916,4 @@ const title = "Members | Montreal Math Circle";
     </script>
   </body>
 </html>
+

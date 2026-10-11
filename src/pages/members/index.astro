@@ -398,11 +398,27 @@ const title = "Members | Montreal Math Circle";
         background: #f2edf9;
       }
 
+      
       .calendar-day.has-event {
-        background: #f6eff9;
-        border-color: #ad96cc;
+        background: #dceafa;
+        border-color: #6699cc;
+        color: #173b65;
       }
 
+      .calendar-day.has-event:hover {
+        background: #c5dff8;
+      }
+
+      .calendar-day.has-event.selected {
+        background: #a9cef5;
+        border: 2px solid #a81b24;
+      }
+
+      .calendar-day.has-event .calendar-event-dot {
+        background: #2563a6;
+      }
+
+        
       .calendar-day.selected {
         border: 2px solid #a81b24;
         background: #fceff0;
@@ -425,25 +441,33 @@ const title = "Members | Montreal Math Circle";
         min-height: 65px;
       }
 
+      
       .calendar-event-card {
-        padding: 13px 15px;
-        margin: 9px 0;
+        padding: 18px 20px;
+        margin: 20px 0;
         border: 1px solid #ddd4eb;
         border-left: 4px solid #ad96cc;
         border-radius: 9px;
         background: #fff;
       }
 
+
+      
       .calendar-event-title {
-        font-size: 14px;
+        font-size: 17px;
         font-weight: 700;
         color: #a81b24;
+        line-height: 1.5;
       }
 
+
+      
       .calendar-event-meta {
-        margin-top: 5px;
-        font-size: 12px;
-        color: #596579;
+        margin-top: 6px;
+        font-size: 11px;
+        font-weight: 400;
+        color: #687488;
+        line-height: 1.5;
       }
 
       .calendar-event-description {
@@ -537,6 +561,15 @@ const title = "Members | Montreal Math Circle";
             ></div>
 
             <h3>Events</h3>
+            
+            <button
+              id="calendar-show-all"
+              type="button"
+              class="secondary"
+            >
+              Show All Events This Month
+            </button>
+
             <div
               id="calendar-event-list"
               aria-live="polite"
@@ -1633,7 +1666,7 @@ const title = "Members | Montreal Math Circle";
           addText(
             list,
             "p",
-            `Showing events for ${formatCalendarDate(selectedCalendarDate)}. Click the date again to see the whole month.`,
+            `Showing events for ${formatCalendarDate(selectedCalendarDate)}.`,
             "muted"
           );
         }
@@ -1782,6 +1815,12 @@ const title = "Members | Montreal Math Circle";
           );
         }
       }
+      
+      document.querySelector("#calendar-show-all")
+        .addEventListener("click", () => {
+          selectedCalendarDate = null;
+          renderCalendar();
+        });
 
       document.querySelector("#calendar-prev")
         .addEventListener("click", () => {

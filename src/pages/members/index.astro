@@ -958,13 +958,16 @@ const title = "Members | Montreal Math Circle";
           folders = folderResult.folders || [];
           publishedFiles = fileResult.files || [];
 
-          if (
-            selectedFolder !== "all" &&
-            selectedFolder !== "unfiled" &&
-            !folders.some(f => String(f.id) === selectedFolder)
-          ) {
-            selectedFolder = "all";
-          }
+          
+if (
+  selectedFolder !== "none" &&
+  selectedFolder !== "all" &&
+  selectedFolder !== "unfiled" &&
+  !folders.some(f => String(f.id) === selectedFolder)
+) {
+  selectedFolder = "none";
+}
+
 
           renderPublishedFiles();
         } catch (error) {

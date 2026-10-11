@@ -134,12 +134,14 @@ const apiUrl = "https://api.montrealmathcircle.com";
 
           const result = await response.json();
 
+         
           if (response.ok && result.success) {
             window.location.href = "/members/";
           } else {
             message.textContent =
-              "Login failed. Check your name and password.";
+              result.error || `Login failed (HTTP ${response.status}).`;
           }
+
         } catch {
           message.textContent =
             "Unable to connect. Please try again later.";

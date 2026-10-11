@@ -36,15 +36,12 @@ function json(data, status = 200, request, extraHeaders = {}) {
     "Cache-Control": "no-store",
     ...extraHeaders
   });
-
   const origin = request?.headers.get("Origin");
-
   if (origin && ALLOWED_ORIGINS.has(origin)) {
     headers.set("Access-Control-Allow-Origin", origin);
     headers.set("Access-Control-Allow-Credentials", "true");
     headers.set("Vary", "Origin");
   }
-
   return new Response(JSON.stringify(data), { status, headers });
 }
 
@@ -68,12 +65,10 @@ function sameSecret(a, b) {
   if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) {
     return false;
   }
-
   let diff = 0;
   for (let i = 0; i < a.length; i++) {
     diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
   }
-
   return diff === 0;
 }
 
@@ -85,14 +80,12 @@ async function hashCode(code, salt) {
     false,
     ["deriveBits"]
   );
-
   const bits = await crypto.subtle.deriveBits({
     name: "PBKDF2",
     salt,
     iterations: 100000,
     hash: "SHA-256"
   }, key, 256);
-
   return toBase64(new Uint8Array(bits));
 }
 
@@ -103,12 +96,10 @@ function randomHex(n) {
 function getCookie(request, name) {
   for (const part of (request.headers.get("Cookie") || "").split(";")) {
     const i = part.indexOf("=");
-
     if (i >= 0 && part.slice(0, i).trim() === name) {
       return part.slice(i + 1).trim();
     }
   }
-
   return "";
 }
 
@@ -118,11 +109,9 @@ function cookieHeader(value, maxAge) {
 
 function corsPreflight(request) {
   const origin = request.headers.get("Origin") || "";
-
   if (!ALLOWED_ORIGINS.has(origin)) {
     return new Response(null, { status: 403 });
   }
-
   return new Response(null, {
     status: 204,
     headers: {
@@ -138,16 +127,12 @@ function corsPreflight(request) {
 
 async function applyLoginLimit(request, env) {
   const ip = request.headers.get("CF-Connecting-IP");
-
   if (!ip || !env.ADMIN_SECRET) return false;
-
   const ipHash = await sha256(`${env.ADMIN_SECRET}:${ip}`);
   const now = Math.floor(Date.now() / 1000);
-
   const row = await env.DB.prepare(
     "SELECT attempts, window_start FROM login_attempts WHERE ip_hash = ?"
   ).bind(ipHash).first();
-
   if (
     row &&
     now - row.window_start < RATE_WINDOW_SECONDS &&
@@ -155,7 +140,6 @@ async function applyLoginLimit(request, env) {
   ) {
     return false;
   }
-
   await env.DB.prepare(`
     INSERT INTO login_attempts (ip_hash, attempts, window_start)
     VALUES (?, 1, ?)
@@ -171,7 +155,6 @@ async function applyLoginLimit(request, env) {
         ELSE login_attempts.window_start
       END
   `).bind(ipHash, now, RATE_WINDOW_SECONDS, RATE_WINDOW_SECONDS).run();
-
   return true;
 }
 
@@ -183,15 +166,12 @@ function validUsername(u) {
 
 function safeFilename(name) {
   if (typeof name !== "string") return "";
-
   name = name.normalize("NFC")
     .split(/[\\/]/)
     .pop()
     .replace(/[\u0000-\u001f\u007f]/g, "")
     .trim();
-
   if (!name || name === "." || name === "..") return "";
-
   return name.length > 180 ? name.slice(-180) : name;
 }
 
@@ -202,12 +182,9 @@ function validFileRequestOrigin(request) {
 
 async function getSignedInMember(request, env) {
   const token = getCookie(request, SESSION_COOKIE);
-
   if (!/^[a-f0-9]{64}$/.test(token)) return null;
-
   const tokenHash = await sha256(token);
   const now = Math.floor(Date.now() / 1000);
-
   return env.DB.prepare(`
     SELECT m.id, m.name, m.username
     FROM sessions s
@@ -228,7 +205,6 @@ async function authorizedSiteAdministrator(request, env) {
   const member = await getSignedInMember(request, env);
   return Boolean(member && await isSiteAdministrator(member.id, env));
 }
-
 
 async function isFilePublisher(id, env) {
   return Boolean(
@@ -258,7 +234,8 @@ function submissionSummary(row) {
     status: row.status,
     createdAt: row.created_at,
     publishedAt: row.published_at,
-    publishedByMemberId: row.published_by_member_id
+    publishedByMemberId: row.published_by_member_id,
+    folderId: row.folder_id ?? null
   };
 }
 
@@ -293,7 +270,6 @@ export default {
         const result = await env.DB.prepare(
           "SELECT COUNT(*) AS total FROM members"
         ).first();
-
         return json({
           worker: "ok",
           database: "ok",
@@ -311,6 +287,7 @@ export default {
 
     // One-time initial administrator setup.
     // Do not run again after setup has succeeded.
+
     if (path === "/admin/initialize-site-admin") {
       if (request.method !== "POST") {
         return json({ error: "Method not allowed" }, 405, request);
@@ -429,7 +406,7 @@ export default {
     }
 
     // Login.
-    // Members with an individual password use it; others use the shared password.
+
     if (path === "/login") {
       if (request.method !== "POST") {
         return json({ error: "Method not allowed" }, 405, request);
@@ -523,6 +500,7 @@ export default {
     }
 
     // Verify the current session and return roles.
+
     if (path === "/me") {
       if (request.method !== "GET") {
         return json({ error: "Method not allowed" }, 405, request);
@@ -560,6 +538,7 @@ export default {
     }
 
     // Logout.
+
     if (path === "/logout") {
       if (request.method !== "POST") {
         return json({ error: "Method not allowed" }, 405, request);
@@ -584,7 +563,7 @@ export default {
     }
 
     // Administrator account management.
-    // This endpoint is new and returns accounts plus their current roles.
+
     if (path === "/admin/list-members") {
       if (request.method !== "GET") {
         return json({ error: "Method not allowed" }, 405, request);
@@ -650,17 +629,17 @@ export default {
         }
       } catch (error) {
         console.error("Administrator authorization failed:", error);
-        return json({ error: "Could not verify administrator access" }, 500, request);
+        return json({
+          error: "Could not verify administrator access"
+        }, 500, request);
       }
 
       const parsed = await readJson(request);
       if (parsed.error) return parsed.error;
-
       const body = parsed.body;
 
       // Create a member account.
-      
-      // Create a member account with an individual password.
+
       if (path === "/admin/create-member-account") {
         const name = typeof body.name === "string"
           ? body.name.trim()
@@ -695,7 +674,6 @@ export default {
         let memberId = null;
 
         try {
-          // Create the member's account.
           const codeSalt = crypto.getRandomValues(new Uint8Array(16));
           const codeHash = await hashCode(randomHex(32), codeSalt);
 
@@ -712,7 +690,6 @@ export default {
 
           memberId = result.meta.last_row_id;
 
-          // Hash the individual password with its own random salt.
           const passwordSalt = crypto.getRandomValues(
             new Uint8Array(16)
           );
@@ -722,7 +699,6 @@ export default {
             passwordSalt
           );
 
-          // Save the password hash and hexadecimal salt in D1.
           await env.DB.prepare(`
             INSERT INTO member_passwords
               (member_id, password_salt, password_hash)
@@ -739,9 +715,7 @@ export default {
             name,
             username
           }, 201, request);
-
         } catch (error) {
-          // If password creation fails, try to remove the incomplete account.
           if (memberId !== null) {
             try {
               await env.DB.prepare(
@@ -766,13 +740,11 @@ export default {
           }
 
           console.error("Member creation failed:", error);
-
           return json({
             error: "Could not create member account"
           }, 500, request);
         }
       }
-
 
       const username = typeof body.username === "string"
         ? body.username.trim().toLowerCase()
@@ -793,9 +765,12 @@ export default {
       }
 
       // Activate or deactivate an account.
+
       if (path === "/admin/set-member-active") {
         if (typeof body.active !== "boolean") {
-          return json({ error: "Provide active: true or false" }, 400, request);
+          return json({
+            error: "Provide active: true or false"
+          }, 400, request);
         }
 
         if (!body.active && await isSiteAdministrator(target.id, env)) {
@@ -835,6 +810,7 @@ export default {
       }
 
       // Grant or revoke contributor or publisher permissions.
+
       if (
         path === "/admin/set-file-contributor" ||
         path === "/admin/set-file-publisher"
@@ -871,6 +847,7 @@ export default {
       }
 
       // Grant or revoke site-administrator permissions.
+
       if (typeof body.administrator !== "boolean") {
         return json({
           error: "Provide administrator: true or false"
@@ -911,12 +888,15 @@ export default {
     }
 
     // File routes require an active signed-in member.
+
     if (path.startsWith("/files/")) {
       if (
         ["POST", "DELETE"].includes(request.method) &&
         !validFileRequestOrigin(request)
       ) {
-        return json({ error: "Invalid request origin" }, 403, request);
+        return json({
+          error: "Invalid request origin"
+        }, 403, request);
       }
 
       let member;
@@ -925,11 +905,15 @@ export default {
         member = await getSignedInMember(request, env);
       } catch (error) {
         console.error("File session check failed:", error);
-        return json({ error: "Could not verify session" }, 500, request);
+        return json({
+          error: "Could not verify session"
+        }, 500, request);
       }
 
       if (!member) {
-        return json({ error: "Sign in required" }, 401, request);
+        return json({
+          error: "Sign in required"
+        }, 401, request);
       }
 
       let publisher;
@@ -940,13 +924,255 @@ export default {
         contributor = await isFileContributor(member.id, env);
       } catch (error) {
         console.error("File permission check failed:", error);
-        return json({ error: "Could not verify permissions" }, 500, request);
+        return json({
+          error: "Could not verify permissions"
+        }, 500, request);
       }
 
-      // List published files and submissions visible to this member.
+      // FOLDER SYSTEM
+      // Members can view folders.
+      // Only administrators can manage folders.
+
+      if (path === "/files/folders" && request.method === "GET") {
+        try {
+          const result = await env.DB.prepare(`
+            SELECT
+              f.id,
+              f.name,
+              f.created_at AS createdAt,
+              (
+                SELECT COUNT(*)
+                FROM file_submissions s
+                WHERE s.folder_id = f.id
+                  AND s.status = 'published'
+              ) AS fileCount
+            FROM file_folders f
+            ORDER BY f.name COLLATE NOCASE, f.id
+          `).all();
+
+          return json({
+            folders: result.results || []
+          }, 200, request);
+        } catch (error) {
+          console.error("Folder listing failed:", error);
+          return json({
+            error: "Could not load folders"
+          }, 500, request);
+        }
+      }
+
+      // Create folder.
+
+      if (path === "/files/folders" && request.method === "POST") {
+        if (!await isSiteAdministrator(member.id, env)) {
+          return json({
+            error: "Administrator permission required"
+          }, 403, request);
+        }
+
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const name = typeof parsed.body.name === "string"
+          ? parsed.body.name.trim()
+          : "";
+
+        if (
+          !name ||
+          name.length > 80 ||
+          /[\u0000-\u001f\u007f]/.test(name)
+        ) {
+          return json({
+            error: "Folder name must be 1–80 characters"
+          }, 400, request);
+        }
+
+        try {
+          const result = await env.DB.prepare(
+            "INSERT INTO file_folders (name) VALUES (?)"
+          ).bind(name).run();
+
+          return json({
+            success: true,
+            folder: {
+              id: result.meta.last_row_id,
+              name
+            }
+          }, 201, request);
+        } catch (error) {
+          if (String(error).includes("UNIQUE")) {
+            return json({
+              error: "A folder with that name already exists"
+            }, 409, request);
+          }
+
+          console.error("Folder creation failed:", error);
+          return json({
+            error: "Could not create folder"
+          }, 500, request);
+        }
+      }
+
+      // Rename or delete folder.
+
+      const folderRoute = path.match(
+        /^\/files\/folders\/([0-9]+)$/
+      );
+
+      if (
+        folderRoute &&
+        ["POST", "DELETE"].includes(request.method)
+      ) {
+        if (!await isSiteAdministrator(member.id, env)) {
+          return json({
+            error: "Administrator permission required"
+          }, 403, request);
+        }
+
+        const folderId = Number(folderRoute[1]);
+
+        try {
+          const folder = await env.DB.prepare(
+            "SELECT id FROM file_folders WHERE id = ?"
+          ).bind(folderId).first();
+
+          if (!folder) {
+            return json({
+              error: "Folder not found"
+            }, 404, request);
+          }
+
+          if (request.method === "DELETE") {
+            // Preserve documents when their folder is removed.
+            await env.DB.batch([
+              env.DB.prepare(`
+                UPDATE file_submissions
+                SET folder_id = NULL
+                WHERE folder_id = ?
+              `).bind(folderId),
+              env.DB.prepare(`
+                DELETE FROM file_folders
+                WHERE id = ?
+              `).bind(folderId)
+            ]);
+
+            return json({
+              success: true
+            }, 200, request);
+          }
+
+          const parsed = await readJson(request);
+          if (parsed.error) return parsed.error;
+
+          const name = typeof parsed.body.name === "string"
+            ? parsed.body.name.trim()
+            : "";
+
+          if (
+            !name ||
+            name.length > 80 ||
+            /[\u0000-\u001f\u007f]/.test(name)
+          ) {
+            return json({
+              error: "Folder name must be 1–80 characters"
+            }, 400, request);
+          }
+
+          await env.DB.prepare(`
+            UPDATE file_folders
+            SET name = ?
+            WHERE id = ?
+          `).bind(name, folderId).run();
+
+          return json({
+            success: true
+          }, 200, request);
+        } catch (error) {
+          if (String(error).includes("UNIQUE")) {
+            return json({
+              error: "A folder with that name already exists"
+            }, 409, request);
+          }
+
+          console.error("Folder update failed:", error);
+          return json({
+            error: "Could not update folder"
+          }, 500, request);
+        }
+      }
+
+      // Assign published document to folder.
+      // null = Unfiled.
+
+      const moveFile = path.match(
+        /^\/files\/submissions\/([0-9]+)\/folder$/
+      );
+
+      if (moveFile && request.method === "POST") {
+        if (!await isSiteAdministrator(member.id, env)) {
+          return json({
+            error: "Administrator permission required"
+          }, 403, request);
+        }
+
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const folderId = parsed.body.folderId;
+
+        if (
+          folderId !== null &&
+          (!Number.isSafeInteger(folderId) || folderId < 1)
+        ) {
+          return json({
+            error: "Use a valid folderId or null for Unfiled"
+          }, 400, request);
+        }
+
+        try {
+          if (folderId !== null) {
+            const folder = await env.DB.prepare(
+              "SELECT id FROM file_folders WHERE id = ?"
+            ).bind(folderId).first();
+
+            if (!folder) {
+              return json({
+                error: "Folder not found"
+              }, 404, request);
+            }
+          }
+
+          const result = await env.DB.prepare(`
+            UPDATE file_submissions
+            SET folder_id = ?
+            WHERE id = ?
+              AND status = 'published'
+          `).bind(folderId, Number(moveFile[1])).run();
+
+          if (!result.meta.changes) {
+            return json({
+              error: "Published document not found"
+            }, 404, request);
+          }
+
+          return json({
+            success: true
+          }, 200, request);
+        } catch (error) {
+          console.error("Moving file failed:", error);
+          return json({
+            error: "Could not move document"
+          }, 500, request);
+        }
+      }
+
+      // List published files and submissions.
+
       if (path === "/files/list") {
         if (request.method !== "GET") {
-          return json({ error: "Method not allowed" }, 405, request);
+          return json({
+            error: "Method not allowed"
+          }, 405, request);
         }
 
         try {
@@ -1010,24 +1236,35 @@ export default {
           }, 200, request);
         } catch (error) {
           console.error("File listing failed:", error);
-          return json({ error: "Could not retrieve files" }, 500, request);
+          return json({
+            error: "Could not retrieve files"
+          }, 500, request);
         }
       }
 
-      // Upload files: contributors and publishers only.
+      // Upload files.
+
       if (path === "/files/upload") {
         if (request.method !== "POST") {
-          return json({ error: "Method not allowed" }, 405, request);
+          return json({
+            error: "Method not allowed"
+          }, 405, request);
         }
 
         if (!publisher && !contributor) {
-          return json({ error: "Contributor permission required" }, 403, request);
+          return json({
+            error: "Contributor permission required"
+          }, 403, request);
         }
 
-        const length = Number(request.headers.get("Content-Length") || 0);
+        const length = Number(
+          request.headers.get("Content-Length") || 0
+        );
 
         if (length > MAX_UPLOAD_REQUEST) {
-          return json({ error: "Upload request is too large" }, 413, request);
+          return json({
+            error: "Upload request is too large"
+          }, 413, request);
         }
 
         let form;
@@ -1043,14 +1280,18 @@ export default {
         const file = form.get("file");
 
         if (!file || typeof file.arrayBuffer !== "function") {
-          return json({ error: "Choose a file to upload" }, 400, request);
+          return json({
+            error: "Choose a file to upload"
+          }, 400, request);
         }
 
         const filename = safeFilename(file.name);
         const type = (file.type || "").toLowerCase();
 
         if (!filename) {
-          return json({ error: "Invalid filename" }, 400, request);
+          return json({
+            error: "Invalid filename"
+          }, 400, request);
         }
 
         if (file.size < 1 || file.size > MAX_FILE_SIZE) {
@@ -1111,15 +1352,19 @@ export default {
           }, 201, request);
         } catch (error) {
           console.error("Upload failed:", error);
-          return json({ error: "Could not save submission" }, 500, request);
+          return json({
+            error: "Could not save submission"
+          }, 500, request);
         }
       }
 
-      // Contributors see their own unpublished submissions.
-      // Publishers see pending submissions from all contributors.
+      // View submissions.
+
       if (path === "/files/submissions") {
         if (request.method !== "GET") {
-          return json({ error: "Method not allowed" }, 405, request);
+          return json({
+            error: "Method not allowed"
+          }, 405, request);
         }
 
         if (!publisher && !contributor) {
@@ -1150,14 +1395,19 @@ export default {
           }, 200, request);
         } catch (error) {
           console.error("Submission list failed:", error);
-          return json({ error: "Could not load submissions" }, 500, request);
+          return json({
+            error: "Could not load submissions"
+          }, 500, request);
         }
       }
 
       // Published files are visible to all signed-in members.
+
       if (path === "/files/published") {
         if (request.method !== "GET") {
-          return json({ error: "Method not allowed" }, 405, request);
+          return json({
+            error: "Method not allowed"
+          }, 405, request);
         }
 
         try {
@@ -1173,18 +1423,23 @@ export default {
           }, 200, request);
         } catch (error) {
           console.error("Published file list failed:", error);
-          return json({ error: "Could not load published files" }, 500, request);
+          return json({
+            error: "Could not load published files"
+          }, 500, request);
         }
       }
 
-      // Publish or reject pending submissions: publishers only.
+      // Publish or reject pending submissions.
+
       const review = path.match(
         /^\/files\/submissions\/([0-9]+)\/(publish|reject)$/
       );
 
       if (review) {
         if (request.method !== "POST") {
-          return json({ error: "Method not allowed" }, 405, request);
+          return json({
+            error: "Method not allowed"
+          }, 405, request);
         }
 
         if (!publisher) {
@@ -1210,7 +1465,9 @@ export default {
 
           if (action === "publish") {
             if (!await env.FILES.head(row.object_key)) {
-              return json({ error: "The stored file is missing" }, 500, request);
+              return json({
+                error: "The stored file is missing"
+              }, 500, request);
             }
 
             const result = await env.DB.prepare(`
@@ -1253,19 +1510,24 @@ export default {
           }, 200, request);
         } catch (error) {
           console.error("Submission review failed:", error);
-          return json({ error: "Could not review submission" }, 500, request);
+          return json({
+            error: "Could not review submission"
+          }, 500, request);
         }
       }
 
-      
-      // Delete submissions:
-      // Site administrators may delete any submission, including published files.
-      // Other contributors may delete only their own unpublished submissions.
-      const deletion = path.match(/^\/files\/submissions\/([0-9]+)$/);
+      // Delete submissions.
+      // Only administrators can delete published files.
+
+      const deletion = path.match(
+        /^\/files\/submissions\/([0-9]+)$/
+      );
 
       if (deletion) {
         if (request.method !== "DELETE") {
-          return json({ error: "Method not allowed" }, 405, request);
+          return json({
+            error: "Method not allowed"
+          }, 405, request);
         }
 
         const id = Number(deletion[1]);
@@ -1276,19 +1538,21 @@ export default {
           ).bind(id).first();
 
           if (!row) {
-            return json({ error: "Submission not found" }, 404, request);
+            return json({
+              error: "Submission not found"
+            }, 404, request);
           }
 
-          const administrator = await isSiteAdministrator(member.id, env);
+          const administrator = await isSiteAdministrator(
+            member.id, env
+          );
 
-          // Only site administrators may delete published files.
           if (row.status === "published" && !administrator) {
             return json({
               error: "Only a site administrator can delete published files"
             }, 403, request);
           }
 
-          // Non-administrators may delete only their own submissions.
           if (!administrator) {
             if (!contributor) {
               return json({
@@ -1309,7 +1573,10 @@ export default {
             "DELETE FROM file_submissions WHERE id = ?"
           ).bind(id).run();
 
-          return json({ success: true, id }, 200, request);
+          return json({
+            success: true,
+            id
+          }, 200, request);
         } catch (error) {
           console.error("Submission deletion failed:", error);
           return json({
@@ -1318,12 +1585,17 @@ export default {
         }
       }
 
-      // Download published files: any signed-in member.
-      const download = path.match(/^\/files\/download\/([0-9]+)$/);
+      // Download published files.
+
+      const download = path.match(
+        /^\/files\/download\/([0-9]+)$/
+      );
 
       if (download) {
         if (request.method !== "GET") {
-          return json({ error: "Method not allowed" }, 405, request);
+          return json({
+            error: "Method not allowed"
+          }, 405, request);
         }
 
         try {
@@ -1341,7 +1613,9 @@ export default {
           const object = await env.FILES.get(row.object_key);
 
           if (!object) {
-            return json({ error: "Stored file not found" }, 404, request);
+            return json({
+              error: "Stored file not found"
+            }, 404, request);
           }
 
           const filename = row.original_filename
@@ -1371,13 +1645,20 @@ export default {
           });
         } catch (error) {
           console.error("Download failed:", error);
-          return json({ error: "Could not download file" }, 500, request);
+          return json({
+            error: "Could not download file"
+          }, 500, request);
         }
       }
 
-      return json({ error: "File route not found" }, 404, request);
+      return json({
+        error: "File route not found"
+      }, 404, request);
     }
 
-    return json({ error: "Not found" }, 404, request);
+    return json({
+      error: "Not found"
+    }, 404, request);
   }
 };
+

@@ -557,10 +557,10 @@ const title = "Members | Montreal Math Circle";
   await loadMySubmissions();
 }
 
-          if (roles.filePublisher) {
-            document.querySelector("#publisher-panel").classList.remove("hidden");
-            await loadReviewQueue();
-          }
+         if (roles.filePublisher || roles.siteAdministrator) {
+  document.querySelector("#publisher-panel").classList.remove("hidden");
+  await loadReviewQueue();
+}
 
           if (roles.siteAdministrator) {
             document.querySelector("#admin-panel").classList.remove("hidden");

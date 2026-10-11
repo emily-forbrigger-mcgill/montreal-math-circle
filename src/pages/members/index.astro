@@ -369,7 +369,9 @@ const title = "Members | Montreal Math Circle";
           for (const file of files) {
             const item = document.createElement("div");
             item.className = "item";
-            addText(item, "div", file.filename || file.original_filename || "Untitled file", "item-title");
+
+            const filename = file.filename || file.original_filename || "Untitled file";
+            addText(item, "div", filename, "item-title");
 
             const details = [
               file.ownerUsername ? `Submitted by ${file.ownerUsername}` : "",
@@ -385,8 +387,44 @@ const title = "Members | Montreal Math Circle";
             download.className = "button";
             download.textContent = "Download";
             download.href = `${API}/files/download/${encodeURIComponent(file.id)}`;
-            download.setAttribute("aria-label", `Download ${file.filename || "file"}`);
+            download.setAttribute("aria-label", `Download ${filename}`);
             item.appendChild(download);
+
+            // Only site administrators see this button.
+            // The Worker must also enforce this permission server-side.
+            if (roles.siteAdministrator) {
+              addButton(
+                item,
+                "Delete published file",
+                async () => {
+                  if (!confirm(
+                    `Permanently delete "${filename}"? Members will no longer be able to download it. This cannot be undone.`
+                  )) {
+                    return;
+                  }
+
+                  try {
+                    await api(
+                      `/files/submissions/${encodeURIComponent(file.id)}`,
+                      { method: "DELETE" }
+                    );
+
+                    await loadPublishedFiles();
+                    await loadMySubmissions();
+                    await loadReviewQueue();
+
+                    setMessage(
+                      "role-status",
+                      `Deleted "${filename}".`
+                    );
+                  } catch (error) {
+                    alert(`Could not delete published file: ${error.message}`);
+                  }
+                },
+                "danger"
+              );
+            }
+
             container.appendChild(item);
           }
         } catch (error) {
@@ -419,7 +457,7 @@ const title = "Members | Montreal Math Circle";
           const submissions = result.submissions || [];
 
           if (!submissions.length) {
-            addText(container, "p", "You have no pending submissions.", "muted");
+            addText(container, "p", "You have no submissions.", "muted");
             return;
           }
 
@@ -548,19 +586,19 @@ const title = "Members | Montreal Math Circle";
           statusBox.textContent = "";
 
           if (
-  roles.siteAdministrator ||
-  roles.fileContributor ||
-  roles.filePublisher
-) {
-  document.querySelector("#upload-panel").classList.remove("hidden");
-  document.querySelector("#my-submissions-panel").classList.remove("hidden");
-  await loadMySubmissions();
-}
+            roles.siteAdministrator ||
+            roles.fileContributor ||
+            roles.filePublisher
+          ) {
+            document.querySelector("#upload-panel").classList.remove("hidden");
+            document.querySelector("#my-submissions-panel").classList.remove("hidden");
+            await loadMySubmissions();
+          }
 
-         if (roles.filePublisher || roles.siteAdministrator) {
-  document.querySelector("#publisher-panel").classList.remove("hidden");
-  await loadReviewQueue();
-}
+          if (roles.filePublisher || roles.siteAdministrator) {
+            document.querySelector("#publisher-panel").classList.remove("hidden");
+            await loadReviewQueue();
+          }
 
           if (roles.siteAdministrator) {
             document.querySelector("#admin-panel").classList.remove("hidden");
@@ -573,7 +611,6 @@ const title = "Members | Montreal Math Circle";
       }
 
       document.querySelector("#refresh-files").addEventListener("click", loadPublishedFiles);
-
       document.querySelector("#refresh-review").addEventListener("click", loadReviewQueue);
 
       document.querySelector("#upload-form").addEventListener("submit", async event => {
@@ -625,26 +662,17 @@ const title = "Members | Montreal Math Circle";
         const confirmPassword = document.querySelector("#confirm-password").value;
 
         if (password.length < 12) {
-          setMessage(
-            "create-account-status",
-            "The password must be at least 12 characters long."
-          );
+          setMessage("create-account-status", "The password must be at least 12 characters long.");
           return;
         }
 
         if (password.length > 256) {
-          setMessage(
-            "create-account-status",
-            "The password cannot exceed 256 characters."
-          );
+          setMessage("create-account-status", "The password cannot exceed 256 characters.");
           return;
         }
 
         if (password !== confirmPassword) {
-          setMessage(
-            "create-account-status",
-            "The passwords do not match. Please check them and try again."
-          );
+          setMessage("create-account-status", "The passwords do not match. Please check them and try again.");
           return;
         }
 
@@ -665,10 +693,7 @@ const title = "Members | Montreal Math Circle";
 
           document.querySelector("#create-account-form").reset();
         } catch (error) {
-          setMessage(
-            "create-account-status",
-            `Could not create account: ${error.message}`
-          );
+          setMessage("create-account-status", `Could not create account: ${error.message}`);
         } finally {
           button.disabled = false;
         }
@@ -703,6 +728,7 @@ const title = "Members | Montreal Math Circle";
           }
 
           setMessage("role-status", `Saved roles for ${username}.`);
+
           if (username === currentMember.username) {
             setMessage(
               "role-status",
@@ -740,7 +766,9 @@ const title = "Members | Montreal Math Circle";
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, active })
           });
+
           setMessage("active-status", `Updated ${username}: ${active ? "active" : "inactive"}.`);
+
           if (!active && username === currentMember.username) {
             window.location.replace("/members/login");
           }

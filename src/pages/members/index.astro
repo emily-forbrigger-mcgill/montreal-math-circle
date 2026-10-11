@@ -5,16 +5,32 @@ const title = "Members | Montreal Math Circle";
 
 <html lang="en">
   <head>
+       <!-- Same fonts as the main website -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Mali:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <style>
       :root {
-        font-family: Arial, sans-serif;
-        color: #202b3c;
-        background: #f1edff;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: #18181b;
+        background: #fafbfc;
+            }
+            /* Match the main website headings */
+      h1, h2, h3, h4 {
+        font-family: 'Mali', cursive, system-ui, sans-serif;
+        font-weight: 700;
       }
-
+      
+      /* Match the main website buttons and form controls */
+      button, input, select {
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      }
       * { box-sizing: border-box; }
 
       body { margin: 0; }

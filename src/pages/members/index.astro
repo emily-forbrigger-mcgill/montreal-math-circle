@@ -451,6 +451,89 @@ const title = "Members | Montreal Math Circle";
               ></div>
             </div>
           </section>
+           
+          <!-- Member Directory -->
+          <section class="panel wide" id="member-directory-panel">
+            <h2>Member Directory</h2>
+            <p>Contact information for Montreal Math Circle members.</p>
+
+            <div
+              id="directory-list"
+              class="links-list"
+              aria-live="polite"
+            >
+              Loading member directory…
+            </div>
+
+            <!-- Administrator-only editing controls -->
+            <div id="directory-admin" class="hidden">
+              <h3 id="directory-form-heading">Add a Directory Member</h3>
+
+              <form id="directory-form">
+                <div class="field">
+                  <label for="directory-name">Full name</label>
+                  <input
+                    id="directory-name"
+                    required
+                    maxlength="120"
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="directory-role">Role or position (optional)</label>
+                  <input id="directory-role" maxlength="120" />
+                </div>
+
+                <div class="field">
+                  <label for="directory-email">Email (optional)</label>
+                  <input
+                    id="directory-email"
+                    type="email"
+                    maxlength="254"
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="directory-phone">Phone (optional)</label>
+                  <input id="directory-phone" type="tel" maxlength="60" />
+                </div>
+
+                <div class="field">
+                  <label for="directory-description">
+                    Short description (optional)
+                  </label>
+                  <textarea
+                    id="directory-description"
+                    maxlength="500"
+                    rows="3"
+                    style="width:100%; padding:11px; border:1px solid #ccd3dd; border-radius:6px; font:inherit;"
+                  ></textarea>
+                </div>
+
+                <div class="link-form-actions">
+                  <button id="directory-save" type="submit">
+                    Add member
+                  </button>
+
+                  <button
+                    id="directory-cancel"
+                    type="button"
+                    class="secondary hidden"
+                  >
+                    Cancel edit
+                  </button>
+                </div>
+              </form>
+
+              <div
+                id="directory-status"
+                class="notice"
+                role="status"
+                aria-live="polite"
+              ></div>
+            </div>
+          </section>
+
 
 
           <section class="panel wide">
@@ -934,6 +1017,260 @@ const title = "Members | Montreal Math Circle";
             setMessage(
               "links-status",
               `Could not save link: ${error.message}`
+            );
+          } finally {
+            button.disabled = false;
+          }
+        });
+      
+      // MEMBER DIRECTORY
+
+      let directoryMembers = [];
+      let editingDirectoryId = null;
+
+      function resetDirectoryForm() {
+        editingDirectoryId = null;
+        document.querySelector("#directory-form").reset();
+        document.querySelector("#directory-form-heading").textContent =
+          "Add a Directory Member";
+        document.querySelector("#directory-save").textContent =
+          "Add member";
+        document.querySelector("#directory-cancel").classList.add("hidden");
+      }
+
+      function renderMemberDirectory() {
+        const list = document.querySelector("#directory-list");
+        list.replaceChildren();
+
+        if (!directoryMembers.length) {
+          addText(
+            list,
+            "p",
+            "No members have been added to the directory yet.",
+            "muted"
+          );
+          return;
+        }
+
+        for (const [index, member] of directoryMembers.entries()) {
+          const entry = document.createElement("div");
+          entry.className = "link-entry";
+
+          const name = addText(
+            entry,
+            "div",
+            member.fullName,
+            "item-title"
+          );
+          name.style.color = "#a81b24";
+
+          if (member.memberRole) {
+            addText(entry, "div", member.memberRole, "meta");
+          }
+
+          if (member.email) {
+            const emailLine = document.createElement("div");
+            emailLine.className = "meta";
+
+            const emailLink = document.createElement("a");
+            emailLink.textContent = member.email;
+            emailLink.href = "mailto:" + member.email;
+            emailLine.appendChild(emailLink);
+            entry.appendChild(emailLine);
+          }
+
+          if (member.phone) {
+            const phoneLine = document.createElement("div");
+            phoneLine.className = "meta";
+
+            const phoneLink = document.createElement("a");
+            phoneLink.textContent = member.phone;
+            phoneLink.href = "tel:" + member.phone.replace(/[^\d+]/g, "");
+            phoneLine.appendChild(phoneLink);
+            entry.appendChild(phoneLine);
+          }
+
+          if (member.description) {
+            addText(
+              entry,
+              "p",
+              member.description,
+              "link-description"
+            );
+          }
+
+          if (roles.siteAdministrator) {
+            const actions = document.createElement("div");
+            actions.className = "link-actions";
+
+            addButton(actions, "Edit", () => {
+              editingDirectoryId = member.id;
+
+              document.querySelector("#directory-name").value =
+                member.fullName || "";
+              document.querySelector("#directory-role").value =
+                member.memberRole || "";
+              document.querySelector("#directory-email").value =
+                member.email || "";
+              document.querySelector("#directory-phone").value =
+                member.phone || "";
+              document.querySelector("#directory-description").value =
+                member.description || "";
+
+              document.querySelector("#directory-form-heading").textContent =
+                "Edit Directory Member";
+              document.querySelector("#directory-save").textContent =
+                "Save changes";
+              document.querySelector("#directory-cancel")
+                .classList.remove("hidden");
+
+              document.querySelector("#directory-admin").scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+              });
+
+              document.querySelector("#directory-name").focus();
+            });
+
+            async function moveDirectoryMember(otherIndex) {
+              const ids = directoryMembers.map(item => item.id);
+
+              [ids[index], ids[otherIndex]] =
+                [ids[otherIndex], ids[index]];
+
+              try {
+                await api("/member-directory/reorder", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ ids })
+                });
+
+                await loadMemberDirectory();
+                setMessage("directory-status", "Directory order updated.");
+              } catch (error) {
+                setMessage(
+                  "directory-status",
+                  `Could not reorder directory: ${error.message}`
+                );
+              }
+            }
+
+            const up = addButton(
+              actions,
+              "↑ Up",
+              () => moveDirectoryMember(index - 1)
+            );
+            up.disabled = index === 0;
+
+            const down = addButton(
+              actions,
+              "↓ Down",
+              () => moveDirectoryMember(index + 1)
+            );
+            down.disabled = index === directoryMembers.length - 1;
+
+            addButton(
+              actions,
+              "Delete",
+              async () => {
+                if (!confirm(
+                  `Remove "${member.fullName}" from the directory?`
+                )) return;
+
+                try {
+                  await api(
+                    `/member-directory/${encodeURIComponent(member.id)}`,
+                    { method: "DELETE" }
+                  );
+
+                  if (editingDirectoryId === member.id) {
+                    resetDirectoryForm();
+                  }
+
+                  await loadMemberDirectory();
+                  setMessage(
+                    "directory-status",
+                    "Directory member removed."
+                  );
+                } catch (error) {
+                  setMessage(
+                    "directory-status",
+                    `Could not delete member: ${error.message}`
+                  );
+                }
+              },
+              "danger"
+            );
+
+            entry.appendChild(actions);
+          }
+
+          list.appendChild(entry);
+        }
+      }
+
+      async function loadMemberDirectory() {
+        const list = document.querySelector("#directory-list");
+
+        try {
+          const result = await api("/member-directory");
+          directoryMembers = result.members || [];
+          renderMemberDirectory();
+        } catch (error) {
+          list.replaceChildren();
+          addText(
+            list,
+            "p",
+            `Could not load member directory: ${error.message}`,
+            "muted"
+          );
+        }
+      }
+
+      document.querySelector("#directory-cancel")
+        .addEventListener("click", resetDirectoryForm);
+
+      document.querySelector("#directory-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const data = {
+            fullName: document.querySelector("#directory-name").value.trim(),
+            memberRole: document.querySelector("#directory-role").value.trim(),
+            email: document.querySelector("#directory-email").value.trim(),
+            phone: document.querySelector("#directory-phone").value.trim(),
+            description:
+              document.querySelector("#directory-description").value.trim()
+          };
+
+          const wasEditing = editingDirectoryId !== null;
+          const path = wasEditing
+            ? `/member-directory/${encodeURIComponent(editingDirectoryId)}`
+            : "/member-directory";
+
+          const button = document.querySelector("#directory-save");
+          button.disabled = true;
+
+          try {
+            await api(path, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data)
+            });
+
+            resetDirectoryForm();
+            await loadMemberDirectory();
+
+            setMessage(
+              "directory-status",
+              wasEditing
+                ? "Directory member updated."
+                : "Directory member added."
+            );
+          } catch (error) {
+            setMessage(
+              "directory-status",
+              `Could not save directory member: ${error.message}`
             );
           } finally {
             button.disabled = false;
@@ -1427,12 +1764,16 @@ if (
             document.querySelector("#admin-panel").classList.remove("hidden");
             document.querySelector("#folder-admin").classList.remove("hidden");
             document.querySelector("#links-admin").classList.remove("hidden");
+            document.querySelector("#directory-admin").classList.remove("hidden");
           }
 
+          
           await Promise.all([
-  loadPublishedFiles(),
-  loadImportantLinks()
-]);
+            loadPublishedFiles(),
+            loadImportantLinks(),
+            loadMemberDirectory()
+          ]);
+
         } catch (error) {
           statusBox.textContent = `Unable to verify your sign-in: ${error.message}`;
         }

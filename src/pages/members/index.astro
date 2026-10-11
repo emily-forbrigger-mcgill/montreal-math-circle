@@ -348,6 +348,140 @@ const title = "Members | Montreal Math Circle";
         flex-wrap: wrap;
         gap: 8px;
       }
+     
+      /* Montreal Math Circle Calendar */
+
+      .calendar-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 18px 0;
+      }
+
+      .calendar-toolbar h3 {
+        margin: 0;
+        color: #203e65;
+        text-align: center;
+      }
+
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 5px;
+        margin: 14px 0 24px;
+      }
+
+      .calendar-weekday {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #596579;
+        padding: 10px 2px;
+      }
+
+      .calendar-day {
+        min-width: 0;
+        min-height: 65px;
+        padding: 8px;
+        border: 1px solid #ded7ed;
+        border-radius: 7px;
+        background: #fff;
+        color: #203e65;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .calendar-day:hover {
+        background: #f2edf9;
+      }
+
+      .calendar-day.has-event {
+        background: #f6eff9;
+        border-color: #ad96cc;
+      }
+
+      .calendar-day.selected {
+        border: 2px solid #a81b24;
+        background: #fceff0;
+      }
+
+      .calendar-day-number {
+        display: block;
+      }
+
+      .calendar-event-dot {
+        display: block;
+        width: 7px;
+        height: 7px;
+        margin-top: 7px;
+        border-radius: 50%;
+        background: #a81b24;
+      }
+
+      .calendar-empty {
+        min-height: 65px;
+      }
+
+      .calendar-event-card {
+        padding: 13px 15px;
+        margin: 9px 0;
+        border: 1px solid #ddd4eb;
+        border-left: 4px solid #ad96cc;
+        border-radius: 9px;
+        background: #fff;
+      }
+
+      .calendar-event-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #a81b24;
+      }
+
+      .calendar-event-meta {
+        margin-top: 5px;
+        font-size: 12px;
+        color: #596579;
+      }
+
+      .calendar-event-description {
+        margin-top: 8px;
+        font-size: 13px;
+        white-space: pre-wrap;
+      }
+
+      #calendar-admin {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid #e8e0f1;
+      }
+
+      #calendar-form {
+        max-width: 650px;
+      }
+
+      @media (max-width: 680px) {
+        .calendar-day,
+        .calendar-empty {
+          min-height: 43px;
+        }
+
+        .calendar-day {
+          padding: 5px;
+          font-size: 12px;
+        }
+
+        .calendar-toolbar button {
+          padding: 8px 10px;
+          font-size: 12px;
+        }
+
+        .calendar-weekday {
+          font-size: 10px;
+        }
+      }
 
     </style>
   </head>
@@ -372,11 +506,101 @@ const title = "Members | Montreal Math Circle";
             <a class="button" href="https://groups.io/g/montrealmathcircle/messages?expanded=1" target="_blank" rel="noopener noreferrer">Discussion Board →</a>
           </section>
 
-          <section class="panel">
+          
+          <!-- Members Calendar -->
+          <section class="panel wide" id="calendar-panel">
             <h2>Calendar</h2>
-            <p>View upcoming meetings, activities, and other Montreal Math Circle events.</p>
-            <a class="button" href="https://groups.io/g/montrealmathcircle/calendar" target="_blank" rel="noopener noreferrer">View Calendar →</a>
+            <p>Upcoming Montreal Math Circle meetings and activities.</p>
+
+            <div class="calendar-toolbar">
+              <button
+                id="calendar-prev"
+                class="secondary"
+                type="button"
+                aria-label="Previous month"
+              >← Previous</button>
+
+              <h3 id="calendar-month-heading"></h3>
+
+              <button
+                id="calendar-next"
+                class="secondary"
+                type="button"
+                aria-label="Next month"
+              >Next →</button>
+            </div>
+
+            <div
+              id="calendar-grid"
+              class="calendar-grid"
+              aria-label="Monthly calendar"
+            ></div>
+
+            <h3>Events</h3>
+            <div
+              id="calendar-event-list"
+              aria-live="polite"
+            >Loading events…</div>
+
+            <!-- Visible only to site administrators -->
+            <div id="calendar-admin" class="hidden">
+              <h3 id="calendar-form-heading">Add an Event</h3>
+
+              <form id="calendar-form">
+                <div class="field">
+                  <label for="calendar-title">Event title</label>
+                  <input id="calendar-title" required maxlength="150" />
+                </div>
+
+                <div class="field">
+                  <label for="calendar-date">Date</label>
+                  <input id="calendar-date" type="date" required />
+                </div>
+
+                <div class="field">
+                  <label for="calendar-start">Start time (optional)</label>
+                  <input id="calendar-start" type="time" />
+                </div>
+
+                <div class="field">
+                  <label for="calendar-end">End time (optional)</label>
+                  <input id="calendar-end" type="time" />
+                </div>
+
+                <div class="field">
+                  <label for="calendar-location">Location (optional)</label>
+                  <input id="calendar-location" maxlength="200" />
+                </div>
+
+                <div class="field">
+                  <label for="calendar-description">Description (optional)</label>
+                  <textarea
+                    id="calendar-description"
+                    maxlength="2000"
+                    rows="3"
+                    style="width:100%;padding:11px;border:1px solid #ccd3dd;border-radius:6px;font:inherit;"
+                  ></textarea>
+                </div>
+
+                <div class="link-form-actions">
+                  <button type="submit" id="calendar-save">Add event</button>
+                  <button
+                    type="button"
+                    id="calendar-cancel"
+                    class="secondary hidden"
+                  >Cancel edit</button>
+                </div>
+              </form>
+
+              <div
+                id="calendar-status"
+                class="notice"
+                role="status"
+                aria-live="polite"
+              ></div>
+            </div>
           </section>
+
            
           <!-- Important Links: visible to all signed-in members -->
           <section class="panel wide" id="important-links-panel">
@@ -1276,6 +1500,356 @@ const title = "Members | Montreal Math Circle";
             button.disabled = false;
           }
         });
+        
+      // MEMBERS CALENDAR
+
+      let calendarEvents = [];
+      let calendarMonth = new Date();
+      calendarMonth.setDate(1);
+      let selectedCalendarDate = null;
+      let editingCalendarId = null;
+
+      function calendarDateString(year, month, day) {
+        return (
+          String(year).padStart(4, "0") + "-" +
+          String(month + 1).padStart(2, "0") + "-" +
+          String(day).padStart(2, "0")
+        );
+      }
+
+      function formatCalendarDate(dateString) {
+        const [year, month, day] = dateString.split("-").map(Number);
+        return new Date(year, month - 1, day).toLocaleDateString(
+          "en-CA",
+          { weekday: "long", year: "numeric", month: "long", day: "numeric" }
+        );
+      }
+
+      function formatCalendarTime(value) {
+        if (!value) return "";
+        const [hours, minutes] = value.split(":").map(Number);
+        const hour12 = hours % 12 || 12;
+        return `${hour12}:${String(minutes).padStart(2, "0")} ${hours < 12 ? "AM" : "PM"}`;
+      }
+
+      function resetCalendarForm() {
+        editingCalendarId = null;
+        document.querySelector("#calendar-form").reset();
+        document.querySelector("#calendar-form-heading").textContent =
+          "Add an Event";
+        document.querySelector("#calendar-save").textContent = "Add event";
+        document.querySelector("#calendar-cancel").classList.add("hidden");
+      }
+
+      function renderCalendar() {
+        const grid = document.querySelector("#calendar-grid");
+        const list = document.querySelector("#calendar-event-list");
+        const heading = document.querySelector("#calendar-month-heading");
+
+        grid.replaceChildren();
+        list.replaceChildren();
+
+        const year = calendarMonth.getFullYear();
+        const month = calendarMonth.getMonth();
+
+        heading.textContent = calendarMonth.toLocaleDateString(
+          "en-CA",
+          { month: "long", year: "numeric" }
+        );
+
+        // Weekday headings.
+        for (const dayName of ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]) {
+          addText(grid, "div", dayName, "calendar-weekday");
+        }
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Empty squares before the first day.
+        for (let i = 0; i < firstDay; i++) {
+          const empty = document.createElement("div");
+          empty.className = "calendar-empty";
+          grid.appendChild(empty);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dateString = calendarDateString(year, month, day);
+
+          const eventsToday = calendarEvents.filter(
+            event => event.eventDate === dateString
+          );
+
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "calendar-day";
+
+          if (eventsToday.length) {
+            button.classList.add("has-event");
+          }
+
+          if (selectedCalendarDate === dateString) {
+            button.classList.add("selected");
+          }
+
+          button.setAttribute("aria-pressed", String(
+            selectedCalendarDate === dateString
+          ));
+
+          button.setAttribute(
+            "aria-label",
+            `${formatCalendarDate(dateString)}, ${eventsToday.length} events`
+          );
+
+          addText(button, "span", String(day), "calendar-day-number");
+
+          if (eventsToday.length) {
+            const dot = document.createElement("span");
+            dot.className = "calendar-event-dot";
+            dot.setAttribute("aria-hidden", "true");
+            button.appendChild(dot);
+          }
+
+          button.addEventListener("click", () => {
+            // Clicking a selected date again shows the whole month.
+            selectedCalendarDate =
+              selectedCalendarDate === dateString ? null : dateString;
+
+            renderCalendar();
+          });
+
+          grid.appendChild(button);
+        }
+
+        // Show events for the selected day, or for the entire month.
+        const monthPrefix = calendarDateString(year, month, 1).slice(0, 7);
+
+        const visibleEvents = calendarEvents.filter(event =>
+          selectedCalendarDate
+            ? event.eventDate === selectedCalendarDate
+            : event.eventDate.startsWith(monthPrefix)
+        );
+
+        if (selectedCalendarDate) {
+          addText(
+            list,
+            "p",
+            `Showing events for ${formatCalendarDate(selectedCalendarDate)}. Click the date again to see the whole month.`,
+            "muted"
+          );
+        }
+
+        if (!visibleEvents.length) {
+          addText(
+            list,
+            "p",
+            selectedCalendarDate
+              ? "No events scheduled for this date."
+              : "No events scheduled for this month.",
+            "muted"
+          );
+          return;
+        }
+
+        for (const event of visibleEvents) {
+          const card = document.createElement("div");
+          card.className = "calendar-event-card";
+
+          addText(
+            card,
+            "div",
+            event.title,
+            "calendar-event-title"
+          );
+
+          const details = [formatCalendarDate(event.eventDate)];
+
+          if (event.startTime) {
+            let times = formatCalendarTime(event.startTime);
+
+            if (event.endTime) {
+              times += " – " + formatCalendarTime(event.endTime);
+            }
+
+            details.push(times);
+          }
+
+          if (event.location) {
+            details.push(event.location);
+          }
+
+          addText(
+            card,
+            "div",
+            details.join(" · "),
+            "calendar-event-meta"
+          );
+
+          if (event.description) {
+            addText(
+              card,
+              "div",
+              event.description,
+              "calendar-event-description"
+            );
+          }
+
+          if (roles.siteAdministrator) {
+            const actions = document.createElement("div");
+            actions.className = "link-actions";
+
+            addButton(actions, "Edit", () => {
+              editingCalendarId = event.id;
+
+              document.querySelector("#calendar-title").value =
+                event.title || "";
+              document.querySelector("#calendar-date").value =
+                event.eventDate || "";
+              document.querySelector("#calendar-start").value =
+                event.startTime || "";
+              document.querySelector("#calendar-end").value =
+                event.endTime || "";
+              document.querySelector("#calendar-location").value =
+                event.location || "";
+              document.querySelector("#calendar-description").value =
+                event.description || "";
+
+              document.querySelector("#calendar-form-heading").textContent =
+                "Edit Event";
+              document.querySelector("#calendar-save").textContent =
+                "Save changes";
+              document.querySelector("#calendar-cancel")
+                .classList.remove("hidden");
+
+              document.querySelector("#calendar-admin").scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+              });
+
+              document.querySelector("#calendar-title").focus();
+            });
+
+            addButton(
+              actions,
+              "Delete",
+              async () => {
+                if (!confirm(`Delete event "${event.title}"?`)) {
+                  return;
+                }
+
+                try {
+                  await api(
+                    `/calendar-events/${encodeURIComponent(event.id)}`,
+                    { method: "DELETE" }
+                  );
+
+                  if (editingCalendarId === event.id) {
+                    resetCalendarForm();
+                  }
+
+                  await loadCalendarEvents();
+                  setMessage("calendar-status", "Event deleted.");
+                } catch (error) {
+                  setMessage(
+                    "calendar-status",
+                    `Could not delete event: ${error.message}`
+                  );
+                }
+              },
+              "danger"
+            );
+
+            card.appendChild(actions);
+          }
+
+          list.appendChild(card);
+        }
+      }
+
+      async function loadCalendarEvents() {
+        const list = document.querySelector("#calendar-event-list");
+
+        try {
+          const result = await api("/calendar-events");
+          calendarEvents = result.events || [];
+          renderCalendar();
+        } catch (error) {
+          list.replaceChildren();
+          addText(
+            list,
+            "p",
+            `Could not load calendar events: ${error.message}`,
+            "muted"
+          );
+        }
+      }
+
+      document.querySelector("#calendar-prev")
+        .addEventListener("click", () => {
+          calendarMonth.setMonth(calendarMonth.getMonth() - 1);
+          selectedCalendarDate = null;
+          renderCalendar();
+        });
+
+      document.querySelector("#calendar-next")
+        .addEventListener("click", () => {
+          calendarMonth.setMonth(calendarMonth.getMonth() + 1);
+          selectedCalendarDate = null;
+          renderCalendar();
+        });
+
+      document.querySelector("#calendar-cancel")
+        .addEventListener("click", resetCalendarForm);
+
+      document.querySelector("#calendar-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const data = {
+            title: document.querySelector("#calendar-title").value.trim(),
+            eventDate: document.querySelector("#calendar-date").value,
+            startTime: document.querySelector("#calendar-start").value,
+            endTime: document.querySelector("#calendar-end").value,
+            location: document.querySelector("#calendar-location").value.trim(),
+            description:
+              document.querySelector("#calendar-description").value.trim()
+          };
+
+          const wasEditing = editingCalendarId !== null;
+
+          const path = wasEditing
+            ? `/calendar-events/${encodeURIComponent(editingCalendarId)}`
+            : "/calendar-events";
+
+          const button = document.querySelector("#calendar-save");
+          button.disabled = true;
+
+          try {
+            await api(path, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data)
+            });
+
+            const [year, month] = data.eventDate.split("-").map(Number);
+            calendarMonth = new Date(year, month - 1, 1);
+            selectedCalendarDate = data.eventDate;
+
+            resetCalendarForm();
+            await loadCalendarEvents();
+
+            setMessage(
+              "calendar-status",
+              wasEditing ? "Event updated." : "Event added."
+            );
+          } catch (error) {
+            setMessage(
+              "calendar-status",
+              `Could not save event: ${error.message}`
+            );
+          } finally {
+            button.disabled = false;
+          }
+        });
 
       let folders = [];
       let publishedFiles = [];
@@ -1765,14 +2339,18 @@ if (
             document.querySelector("#folder-admin").classList.remove("hidden");
             document.querySelector("#links-admin").classList.remove("hidden");
             document.querySelector("#directory-admin").classList.remove("hidden");
+            document.querySelector("#calendar-admin").classList.remove("hidden");
           }
 
+          
           
           await Promise.all([
             loadPublishedFiles(),
             loadImportantLinks(),
-            loadMemberDirectory()
+            loadMemberDirectory(),
+            loadCalendarEvents()
           ]);
+
 
         } catch (error) {
           statusBox.textContent = `Unable to verify your sign-in: ${error.message}`;

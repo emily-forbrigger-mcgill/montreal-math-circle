@@ -229,16 +229,23 @@ async function authorizedSiteAdministrator(request, env) {
   return Boolean(member && await isSiteAdministrator(member.id, env));
 }
 
+
 async function isFilePublisher(id, env) {
-  return Boolean(await env.DB.prepare(
-    "SELECT member_id FROM file_publishers WHERE member_id = ?"
-  ).bind(id).first());
+  return Boolean(
+    await isSiteAdministrator(id, env) ||
+    await env.DB.prepare(
+      "SELECT member_id FROM file_publishers WHERE member_id = ?"
+    ).bind(id).first()
+  );
 }
 
 async function isFileContributor(id, env) {
-  return Boolean(await env.DB.prepare(
-    "SELECT member_id FROM file_contributors WHERE member_id = ?"
-  ).bind(id).first());
+  return Boolean(
+    await isSiteAdministrator(id, env) ||
+    await env.DB.prepare(
+      "SELECT member_id FROM file_contributors WHERE member_id = ?"
+    ).bind(id).first()
+  );
 }
 
 function submissionSummary(row) {
@@ -1250,8 +1257,10 @@ export default {
         }
       }
 
-      // Contributors may delete their own unpublished submissions.
-      // Publishers may delete any submission.
+      
+      // Delete submissions:
+      // Site administrators may delete any submission, including published files.
+      // Other contributors may delete only their own unpublished submissions.
       const deletion = path.match(/^\/files\/submissions\/([0-9]+)$/);
 
       if (deletion) {
@@ -1270,7 +1279,17 @@ export default {
             return json({ error: "Submission not found" }, 404, request);
           }
 
-          if (!publisher) {
+          const administrator = await isSiteAdministrator(member.id, env);
+
+          // Only site administrators may delete published files.
+          if (row.status === "published" && !administrator) {
+            return json({
+              error: "Only a site administrator can delete published files"
+            }, 403, request);
+          }
+
+          // Non-administrators may delete only their own submissions.
+          if (!administrator) {
             if (!contributor) {
               return json({
                 error: "Contributor permission required"
@@ -1280,12 +1299,6 @@ export default {
             if (row.owner_member_id !== member.id) {
               return json({
                 error: "You can delete only your own submissions"
-              }, 403, request);
-            }
-
-            if (row.status === "published") {
-              return json({
-                error: "Only a publisher can delete published files"
               }, 403, request);
             }
           }
@@ -1299,7 +1312,9 @@ export default {
           return json({ success: true, id }, 200, request);
         } catch (error) {
           console.error("Submission deletion failed:", error);
-          return json({ error: "Could not delete submission" }, 500, request);
+          return json({
+            error: "Could not delete submission"
+          }, 500, request);
         }
       }
 

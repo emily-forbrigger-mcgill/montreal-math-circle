@@ -1,4 +1,3 @@
-
 ---
 const title = "Members | Montreal Math Circle";
 ---
@@ -86,12 +85,19 @@ const title = "Members | Montreal Math Circle";
         font-size: 12px;
         margin: 3px 0;
       }
-      .notice { margin: 16px 0; padding: 12px; border-radius: 6px; background: #edf2f7; line-height: 1.5; }
+      .notice {
+        margin: 16px 0;
+        padding: 12px;
+        border-radius: 6px;
+        background: #edf2f7;
+        line-height: 1.5;
+      }
       .notice:empty { display: none; }
       .logout-area { margin-top: 26px; }
       #status:empty { display: none; }
       .hidden { display: none !important; }
       .small { font-size: 13px; }
+
       @media (max-width: 680px) {
         main { margin: 2vh auto; padding: 16px; }
         .sections { grid-template-columns: 1fr; }
@@ -166,7 +172,7 @@ const title = "Members | Montreal Math Circle";
 
           <section id="admin-panel" class="panel wide hidden">
             <h2>Account Management</h2>
-            <p>Create member accounts and assign permissions. New member accounts use the configured shared member password unless an individual password is added through a separately supported workflow.</p>
+            <p>Create member accounts with individual passwords and assign permissions.</p>
 
             <h3>Create a member account</h3>
             <form id="create-account-form">
@@ -174,11 +180,47 @@ const title = "Members | Montreal Math Circle";
                 <label for="new-name">Member's full name</label>
                 <input id="new-name" name="name" required minlength="2" maxlength="100" />
               </div>
+
               <div class="field">
                 <label for="new-username">Username</label>
-                <input id="new-username" name="username" required maxlength="100" placeholder="first.last.mathcircle" pattern="[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle" />
+                <input
+                  id="new-username"
+                  name="username"
+                  required
+                  maxlength="100"
+                  placeholder="first.last.mathcircle"
+                  pattern="[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle"
+                />
                 <span class="meta">Use lowercase letters and numbers, optionally separated by dots or hyphens, ending in .mathcircle.</span>
               </div>
+
+              <div class="field">
+                <label for="new-password">Member's password</label>
+                <input
+                  id="new-password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  required
+                  minlength="12"
+                  maxlength="256"
+                />
+                <span class="meta">Use at least 12 characters. Choose a unique password for each member.</span>
+              </div>
+
+              <div class="field">
+                <label for="confirm-password">Confirm password</label>
+                <input
+                  id="confirm-password"
+                  name="confirmPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  required
+                  minlength="12"
+                  maxlength="256"
+                />
+              </div>
+
               <button id="create-account-button" type="submit">Create account</button>
             </form>
             <div id="create-account-status" class="notice" role="status" aria-live="polite"></div>
@@ -571,9 +613,36 @@ const title = "Members | Montreal Math Circle";
 
       document.querySelector("#create-account-form").addEventListener("submit", async event => {
         event.preventDefault();
+
         const button = document.querySelector("#create-account-button");
         const name = document.querySelector("#new-name").value.trim();
         const username = document.querySelector("#new-username").value.trim().toLowerCase();
+        const password = document.querySelector("#new-password").value;
+        const confirmPassword = document.querySelector("#confirm-password").value;
+
+        if (password.length < 12) {
+          setMessage(
+            "create-account-status",
+            "The password must be at least 12 characters long."
+          );
+          return;
+        }
+
+        if (password.length > 256) {
+          setMessage(
+            "create-account-status",
+            "The password cannot exceed 256 characters."
+          );
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          setMessage(
+            "create-account-status",
+            "The passwords do not match. Please check them and try again."
+          );
+          return;
+        }
 
         button.disabled = true;
         setMessage("create-account-status", "Creating account…");
@@ -582,15 +651,20 @@ const title = "Members | Montreal Math Circle";
           const result = await api("/admin/create-member-account", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, username })
+            body: JSON.stringify({ name, username, password })
           });
+
           setMessage(
             "create-account-status",
-            `Created ${result.name} (${result.username}). The account uses the configured shared member password.`
+            `Created ${result.name} (${result.username}) with an individual password.`
           );
+
           document.querySelector("#create-account-form").reset();
         } catch (error) {
-          setMessage("create-account-status", `Could not create account: ${error.message}`);
+          setMessage(
+            "create-account-status",
+            `Could not create account: ${error.message}`
+          );
         } finally {
           button.disabled = false;
         }
@@ -628,7 +702,7 @@ const title = "Members | Montreal Math Circle";
           if (username === currentMember.username) {
             setMessage(
               "role-status",
-              `Saved roles for your account. Refresh the page to update the visible controls.`
+              "Saved roles for your account. Refresh the page to update the visible controls."
             );
           }
         } catch (error) {
@@ -690,4 +764,3 @@ const title = "Members | Montreal Math Circle";
     </script>
   </body>
 </html>
-

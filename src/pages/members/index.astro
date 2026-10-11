@@ -508,43 +508,120 @@ const title = "Members | Montreal Math Circle";
       }
 
       
-      /* Calendar appearance fixes */
+      
+      /* Calendar styling for JavaScript-created elements */
 
-      #calendar-grid .calendar-day.has-event {
-        background-color: #c5dff8 !important;
-        border: 2px solid #2563a6 !important;
-        color: #173b65 !important;
+      :global(#calendar-grid .calendar-weekday) {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #596579;
+        padding: 10px 2px;
       }
 
-      #calendar-grid .calendar-day.has-event:hover {
-        background-color: #a9cef5 !important;
+      :global(#calendar-grid .calendar-day) {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        min-height: 65px;
+        padding: 8px;
+        border: 1px solid #ded7ed;
+        border-radius: 7px;
+        background: #ffffff;
+        color: #203e65;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
       }
 
-      #calendar-grid .calendar-day.has-event.selected {
-        background-color: #93c5fd !important;
-        border: 2px solid #a81b24 !important;
+      :global(#calendar-grid .calendar-day:hover) {
+        background: #f2edf9;
       }
 
-      #calendar-event-list .calendar-event-title {
-        font-size: 17px !important;
-        font-weight: 700 !important;
-        color: #a81b24 !important;
+      :global(#calendar-grid .calendar-day.has-event) {
+        background: #c5dff8;
+        border: 2px solid #2563a6;
+        color: #173b65;
+      }
+
+      :global(#calendar-grid .calendar-day.has-event:hover) {
+        background: #a9cef5;
+      }
+
+      :global(#calendar-grid .calendar-day.selected) {
+        border: 2px solid #a81b24;
+        background: #fceff0;
+      }
+
+      :global(#calendar-grid .calendar-day.has-event.selected) {
+        background: #93c5fd;
+        border: 2px solid #a81b24;
+      }
+
+      :global(#calendar-grid .calendar-day-number) {
+        display: block;
+      }
+
+      :global(#calendar-grid .calendar-event-dot) {
+        display: block;
+        width: 7px;
+        height: 7px;
+        margin-top: 7px;
+        border-radius: 50%;
+        background: #2563a6;
+      }
+
+      :global(#calendar-grid .calendar-empty) {
+        min-height: 65px;
+      }
+
+      :global(#calendar-event-list .calendar-event-card) {
+        padding: 18px 20px;
+        margin: 20px 0;
+        border: 1px solid #ddd4eb;
+        border-left: 4px solid #ad96cc;
+        border-radius: 9px;
+        background: #ffffff;
+      }
+
+      :global(#calendar-event-list .calendar-event-title) {
+        font-size: 17px;
+        font-weight: 700;
+        color: #a81b24;
         line-height: 1.5;
       }
 
-      #calendar-event-list .calendar-event-meta {
-        font-size: 11px !important;
-        font-weight: 400 !important;
-        color: #687488 !important;
-        line-height: 1.5;
+      :global(#calendar-event-list .calendar-event-meta) {
         margin-top: 6px;
+        font-size: 11px;
+        font-weight: 400;
+        color: #687488;
+        line-height: 1.5;
       }
 
-      #calendar-event-list .calendar-event-card {
-        margin: 20px 0 !important;
-        padding: 18px 20px !important;
+      :global(#calendar-event-list .calendar-event-description) {
+        margin-top: 8px;
+        font-size: 13px;
+        line-height: 1.6;
+        white-space: pre-wrap;
       }
 
+      @media (max-width: 680px) {
+        :global(#calendar-grid .calendar-day),
+        :global(#calendar-grid .calendar-empty) {
+          min-height: 43px;
+        }
+
+        :global(#calendar-grid .calendar-day) {
+          padding: 5px;
+          font-size: 12px;
+        }
+
+        :global(#calendar-grid .calendar-weekday) {
+          font-size: 10px;
+        }
+      }
 
     </style>
   </head>

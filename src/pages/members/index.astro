@@ -123,6 +123,166 @@ const title = "Members | Montreal Math Circle";
       #folder-form input { max-width: 400px; }
       .folder-heading { margin-top: 22px; }
 
+      
+/* Cleaner Shared Files design */
+
+#folder-navigation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 12px;
+  margin: 20px 0 26px;
+}
+
+#folder-navigation .folder-tile {
+  min-height: 68px;
+  padding: 14px 16px;
+  border: 1px solid #ded7ef;
+  border-radius: 12px;
+  background: #f5f1fc;
+  color: #403654;
+  text-align: left;
+  font-family: inherit;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+#folder-navigation .folder-tile:hover {
+  background: #eae2f8;
+}
+
+#folder-navigation .folder-tile.selected {
+  background: #a81b24;
+  color: white;
+  border-color: #a81b24;
+}
+
+#published-files .document-card {
+  padding: 20px;
+  margin: 14px 0;
+  border: 1px solid #e4deef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(35, 20, 65, 0.04);
+}
+
+#published-files .document-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+#published-files .document-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #f1ebfa;
+  font-size: 24px;
+}
+
+#published-files .document-information {
+  flex: 1;
+  min-width: 0;
+}
+
+#published-files .document-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #18181b;
+  overflow-wrap: anywhere;
+}
+
+#published-files .document-details {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+#published-files .document-folder {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: #f1ebfa;
+  color: #604785;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#published-files .document-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #eeeaf3;
+}
+
+#published-files .document-download {
+  background: #a81b24;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  padding: 10px 16px;
+  font-weight: 600;
+}
+
+#published-files .document-download:hover {
+  background: #87171d;
+}
+
+#published-files .document-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+#published-files .document-folder-select {
+  width: auto;
+  max-width: 220px;
+  min-width: 145px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+#published-files .document-delete {
+  background: white;
+  color: #a81b24;
+  border: 1px solid #e3b4b9;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+#published-files .document-delete:hover {
+  background: #fcf1f2;
+}
+
+#published-files .document-folder-actions {
+  margin: 12px 0 18px;
+}
+
+@media (max-width: 680px) {
+  #published-files .document-admin-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  #published-files .document-folder-select {
+    flex: 1;
+    max-width: none;
+  }
+}
+
+      
+
       @media (max-width: 680px) {
         main { margin: 2vh auto; padding: 16px; }
         .sections { grid-template-columns: 1fr; }
@@ -412,141 +572,348 @@ const title = "Members | Montreal Math Circle";
         }
       }
 
-      function renderPublishedFiles() {
-        const nav = document.querySelector("#folder-navigation");
-        const container = document.querySelector("#published-files");
-        nav.replaceChildren();
-        container.replaceChildren();
+   
+function renderPublishedFiles() {
+  const nav = document.querySelector("#folder-navigation");
+  const container = document.querySelector("#published-files");
 
-        function tile(id, label, count) {
-          const button = addButton(nav, `${label} (${count})`, () => {
-            selectedFolder = id;
-            renderPublishedFiles();
-          }, "folder-tile" + (selectedFolder === id ? " selected" : ""));
-          button.setAttribute("aria-pressed", String(selectedFolder === id));
-        }
-        tile("all", "📁 All documents", publishedFiles.length);
-        for (const folder of folders) {
-          const count = publishedFiles.filter(f => Number(f.folderId) === Number(folder.id) && f.folderId != null).length;
-          tile(String(folder.id), `📁 ${folder.name}`, count);
-        }
-        const unfiledCount = publishedFiles.filter(f => f.folderId == null).length;
-        tile("unfiled", "📄 Unfiled Documents", unfiledCount);
+  nav.replaceChildren();
+  container.replaceChildren();
 
-        if (roles.siteAdministrator && selectedFolder !== "all" && selectedFolder !== "unfiled") {
-          const folder = folders.find(f => String(f.id) === selectedFolder);
-          if (folder) {
-            const controls = document.createElement("div");
-            controls.className = "folder-controls";
-            addButton(controls, "Rename this folder", async () => {
-              const name = prompt("New folder name:", folder.name);
-              if (name === null) return;
-              if (!name.trim() || name.trim().length > 80) {
-                setMessage("folder-status", "Folder names must be 1–80 characters.");
-                return;
-              }
-              try {
-                await api(`/files/folders/${folder.id}`, {
-                  method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ name: name.trim() })
-                });
-                setMessage("folder-status", "Folder renamed.");
-                await loadPublishedFiles();
-              } catch (error) { setMessage("folder-status", error.message); }
-            });
-            addButton(controls, "Delete this folder", async () => {
-              if (!confirm(`Delete folder "${folder.name}"? Its files will become Unfiled; the files will NOT be deleted.`)) return;
-              try {
-                await api(`/files/folders/${folder.id}`, { method: "DELETE" });
-                selectedFolder = "unfiled";
-                setMessage("folder-status", "Folder deleted. Its files are now Unfiled.");
-                await loadPublishedFiles();
-              } catch (error) { setMessage("folder-status", error.message); }
-            }, "danger");
-            container.appendChild(controls);
-          }
-        }
+  // Display folder navigation.
+  function tile(id, label, count) {
+    const button = addButton(
+      nav,
+      `${label} (${count})`,
+      () => {
+        selectedFolder = id;
+        renderPublishedFiles();
+      },
+      "folder-tile" + (selectedFolder === id ? " selected" : "")
+    );
 
-        const visible = publishedFiles.filter(file =>
-          selectedFolder === "all" ||
-          (selectedFolder === "unfiled" && file.folderId == null) ||
-          (selectedFolder !== "unfiled" && selectedFolder !== "all" && String(file.folderId) === selectedFolder)
-        );
-        const heading = selectedFolder === "all" ? "All Documents" :
-          selectedFolder === "unfiled" ? "Unfiled Documents" :
-          folders.find(f => String(f.id) === selectedFolder)?.name || "Documents";
-        addText(container, "h3", heading, "folder-heading");
-        if (!visible.length) {
-          addText(container, "p", "There are no published documents here yet.", "muted");
+    button.setAttribute(
+      "aria-pressed",
+      String(selectedFolder === id)
+    );
+  }
+
+  tile("all", "📁 All documents", publishedFiles.length);
+
+  for (const folder of folders) {
+    const count = publishedFiles.filter(
+      file =>
+        file.folderId != null &&
+        Number(file.folderId) === Number(folder.id)
+    ).length;
+
+    tile(String(folder.id), `📁 ${folder.name}`, count);
+  }
+
+  const unfiledCount = publishedFiles.filter(
+    file => file.folderId == null
+  ).length;
+
+  tile("unfiled", "📄 Unfiled Documents", unfiledCount);
+
+  // Administrator controls for the selected folder.
+  if (
+    roles.siteAdministrator &&
+    selectedFolder !== "all" &&
+    selectedFolder !== "unfiled"
+  ) {
+    const folder = folders.find(
+      f => String(f.id) === selectedFolder
+    );
+
+    if (folder) {
+      const controls = document.createElement("div");
+      controls.className = "document-folder-actions folder-controls";
+
+      addButton(controls, "Rename this folder", async () => {
+        const name = prompt("New folder name:", folder.name);
+
+        if (name === null) return;
+
+        if (!name.trim() || name.trim().length > 80) {
+          setMessage(
+            "folder-status",
+            "Folder names must be 1–80 characters."
+          );
           return;
         }
-        for (const file of visible) {
-          const item = document.createElement("div");
-          item.className = "item";
-          const filename = file.filename || "Untitled file";
-          addText(item, "div", filename, "item-title");
-          const folderName = folders.find(f => Number(f.id) === Number(file.folderId) && file.folderId != null)?.name || "Unfiled";
-          const details = [
-            selectedFolder === "all" ? `Folder: ${folderName}` : "",
-            file.ownerUsername ? `Submitted by ${file.ownerUsername}` : "",
-            formatSize(file.sizeBytes),
-            file.publishedAt ? `Published ${formatDate(file.publishedAt)}` : ""
-          ].filter(Boolean).join(" · ");
-          addText(item, "div", details, "meta");
-          const actions = document.createElement("div");
-          actions.className = "folder-controls";
-          const download = document.createElement("a");
-          download.className = "button";
-          download.textContent = "Download";
-          download.href = `${API}/files/download/${encodeURIComponent(file.id)}`;
-          download.setAttribute("aria-label", `Download ${filename}`);
-          actions.appendChild(download);
-          if (roles.siteAdministrator) {
-            const select = document.createElement("select");
-            select.setAttribute("aria-label", `Folder for ${filename}`);
-            const unfiled = document.createElement("option");
-            unfiled.value = "";
-            unfiled.textContent = "Unfiled";
-            select.appendChild(unfiled);
-            for (const folder of folders) {
-              const option = document.createElement("option");
-              option.value = String(folder.id);
-              option.textContent = folder.name;
-              select.appendChild(option);
-            }
-            select.value = file.folderId == null ? "" : String(file.folderId);
-            const initial = select.value;
-            select.addEventListener("change", async () => {
-              select.disabled = true;
-              try {
-                await api(`/files/submissions/${encodeURIComponent(file.id)}/folder`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ folderId: select.value === "" ? null : Number(select.value) })
-                });
-                setMessage("folder-status", `Moved "${filename}".`);
-                await loadPublishedFiles();
-              } catch (error) {
-                select.value = initial;
-                setMessage("folder-status", `Could not move file: ${error.message}`);
-              } finally { select.disabled = false; }
-            });
-            actions.appendChild(select);
-            addButton(actions, "Delete published file", async () => {
-              if (!confirm(`Permanently delete "${filename}"? This cannot be undone.`)) return;
-              try {
-                await api(`/files/submissions/${encodeURIComponent(file.id)}`, { method: "DELETE" });
-                setMessage("folder-status", `Deleted "${filename}".`);
-                await loadPublishedFiles();
-                await loadMySubmissions();
-                await loadReviewQueue();
-              } catch (error) { setMessage("folder-status", `Could not delete file: ${error.message}`); }
-            }, "danger");
-          }
-          item.appendChild(actions);
-          container.appendChild(item);
+
+        try {
+          await api(`/files/folders/${folder.id}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: name.trim() })
+          });
+
+          setMessage("folder-status", "Folder renamed.");
+          await loadPublishedFiles();
+        } catch (error) {
+          setMessage("folder-status", error.message);
         }
+      });
+
+      addButton(
+        controls,
+        "Delete this folder",
+        async () => {
+          if (!confirm(
+            `Delete folder "${folder.name}"? Its files will become Unfiled; the files will NOT be deleted.`
+          )) return;
+
+          try {
+            await api(`/files/folders/${folder.id}`, {
+              method: "DELETE"
+            });
+
+            selectedFolder = "unfiled";
+
+            setMessage(
+              "folder-status",
+              "Folder deleted. Its files are now Unfiled."
+            );
+
+            await loadPublishedFiles();
+          } catch (error) {
+            setMessage("folder-status", error.message);
+          }
+        },
+        "danger"
+      );
+
+      container.appendChild(controls);
+    }
+  }
+
+  // Choose documents belonging to the selected folder.
+  const visible = publishedFiles.filter(file =>
+    selectedFolder === "all" ||
+    (
+      selectedFolder === "unfiled" &&
+      file.folderId == null
+    ) ||
+    (
+      selectedFolder !== "unfiled" &&
+      selectedFolder !== "all" &&
+      String(file.folderId) === selectedFolder
+    )
+  );
+
+  const heading =
+    selectedFolder === "all"
+      ? "All Documents"
+      : selectedFolder === "unfiled"
+        ? "Unfiled Documents"
+        : folders.find(
+            f => String(f.id) === selectedFolder
+          )?.name || "Documents";
+
+  addText(container, "h3", heading, "folder-heading");
+
+  if (!visible.length) {
+    addText(
+      container,
+      "p",
+      "There are no published documents here yet.",
+      "muted"
+    );
+    return;
+  }
+
+  // Render each published document as a card.
+  for (const file of visible) {
+    const card = document.createElement("div");
+    card.className = "document-card";
+
+    const filename = file.filename || "Untitled file";
+
+    const folderName = folders.find(
+      f =>
+        file.folderId != null &&
+        Number(f.id) === Number(file.folderId)
+    )?.name || "Unfiled";
+
+    // File information.
+    const header = document.createElement("div");
+    header.className = "document-header";
+
+    addText(header, "div", "📄", "document-icon");
+
+    const information = document.createElement("div");
+    information.className = "document-information";
+
+    addText(
+      information,
+      "div",
+      filename,
+      "document-title"
+    );
+
+    const details = [
+      formatSize(file.sizeBytes),
+      file.publishedAt
+        ? `Published ${formatDate(file.publishedAt)}`
+        : "",
+      file.ownerUsername
+        ? `Submitted by ${file.ownerUsername}`
+        : ""
+    ].filter(Boolean).join(" · ");
+
+    addText(
+      information,
+      "div",
+      details,
+      "document-details"
+    );
+
+    addText(
+      information,
+      "div",
+      `📁 ${folderName}`,
+      "document-folder"
+    );
+
+    header.appendChild(information);
+    card.appendChild(header);
+
+    // Document actions.
+    const actions = document.createElement("div");
+    actions.className = "document-actions";
+
+    // Download button.
+    const download = document.createElement("a");
+    download.className = "button document-download";
+    download.textContent = "↓ Download";
+    download.href =
+      `${API}/files/download/${encodeURIComponent(file.id)}`;
+
+    download.setAttribute(
+      "aria-label",
+      `Download ${filename}`
+    );
+
+    actions.appendChild(download);
+
+    // Only administrators can move or delete files.
+    if (roles.siteAdministrator) {
+      const adminActions = document.createElement("div");
+      adminActions.className = "document-admin-actions";
+
+      const select = document.createElement("select");
+      select.className = "document-folder-select";
+      select.setAttribute(
+        "aria-label",
+        `Folder for ${filename}`
+      );
+
+      const unfiled = document.createElement("option");
+      unfiled.value = "";
+      unfiled.textContent = "Unfiled";
+      select.appendChild(unfiled);
+
+      for (const folder of folders) {
+        const option = document.createElement("option");
+        option.value = String(folder.id);
+        option.textContent = folder.name;
+        select.appendChild(option);
       }
+
+      select.value =
+        file.folderId == null ? "" : String(file.folderId);
+
+      const initial = select.value;
+
+      select.addEventListener("change", async () => {
+        select.disabled = true;
+
+        try {
+          await api(
+            `/files/submissions/${encodeURIComponent(file.id)}/folder`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                folderId:
+                  select.value === ""
+                    ? null
+                    : Number(select.value)
+              })
+            }
+          );
+
+          setMessage(
+            "folder-status",
+            `Moved "${filename}".`
+          );
+
+          await loadPublishedFiles();
+        } catch (error) {
+          select.value = initial;
+
+          setMessage(
+            "folder-status",
+            `Could not move file: ${error.message}`
+          );
+        } finally {
+          select.disabled = false;
+        }
+      });
+
+      adminActions.appendChild(select);
+
+      // Administrator-only published-file deletion.
+      const deleteButton = addButton(
+        adminActions,
+        "Delete",
+        async () => {
+          if (!confirm(
+            `Permanently delete "${filename}"? This cannot be undone.`
+          )) return;
+
+          try {
+            await api(
+              `/files/submissions/${encodeURIComponent(file.id)}`,
+              { method: "DELETE" }
+            );
+
+            setMessage(
+              "folder-status",
+              `Deleted "${filename}".`
+            );
+
+            await loadPublishedFiles();
+            await loadMySubmissions();
+            await loadReviewQueue();
+          } catch (error) {
+            setMessage(
+              "folder-status",
+              `Could not delete file: ${error.message}`
+            );
+          }
+        },
+        "document-delete"
+      );
+
+      deleteButton.setAttribute(
+        "aria-label",
+        `Delete ${filename}`
+      );
+
+      actions.appendChild(adminActions);
+    }
+
+    card.appendChild(actions);
+    container.appendChild(card);
+  }
+}
+
+      
 
       async function deleteSubmission(id, statusId, reloadFunction) {
         if (!confirm("Delete this submission? This cannot be undone.")) return;

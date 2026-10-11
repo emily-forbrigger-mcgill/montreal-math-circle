@@ -1,693 +1,762 @@
 
 ---
-const title = "Members | Montreal Math Circle";
+const API_BASE = "https://api.montrealmathcircle.com";
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <style>
-      :root {
-        font-family: Arial, sans-serif;
-        color: #202b3c;
-        background: #f5f7fa;
+<svelte:head>
+  <title>Members | Montreal Math Circle</title>
+</svelte:head>
+
+<main id="members-app" data-api-base={API_BASE}>
+  <header class="page-header">
+    <h1>Montreal Math Circle Members</h1>
+    <p>Shared resources and member account management.</p>
+  </header>
+
+  <section id="login-panel" class="panel">
+    <h2>Member sign in</h2>
+    <form id="login-form">
+      <label for="login-username">Username</label>
+      <input id="login-username" name="username" autocomplete="username" required />
+
+      <label for="login-password">Password</label>
+      <input id="login-password" name="password" type="password"
+        autocomplete="current-password" required />
+
+      <button type="submit">Sign in</button>
+    </form>
+  </section>
+
+  <section id="member-panel" hidden>
+    <div class="welcome-row">
+      <div>
+        <h2>Welcome, <span id="member-name"></span></h2>
+        <p id="member-roles"></p>
+      </div>
+      <button id="logout-button" class="secondary">Sign out</button>
+    </div>
+
+    <div id="notice" role="status" aria-live="polite"></div>
+
+    <section class="panel">
+      <h2>Shared files</h2>
+      <p>Browse files published for members.</p>
+      <button id="refresh-files" class="secondary">Refresh files</button>
+      <div id="published-files"></div>
+    </section>
+
+    <section id="upload-panel" class="panel" hidden>
+      <h2>Upload a file</h2>
+      <p>Submit a resource for review and publication.</p>
+
+      <form id="upload-form">
+        <label for="file-title">Title</label>
+        <input id="file-title" name="title" maxlength="200"
+          placeholder="A descriptive title" required />
+
+        <label for="file-description">Description (optional)</label>
+        <textarea id="file-description" name="description" rows="3"
+          maxlength="2000"></textarea>
+
+        <label for="file-input">Choose a file</label>
+        <input id="file-input" name="file" type="file" required
+          accept=".pdf,.txt,.csv,.rtf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.webp" />
+
+        <p class="hint">Maximum file size: 20 MB.</p>
+        <button type="submit">Upload for review</button>
+      </form>
+    </section>
+
+    <section id="submissions-panel" class="panel" hidden>
+      <h2>File submissions</h2>
+      <button id="refresh-submissions" class="secondary">Refresh submissions</button>
+      <div id="submissions-list"></div>
+    </section>
+
+    <section id="admin-panel" class="panel" hidden>
+      <h2>Account management</h2>
+      <p>Create member accounts, change permissions, and activate or deactivate accounts.</p>
+
+      <h3>Create a member account</h3>
+      <form id="create-account-form">
+        <label for="new-name">Member name</label>
+        <input id="new-name" name="name" maxlength="200" required />
+
+        <label for="new-username">Username</label>
+        <input id="new-username" name="username" maxlength="100"
+          autocomplete="off" required />
+
+        <button type="submit">Create account</button>
+        <p class="hint">
+          New accounts use the member-password setup configured in the Worker.
+        </p>
+      </form>
+
+      <hr />
+
+      <div class="table-heading">
+        <h3>Existing accounts</h3>
+        <button id="refresh-members" class="secondary">Refresh accounts</button>
+      </div>
+
+      <div id="members-list">
+        <p>Loading accounts…</p>
+      </div>
+    </section>
+  </section>
+</main>
+
+<style>
+  :global(body) {
+    margin: 0;
+    background: #f5f7fa;
+    color: #202b3c;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.55;
+  }
+
+  main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  h1, h2, h3 {
+    line-height: 1.25;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+  }
+
+  .panel {
+    margin: 1.25rem 0;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid #dce2ea;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgb(20 40 70 / 4%);
+  }
+
+  label {
+    display: block;
+    margin: 1rem 0 0.35rem;
+    font-weight: 650;
+  }
+
+  input, textarea, select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid #b9c4d2;
+    border-radius: 7px;
+    background: white;
+    color: inherit;
+    font: inherit;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
+
+  button {
+    margin-top: 1rem;
+    padding: 0.7rem 1rem;
+    border: 0;
+    border-radius: 7px;
+    background: #174ea6;
+    color: white;
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #103b80;
+  }
+
+  button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  button.secondary {
+    background: #e8edf5;
+    color: #20324c;
+  }
+
+  button.secondary:hover {
+    background: #d8e1ef;
+  }
+
+  .welcome-row, .table-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  #notice {
+    margin: 1rem 0;
+    padding: 0;
+    border-radius: 7px;
+  }
+
+  #notice:not(:empty) {
+    padding: 0.8rem 1rem;
+    background: #edf3fb;
+  }
+
+  #notice.error {
+    background: #fff0f0;
+    color: #8b1d1d;
+  }
+
+  #notice.success {
+    background: #edf8ef;
+    color: #205b2b;
+  }
+
+  .hint, .muted {
+    color: #5b687a;
+    font-size: 0.92rem;
+  }
+
+  .file-item, .submission-item {
+    padding: 1rem 0;
+    border-top: 1px solid #e0e6ee;
+  }
+
+  .file-item:first-child, .submission-item:first-child {
+    margin-top: 1rem;
+  }
+
+  .item-title {
+    font-weight: 700;
+  }
+
+  .item-meta {
+    color: #596579;
+    font-size: 0.9rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .actions button {
+    margin-top: 0.5rem;
+  }
+
+  .member-card {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #dce2ea;
+    border-radius: 8px;
+  }
+
+  .member-card h4 {
+    margin: 0 0 0.25rem;
+    font-size: 1.05rem;
+  }
+
+  .role-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .role-controls label {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .status-active {
+    color: #216e35;
+    font-weight: 650;
+  }
+
+  .status-inactive {
+    color: #9a3434;
+    font-weight: 650;
+  }
+
+  hr {
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid #e0e6ee;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+</style>
+
+<script>
+  const app = document.querySelector("#members-app");
+  const API = app.dataset.apiBase;
+
+  const $ = (selector) => document.querySelector(selector);
+
+  let currentMember = null;
+  let currentRoles = {};
+  let members = [];
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+  }
+
+  function notify(message, type = "") {
+    const notice = $("#notice");
+    notice.textContent = message;
+    notice.className = type;
+  }
+
+  async function request(path, options = {}) {
+    const response = await fetch(`${API}${path}`, {
+      credentials: "include",
+      ...options,
+      headers: {
+        ...(options.body instanceof FormData
+          ? {}
+          : { "Content-Type": "application/json" }),
+        ...(options.headers || {})
       }
+    });
 
-      * { box-sizing: border-box; }
+    const contentType = response.headers.get("content-type") || "";
+    const data = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
 
-      body { margin: 0; }
-      main { max-width: 1100px; margin: 4vh auto; padding: 24px; }
-      h1 { margin-bottom: 8px; }
-      h2 { margin-top: 0; }
-      .subtitle { color: #596579; margin-bottom: 28px; }
-      .muted { color: #596579; line-height: 1.6; }
-      .sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-      .panel {
-        background: white;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 4px 24px #172b4d12;
-        min-width: 0;
+    if (!response.ok) {
+      const message = typeof data === "object" && data
+        ? data.error || data.message
+        : data;
+      throw new Error(message || `Request failed (${response.status})`);
+    }
+
+    return data;
+  }
+
+  function showSignedOut() {
+    currentMember = null;
+    currentRoles = {};
+    $("#login-panel").hidden = false;
+    $("#member-panel").hidden = true;
+  }
+
+  function showSignedIn(data) {
+    currentMember = data.member;
+    currentRoles = data.roles || {};
+
+    $("#login-panel").hidden = true;
+    $("#member-panel").hidden = false;
+    $("#member-name").textContent = currentMember.name || currentMember.username;
+
+    const roleNames = [];
+    if (currentRoles.siteAdministrator) roleNames.push("Site Administrator");
+    if (currentRoles.filePublisher) roleNames.push("File Publisher");
+    if (currentRoles.fileContributor) roleNames.push("File Contributor");
+
+    $("#member-roles").textContent = roleNames.length
+      ? `Your roles: ${roleNames.join(", ")}`
+      : "Member access";
+
+    // Administrators can see the upload interface too.
+    const canUpload = currentRoles.siteAdministrator ||
+      currentRoles.fileContributor || currentRoles.filePublisher;
+
+    $("#upload-panel").hidden = !canUpload;
+    $("#submissions-panel").hidden =
+      !(currentRoles.siteAdministrator || currentRoles.filePublisher || currentRoles.fileContributor);
+    $("#admin-panel").hidden = !currentRoles.siteAdministrator;
+
+    loadFiles();
+
+    if (!$("#submissions-panel").hidden) loadSubmissions();
+    if (currentRoles.siteAdministrator) loadMembers();
+  }
+
+  async function refreshSession() {
+    try {
+      const data = await request("/me");
+      if (data.signedIn && data.member) {
+        showSignedIn(data);
+      } else {
+        showSignedOut();
       }
-      .panel p { color: #596579; line-height: 1.6; }
-      .wide { grid-column: 1 / -1; }
-      .button, button {
-        display: inline-block;
-        background: #203e65;
-        color: white;
-        padding: 11px 16px;
-        border: 0;
-        border-radius: 6px;
-        text-decoration: none;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-      }
-      .button:hover, button:hover { background: #315785; }
-      button:disabled { opacity: .55; cursor: wait; }
-      .secondary {
-        background: white;
-        color: #203e65;
-        border: 1px solid #ccd3dd;
-      }
-      .secondary:hover { background: #edf2f7; }
-      .danger { background: #a12828; }
-      .danger:hover { background: #821e1e; }
-      .field { display: grid; gap: 6px; margin: 14px 0; }
-      label { font-size: 14px; font-weight: 600; }
-      input, select {
-        width: 100%;
-        padding: 11px;
-        border: 1px solid #ccd3dd;
-        border-radius: 6px;
-        font: inherit;
-        background: white;
-      }
-      input[type="checkbox"] { width: auto; }
-      .checkrow { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
-      .checkrow label { font-weight: 400; }
-      .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
-      .item {
-        padding: 14px 0;
-        border-top: 1px solid #e1e6ed;
-        overflow-wrap: anywhere;
-      }
-      .item:first-child { border-top: 0; }
-      .item-title { font-weight: 700; margin-bottom: 6px; }
-      .meta { color: #596579; font-size: 13px; line-height: 1.6; }
-      .badge {
-        display: inline-block;
-        border-radius: 20px;
-        background: #edf2f7;
-        color: #334155;
-        padding: 4px 9px;
-        font-size: 12px;
-        margin: 3px 0;
-      }
-      .notice { margin: 16px 0; padding: 12px; border-radius: 6px; background: #edf2f7; line-height: 1.5; }
-      .notice:empty { display: none; }
-      .logout-area { margin-top: 26px; }
-      #status:empty { display: none; }
-      .hidden { display: none !important; }
-      .small { font-size: 13px; }
-      @media (max-width: 680px) {
-        main { margin: 2vh auto; padding: 16px; }
-        .sections { grid-template-columns: 1fr; }
-        .wide { grid-column: auto; }
-        .panel { padding: 20px; }
-      }
-    </style>
-  </head>
+    } catch {
+      showSignedOut();
+    }
+  }
 
-  <body>
-    <main>
-      <h1>Montreal Math Circle</h1>
-      <p class="subtitle">Members' area</p>
+  $("#login-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
 
-      <p id="status" class="notice" role="status" aria-live="polite">
-        Checking your sign-in…
-      </p>
+    try {
+      notify("Signing in…");
+      await request("/login", {
+        method: "POST",
+        body: JSON.stringify({
+          username: form.get("username"),
+          password: form.get("password")
+        })
+      });
+      event.currentTarget.reset();
+      await refreshSession();
+      if (currentMember) notify("You are signed in.", "success");
+    } catch (error) {
+      notify(error.message || "Sign-in failed.", "error");
+    }
+  });
 
-      <section id="portal" class="hidden">
-        <h2>Welcome, <span id="member-name"></span>!</h2>
-        <p id="role-summary" class="muted"></p>
+  $("#logout-button").addEventListener("click", async () => {
+    try {
+      await request("/logout", { method: "POST", body: JSON.stringify({}) });
+    } catch {
+      // Clear the local view even if the session has already expired.
+    }
+    showSignedOut();
+    notify("You have signed out.", "success");
+  });
 
-        <div class="sections">
-          <section class="panel">
-            <h2>Discussion Board</h2>
-            <p>Join conversations, read messages, and keep up with Montreal Math Circle announcements.</p>
-            <a class="button" href="https://groups.io/g/montrealmathcircle/messages?expanded=1" target="_blank" rel="noopener noreferrer">Discussion Board →</a>
-          </section>
+  function formatDate(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
+  }
 
-          <section class="panel">
-            <h2>Calendar</h2>
-            <p>View upcoming meetings, activities, and other Montreal Math Circle events.</p>
-            <a class="button" href="https://groups.io/g/montrealmathcircle/calendar" target="_blank" rel="noopener noreferrer">View Calendar →</a>
-          </section>
+  function renderFiles(files) {
+    const container = $("#published-files");
 
-          <section class="panel wide">
-            <h2>Shared Files</h2>
-            <p>Published documents and resources available to signed-in members.</p>
-            <div class="toolbar">
-              <button id="refresh-files" type="button">Refresh files</button>
-            </div>
-            <div id="published-files" aria-live="polite">Loading published files…</div>
-          </section>
+    if (!Array.isArray(files) || files.length === 0) {
+      container.innerHTML = "<p>No published files are available yet.</p>";
+      return;
+    }
 
-          <section id="upload-panel" class="panel hidden">
-            <h2>Submit a File</h2>
-            <p>Uploads are sent for publisher review before they become available to all members. Maximum file size: 20 MB.</p>
-            <form id="upload-form">
-              <div class="field">
-                <label for="upload-file">Choose a file</label>
-                <input id="upload-file" name="file" type="file" required />
-              </div>
-              <button id="upload-button" type="submit">Upload for review</button>
-            </form>
-            <div id="upload-status" class="notice" role="status" aria-live="polite"></div>
-          </section>
+    container.innerHTML = files.map((file) => {
+      const title = file.title || file.fileName || file.filename || "Shared file";
+      const description = file.description || "";
+      const id = encodeURIComponent(file.id);
 
-          <section id="my-submissions-panel" class="panel hidden">
-            <h2>Submissions</h2>
-            <p>Track pending submissions and remove your own submissions that have not been published.</p>
-            <div id="my-submissions">Loading submissions…</div>
-          </section>
+      return `
+        <article class="file-item">
+          <div class="item-title">${escapeHtml(title)}</div>
+          ${description ? `<p>${escapeHtml(description)}</p>` : ""}
+          <p class="item-meta">${escapeHtml(file.fileName || file.filename || "")}
+            ${file.createdAt ? ` · Published ${escapeHtml(formatDate(file.createdAt))}` : ""}
+          </p>
+          <a href="${API}/files/download/${id}" data-download="${id}">Download file</a>
+        </article>`;
+    }).join("");
 
-          <section id="publisher-panel" class="panel wide hidden">
-            <h2>Publisher Review</h2>
-            <p>Review pending submissions. Publishing makes a file available to all signed-in members.</p>
-            <div class="toolbar">
-              <button id="refresh-review" type="button">Refresh submissions</button>
-            </div>
-            <div id="review-list">Loading submissions…</div>
-          </section>
+    container.querySelectorAll("[data-download]").forEach((link) => {
+      link.addEventListener("click", async (event) => {
+        event.preventDefault();
+        try {
+          const response = await fetch(
+            `${API}/files/download/${link.dataset.download}`,
+            { credentials: "include" }
+          );
+          if (!response.ok) throw new Error("Could not download this file.");
+          const blob = await response.blob();
+          const objectUrl = URL.createObjectURL(blob);
+          const temporaryLink = document.createElement("a");
+          temporaryLink.href = objectUrl;
+          temporaryLink.download = "";
+          document.body.appendChild(temporaryLink);
+          temporaryLink.click();
+          temporaryLink.remove();
+          URL.revokeObjectURL(objectUrl);
+        } catch (error) {
+          notify(error.message, "error");
+        }
+      });
+    });
+  }
 
-          <section id="admin-panel" class="panel wide hidden">
-            <h2>Account Management</h2>
-            <p>Create member accounts and assign permissions. New member accounts use the configured shared member password unless an individual password is added through a separately supported workflow.</p>
+  async function loadFiles() {
+    try {
+      const data = await request("/files/published");
+      renderFiles(Array.isArray(data) ? data : data.files || []);
+    } catch (error) {
+      $("#published-files").innerHTML =
+        `<p>Could not load files: ${escapeHtml(error.message)}</p>`;
+    }
+  }
 
-            <h3>Create a member account</h3>
-            <form id="create-account-form">
-              <div class="field">
-                <label for="new-name">Member's full name</label>
-                <input id="new-name" name="name" required minlength="2" maxlength="100" />
-              </div>
-              <div class="field">
-                <label for="new-username">Username</label>
-                <input id="new-username" name="username" required maxlength="100" placeholder="first.last.mathcircle" pattern="[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle" />
-                <span class="meta">Use lowercase letters and numbers, optionally separated by dots or hyphens, ending in .mathcircle.</span>
-              </div>
-              <button id="create-account-button" type="submit">Create account</button>
-            </form>
-            <div id="create-account-status" class="notice" role="status" aria-live="polite"></div>
+  $("#refresh-files").addEventListener("click", loadFiles);
 
-            <hr />
+  $("#upload-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const file = $("#file-input").files[0];
 
-            <h3>Manage an existing account's roles</h3>
-            <p class="small">Enter the member's exact username. Role changes take effect on the server. This form does not list all accounts automatically because the current Worker has no member-list endpoint.</p>
-            <form id="role-form">
-              <div class="field">
-                <label for="target-username">Member username</label>
-                <input id="target-username" required maxlength="100" placeholder="first.last.mathcircle" pattern="[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle" />
-              </div>
+    if (!file) {
+      notify("Choose a file first.", "error");
+      return;
+    }
 
-              <div class="checkrow">
-                <input id="role-contributor" type="checkbox" />
-                <label for="role-contributor">Contributor — upload and manage own unpublished submissions</label>
-              </div>
-              <div class="checkrow">
-                <input id="role-publisher" type="checkbox" />
-                <label for="role-publisher">Publisher — review submissions and manage files</label>
-              </div>
-              <div class="checkrow">
-                <input id="role-admin" type="checkbox" />
-                <label for="role-admin">Site administrator — manage accounts and roles</label>
-              </div>
-              <div class="toolbar">
-                <button id="save-roles-button" type="submit">Save selected roles</button>
-              </div>
-            </form>
-            <div id="role-status" class="notice" role="status" aria-live="polite"></div>
+    if (file.size > 20 * 1024 * 1024) {
+      notify("The file must be no larger than 20 MB.", "error");
+      return;
+    }
 
-            <hr />
+    const payload = new FormData();
+    payload.append("title", $("#file-title").value.trim());
+    payload.append("description", $("#file-description").value.trim());
+    payload.append("file", file);
 
-            <h3>Activate or deactivate a member</h3>
-            <form id="active-form">
-              <div class="field">
-                <label for="active-username">Member username</label>
-                <input id="active-username" required maxlength="100" placeholder="first.last.mathcircle" pattern="[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle" />
-              </div>
-              <div class="field">
-                <label for="active-value">Account status</label>
-                <select id="active-value">
-                  <option value="true">Active</option>
-                  <option value="false">Inactive</option>
-                </select>
-              </div>
-              <button id="save-active-button" type="submit">Update account status</button>
-            </form>
-            <div id="active-status" class="notice" role="status" aria-live="polite"></div>
-          </section>
-        </div>
+    try {
+      notify("Uploading file…");
+      await request("/files/upload", {
+        method: "POST",
+        body: payload
+      });
+      form.reset();
+      notify("File uploaded and submitted for review.", "success");
+      await loadSubmissions();
+    } catch (error) {
+      notify(
+        `${error.message} If you are a site administrator and upload is denied, the Worker may also need its upload permission check updated.`,
+        "error"
+      );
+    }
+  });
 
-        <div class="logout-area">
-          <button id="logout" type="button" class="secondary">Sign out</button>
-        </div>
-      </section>
-    </main>
+  function renderSubmissions(items) {
+    const container = $("#submissions-list");
 
-    <script>
-      const API = "https://api.montrealmathcircle.com";
-      const statusBox = document.querySelector("#status");
-      const portal = document.querySelector("#portal");
-      const memberName = document.querySelector("#member-name");
-      const roleSummary = document.querySelector("#role-summary");
+    if (!Array.isArray(items) || items.length === 0) {
+      container.innerHTML = "<p>No submissions to display.</p>";
+      return;
+    }
 
-      let currentMember = null;
-      let roles = {
-        siteAdministrator: false,
-        filePublisher: false,
-        fileContributor: false
-      };
+    container.innerHTML = items.map((item) => {
+      const title = item.title || item.fileName || item.filename || "Untitled submission";
+      const status = item.status || "pending";
+      const canReview = currentRoles.siteAdministrator || currentRoles.filePublisher;
+      const id = encodeURIComponent(item.id);
 
-      async function api(path, options = {}) {
-        const response = await fetch(API + path, {
-          credentials: "include",
-          ...options
+      return `
+        <article class="submission-item">
+          <div class="item-title">${escapeHtml(title)}</div>
+          <p>${escapeHtml(item.description || "")}</p>
+          <p class="item-meta">
+            Status: ${escapeHtml(status)}
+            ${item.createdAt ? ` · Submitted ${escapeHtml(formatDate(item.createdAt))}` : ""}
+          </p>
+          ${canReview && status === "pending" ? `
+            <div class="actions">
+              <button type="button" data-review="publish" data-id="${id}">Publish</button>
+              <button type="button" class="secondary" data-review="reject" data-id="${id}">Reject</button>
+            </div>` : ""}
+        </article>`;
+    }).join("");
+
+    container.querySelectorAll("[data-review]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const action = button.dataset.review;
+        const id = button.dataset.id;
+
+        try {
+          await request(`/files/submissions/${id}/${action}`, {
+            method: "POST",
+            body: JSON.stringify({})
+          });
+          notify(`Submission ${action === "publish" ? "published" : "rejected"}.`, "success");
+          await loadSubmissions();
+          await loadFiles();
+        } catch (error) {
+          notify(error.message, "error");
+        }
+      });
+    });
+  }
+
+  async function loadSubmissions() {
+    try {
+      const data = await request("/files/submissions");
+      renderSubmissions(Array.isArray(data) ? data : data.submissions || []);
+    } catch (error) {
+      $("#submissions-list").innerHTML =
+        `<p>Could not load submissions: ${escapeHtml(error.message)}</p>`;
+    }
+  }
+
+  $("#refresh-submissions").addEventListener("click", loadSubmissions);
+
+  $("#create-account-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const name = $("#new-name").value.trim();
+    const username = $("#new-username").value.trim();
+
+    try {
+      await request("/admin/create-member-account", {
+        method: "POST",
+        body: JSON.stringify({ name, username })
+      });
+      event.currentTarget.reset();
+      notify(`Account created for ${username}.`, "success");
+      await loadMembers();
+    } catch (error) {
+      notify(error.message, "error");
+    }
+  });
+
+  async function changeRole(username, role, enabled) {
+    const routes = {
+      fileContributor: "/admin/set-file-contributor",
+      filePublisher: "/admin/set-file-publisher",
+      siteAdministrator: "/admin/set-site-administrator"
+    };
+
+    await request(routes[role], {
+      method: "POST",
+      body: JSON.stringify({ username, enabled })
+    });
+  }
+
+  async function changeActive(username, active) {
+    await request("/admin/set-member-active", {
+      method: "POST",
+      body: JSON.stringify({ username, active })
+    });
+  }
+
+  function renderMembers(items) {
+    const container = $("#members-list");
+
+    if (!Array.isArray(items) || items.length === 0) {
+      container.innerHTML = "<p>No member accounts found.</p>";
+      return;
+    }
+
+    container.innerHTML = items.map((member) => {
+      const username = escapeHtml(member.username);
+      const active = Boolean(member.active);
+
+      return `
+        <article class="member-card" data-username="${username}">
+          <h4>${escapeHtml(member.name || member.username)}</h4>
+          <p class="item-meta">
+            Username: ${username}<br>
+            Account created: ${escapeHtml(formatDate(member.createdAt) || "Unknown")}<br>
+            Status: <span class="${active ? "status-active" : "status-inactive"}">
+              ${active ? "Active" : "Inactive"}
+            </span>
+          </p>
+
+          <div class="role-controls">
+            <label>
+              <input type="checkbox" data-role="fileContributor"
+                ${member.fileContributor ? "checked" : ""}>
+              Contributor
+            </label>
+            <label>
+              <input type="checkbox" data-role="filePublisher"
+                ${member.filePublisher ? "checked" : ""}>
+              Publisher
+            </label>
+            <label>
+              <input type="checkbox" data-role="siteAdministrator"
+                ${member.siteAdministrator ? "checked" : ""}>
+              Site Administrator
+            </label>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="secondary" data-active="${active ? "false" : "true"}">
+              ${active ? "Deactivate account" : "Activate account"}
+            </button>
+          </div>
+        </article>`;
+    }).join("");
+
+    container.querySelectorAll(".member-card").forEach((card) => {
+      const username = card.dataset.username;
+
+      card.querySelectorAll("[data-role]").forEach((checkbox) => {
+        checkbox.addEventListener("change", async () => {
+          const role = checkbox.dataset.role;
+          const enabled = checkbox.checked;
+          checkbox.disabled = true;
+
+          try {
+            await changeRole(username, role, enabled);
+            notify(`${roleLabel(role)} ${enabled ? "granted to" : "removed from"} ${username}.`, "success");
+            await loadMembers();
+          } catch (error) {
+            checkbox.checked = !enabled;
+            notify(error.message, "error");
+          } finally {
+            checkbox.disabled = false;
+          }
         });
+      });
 
-        const contentType = response.headers.get("content-type") || "";
-        let result = {};
-
-        if (contentType.includes("application/json")) {
-          result = await response.json();
-        }
-
-        if (!response.ok) {
-          throw new Error(result.error || `Request failed (${response.status})`);
-        }
-
-        return result;
-      }
-
-      function setMessage(id, message) {
-        const el = document.querySelector("#" + id);
-        if (el) el.textContent = message || "";
-      }
-
-      function addText(parent, tag, text, className) {
-        const el = document.createElement(tag);
-        el.textContent = text ?? "";
-        if (className) el.className = className;
-        parent.appendChild(el);
-        return el;
-      }
-
-      function addButton(parent, label, onClick, className = "secondary") {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = label;
-        button.className = className;
-        button.addEventListener("click", onClick);
-        parent.appendChild(button);
-        return button;
-      }
-
-      function formatSize(bytes) {
-        if (!Number.isFinite(Number(bytes))) return "";
-        const n = Number(bytes);
-        if (n < 1024) return `${n} bytes`;
-        if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-        return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-      }
-
-      function formatDate(value) {
-        if (!value) return "";
-        const date = new Date(value);
-        return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
-      }
-
-      async function loadPublishedFiles() {
-        const container = document.querySelector("#published-files");
-        container.replaceChildren();
-        addText(container, "p", "Loading published files…", "muted");
-
-        try {
-          const result = await api("/files/published");
-          container.replaceChildren();
-          const files = result.files || [];
-
-          if (!files.length) {
-            addText(container, "p", "No published files yet.", "muted");
-            return;
-          }
-
-          for (const file of files) {
-            const item = document.createElement("div");
-            item.className = "item";
-            addText(item, "div", file.filename || file.original_filename || "Untitled file", "item-title");
-
-            const details = [
-              file.ownerUsername ? `Submitted by ${file.ownerUsername}` : "",
-              formatSize(file.sizeBytes ?? file.size_bytes),
-              file.publishedAt || file.published_at
-                ? `Published ${formatDate(file.publishedAt || file.published_at)}`
-                : ""
-            ].filter(Boolean).join(" · ");
-
-            addText(item, "div", details, "meta");
-
-            const download = document.createElement("a");
-            download.className = "button";
-            download.textContent = "Download";
-            download.href = `${API}/files/download/${encodeURIComponent(file.id)}`;
-            download.setAttribute("aria-label", `Download ${file.filename || "file"}`);
-            item.appendChild(download);
-            container.appendChild(item);
-          }
-        } catch (error) {
-          container.replaceChildren();
-          addText(container, "p", `Could not load published files: ${error.message}`, "muted");
-        }
-      }
-
-      async function deleteSubmission(id, statusId, reloadFunction) {
-        if (!confirm("Delete this submission? This cannot be undone.")) return;
-
-        try {
-          await api(`/files/submissions/${encodeURIComponent(id)}`, {
-            method: "DELETE"
-          });
-          setMessage(statusId, "Submission deleted.");
-          await reloadFunction();
-          await loadPublishedFiles();
-        } catch (error) {
-          setMessage(statusId, error.message);
-        }
-      }
-
-      async function loadMySubmissions() {
-        const container = document.querySelector("#my-submissions");
-        container.replaceChildren();
-
-        try {
-          const result = await api("/files/submissions");
-          const submissions = result.submissions || [];
-
-          if (!submissions.length) {
-            addText(container, "p", "You have no pending submissions.", "muted");
-            return;
-          }
-
-          for (const submission of submissions) {
-            const item = document.createElement("div");
-            item.className = "item";
-            addText(item, "div", submission.filename || "Untitled file", "item-title");
-            addText(item, "span", submission.status || "pending", "badge");
-            addText(
-              item,
-              "div",
-              `${formatSize(submission.sizeBytes)} · Submitted ${formatDate(submission.createdAt)}`,
-              "meta"
-            );
-
-            if (submission.status !== "published") {
-              addButton(
-                item,
-                "Delete submission",
-                () => deleteSubmission(submission.id, "upload-status", loadMySubmissions),
-                "danger"
-              );
-            }
-
-            container.appendChild(item);
-          }
-        } catch (error) {
-          container.replaceChildren();
-          addText(container, "p", error.message, "muted");
-        }
-      }
-
-      async function loadReviewQueue() {
-        const container = document.querySelector("#review-list");
-        container.replaceChildren();
-
-        try {
-          const result = await api("/files/submissions");
-          const submissions = (result.submissions || []).filter(
-            submission => submission.status === "pending"
-          );
-
-          if (!submissions.length) {
-            addText(container, "p", "There are no pending submissions to review.", "muted");
-            return;
-          }
-
-          for (const submission of submissions) {
-            const item = document.createElement("div");
-            item.className = "item";
-            addText(item, "div", submission.filename || "Untitled file", "item-title");
-            addText(item, "div", `Submitted by ${submission.ownerUsername || "unknown"}`, "meta");
-            addText(
-              item,
-              "div",
-              `${formatSize(submission.sizeBytes)} · ${formatDate(submission.createdAt)}`,
-              "meta"
-            );
-
-            addButton(item, "Publish", async () => {
-              try {
-                await api(`/files/submissions/${submission.id}/publish`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: "{}"
-                });
-                setMessage("role-status", "");
-                await loadReviewQueue();
-                await loadPublishedFiles();
-                await loadMySubmissions();
-              } catch (error) {
-                alert(`Could not publish: ${error.message}`);
-              }
-            });
-
-            addButton(item, "Reject", async () => {
-              if (!confirm("Reject this submission?")) return;
-              try {
-                await api(`/files/submissions/${submission.id}/reject`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: "{}"
-                });
-                await loadReviewQueue();
-                await loadMySubmissions();
-              } catch (error) {
-                alert(`Could not reject: ${error.message}`);
-              }
-            }, "secondary");
-
-            addButton(
-              item,
-              "Delete",
-              () => deleteSubmission(submission.id, "role-status", loadReviewQueue),
-              "danger"
-            );
-
-            container.appendChild(item);
-          }
-        } catch (error) {
-          container.replaceChildren();
-          addText(container, "p", error.message, "muted");
-        }
-      }
-
-      async function checkSession() {
-        try {
-          const result = await api("/me");
-
-          if (!result.signedIn || !result.member) {
-            window.location.replace("/members/login");
-            return;
-          }
-
-          currentMember = result.member;
-          roles = result.roles || roles;
-
-          memberName.textContent = currentMember.name;
-          roleSummary.textContent = [
-            roles.siteAdministrator ? "Site administrator" : "",
-            roles.filePublisher ? "File publisher" : "",
-            roles.fileContributor ? "File contributor" : ""
-          ].filter(Boolean).join(" · ") || "Member";
-
-          portal.classList.remove("hidden");
-          statusBox.textContent = "";
-
-          if (roles.fileContributor || roles.filePublisher) {
-            document.querySelector("#upload-panel").classList.remove("hidden");
-            document.querySelector("#my-submissions-panel").classList.remove("hidden");
-            await loadMySubmissions();
-          }
-
-          if (roles.filePublisher) {
-            document.querySelector("#publisher-panel").classList.remove("hidden");
-            await loadReviewQueue();
-          }
-
-          if (roles.siteAdministrator) {
-            document.querySelector("#admin-panel").classList.remove("hidden");
-          }
-
-          await loadPublishedFiles();
-        } catch (error) {
-          statusBox.textContent = `Unable to verify your sign-in: ${error.message}`;
-        }
-      }
-
-      document.querySelector("#refresh-files").addEventListener("click", loadPublishedFiles);
-
-      document.querySelector("#refresh-review").addEventListener("click", loadReviewQueue);
-
-      document.querySelector("#upload-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        const input = document.querySelector("#upload-file");
-        const button = document.querySelector("#upload-button");
-        const file = input.files && input.files[0];
-
-        if (!file) {
-          setMessage("upload-status", "Choose a file first.");
-          return;
-        }
-
-        if (file.size > 20 * 1024 * 1024) {
-          setMessage("upload-status", "The maximum file size is 20 MB.");
-          return;
-        }
-
-        const form = new FormData();
-        form.append("file", file);
+      card.querySelector("[data-active]").addEventListener("click", async (event) => {
+        const button = event.currentTarget;
+        const active = button.dataset.active === "true";
         button.disabled = true;
-        setMessage("upload-status", "Uploading…");
 
         try {
-          const result = await api("/files/upload", {
-            method: "POST",
-            body: form
-          });
-          setMessage(
-            "upload-status",
-            `Uploaded ${result.submission?.filename || file.name}. It is pending publisher review.`
-          );
-          input.value = "";
-          await loadMySubmissions();
+          await changeActive(username, active);
+          notify(`Account ${username} ${active ? "activated" : "deactivated"}.`, "success");
+          await loadMembers();
         } catch (error) {
-          setMessage("upload-status", `Upload failed: ${error.message}`);
+          notify(error.message, "error");
         } finally {
           button.disabled = false;
         }
       });
+    });
+  }
 
-      document.querySelector("#create-account-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        const button = document.querySelector("#create-account-button");
-        const name = document.querySelector("#new-name").value.trim();
-        const username = document.querySelector("#new-username").value.trim().toLowerCase();
+  function roleLabel(role) {
+    return {
+      fileContributor: "Contributor permission",
+      filePublisher: "Publisher permission",
+      siteAdministrator: "Site Administrator permission"
+    }[role] || role;
+  }
 
-        button.disabled = true;
-        setMessage("create-account-status", "Creating account…");
+  async function loadMembers() {
+    const container = $("#members-list");
+    container.innerHTML = "<p>Loading accounts…</p>";
 
-        try {
-          const result = await api("/admin/create-member-account", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, username })
-          });
-          setMessage(
-            "create-account-status",
-            `Created ${result.name} (${result.username}). The account uses the configured shared member password.`
-          );
-          document.querySelector("#create-account-form").reset();
-        } catch (error) {
-          setMessage("create-account-status", `Could not create account: ${error.message}`);
-        } finally {
-          button.disabled = false;
-        }
-      });
+    try {
+      const data = await request("/admin/list-members");
+      members = Array.isArray(data) ? data : data.members || [];
+      renderMembers(members);
+    } catch (error) {
+      container.innerHTML =
+        `<p>Could not load member accounts: ${escapeHtml(error.message)}</p>
+         <p class="hint">Check that the deployed Worker includes GET /admin/list-members.</p>`;
+    }
+  }
 
-      document.querySelector("#role-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        const button = document.querySelector("#save-roles-button");
-        const username = document.querySelector("#target-username").value.trim().toLowerCase();
-        const selected = {
-          contributor: document.querySelector("#role-contributor").checked,
-          publisher: document.querySelector("#role-publisher").checked,
-          administrator: document.querySelector("#role-admin").checked
-        };
+  $("#refresh-members").addEventListener("click", loadMembers);
 
-        button.disabled = true;
-        setMessage("role-status", "Saving roles…");
-
-        try {
-          for (const [field, value] of Object.entries(selected)) {
-            const route = field === "contributor"
-              ? "/admin/set-file-contributor"
-              : field === "publisher"
-                ? "/admin/set-file-publisher"
-                : "/admin/set-site-administrator";
-
-            await api(route, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username, [field]: value })
-            });
-          }
-
-          setMessage("role-status", `Saved roles for ${username}.`);
-          if (username === currentMember.username) {
-            setMessage(
-              "role-status",
-              `Saved roles for your account. Refresh the page to update the visible controls.`
-            );
-          }
-        } catch (error) {
-          setMessage(
-            "role-status",
-            `Role update stopped: ${error.message}. Some earlier role changes may already have been saved. Review the account before trying again.`
-          );
-        } finally {
-          button.disabled = false;
-        }
-      });
-
-      document.querySelector("#active-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        const button = document.querySelector("#save-active-button");
-        const username = document.querySelector("#active-username").value.trim().toLowerCase();
-        const active = document.querySelector("#active-value").value === "true";
-
-        if (!active && username === currentMember.username) {
-          if (!confirm("You are about to deactivate your own account and end future access. Continue only if another active administrator can restore access.")) {
-            return;
-          }
-        }
-
-        button.disabled = true;
-        setMessage("active-status", "Updating account…");
-
-        try {
-          await api("/admin/set-member-active", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, active })
-          });
-          setMessage("active-status", `Updated ${username}: ${active ? "active" : "inactive"}.`);
-          if (!active && username === currentMember.username) {
-            window.location.replace("/members/login");
-          }
-        } catch (error) {
-          setMessage("active-status", `Could not update account: ${error.message}`);
-        } finally {
-          button.disabled = false;
-        }
-      });
-
-      document.querySelector("#logout").addEventListener("click", async () => {
-        const button = document.querySelector("#logout");
-        button.disabled = true;
-
-        try {
-          await api("/logout", { method: "POST" });
-          window.location.replace("/members/login");
-        } catch (error) {
-          statusBox.textContent = `Sign-out failed: ${error.message}`;
-          button.disabled = false;
-        }
-      });
-
-      checkSession();
-    </script>
-  </body>
-</html>
-
+  refreshSession();
+</script>
+</>

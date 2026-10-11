@@ -547,11 +547,15 @@ const title = "Members | Montreal Math Circle";
           portal.classList.remove("hidden");
           statusBox.textContent = "";
 
-          if (roles.fileContributor || roles.filePublisher) {
-            document.querySelector("#upload-panel").classList.remove("hidden");
-            document.querySelector("#my-submissions-panel").classList.remove("hidden");
-            await loadMySubmissions();
-          }
+          if (
+  roles.siteAdministrator ||
+  roles.fileContributor ||
+  roles.filePublisher
+) {
+  document.querySelector("#upload-panel").classList.remove("hidden");
+  document.querySelector("#my-submissions-panel").classList.remove("hidden");
+  await loadMySubmissions();
+}
 
           if (roles.filePublisher) {
             document.querySelector("#publisher-panel").classList.remove("hidden");

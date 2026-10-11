@@ -7,6 +7,7 @@ const apiUrl = "https://api.montrealmathcircle.com";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Member Login | Montreal Math Circle</title>
+
     <style>
       body {
         font-family: system-ui, sans-serif;
@@ -55,6 +56,12 @@ const apiUrl = "https://api.montrealmathcircle.com";
         min-height: 1.5em;
         overflow-wrap: anywhere;
       }
+
+      .hint {
+        color: #555;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
     </style>
   </head>
 
@@ -62,26 +69,25 @@ const apiUrl = "https://api.montrealmathcircle.com";
     <main>
       <h1>Montreal Math Circle</h1>
       <h2>Member Login</h2>
-      <p>Enter your first and last name and the shared member password.</p>
+      <p>Enter your assigned username and the shared member password.</p>
 
       <form id="login-form">
-        <label for="firstName">First name</label>
+        <label for="username">Username</label>
         <input
-          id="firstName"
-          name="firstName"
+          id="username"
+          name="username"
           type="text"
-          autocomplete="given-name"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+          placeholder="first.last.mathcircle"
           required
+          maxlength="100"
         />
 
-        <label for="lastName">Last name</label>
-        <input
-          id="lastName"
-          name="lastName"
-          type="text"
-          autocomplete="family-name"
-          required
-        />
+        <p class="hint">
+          Enter your full username, including <code>.mathcircle</code>.
+        </p>
 
         <label for="password">Shared member password</label>
         <input
@@ -90,6 +96,7 @@ const apiUrl = "https://api.montrealmathcircle.com";
           type="password"
           autocomplete="current-password"
           required
+          maxlength="256"
         />
 
         <button id="login-button" type="submit">Log in</button>
@@ -102,33 +109,21 @@ const apiUrl = "https://api.montrealmathcircle.com";
       const message = document.querySelector("#message");
       const button = document.querySelector("#login-button");
 
-      function makeUsername(name) {
-        return name
-          .trim()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .toLowerCase()
-          .replace(/[^a-z0-9-]/g, "");
-      }
-
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        const firstName = makeUsername(
-          document.querySelector("#firstName").value
-        );
-        const lastName = makeUsername(
-          document.querySelector("#lastName").value
-        );
+        const username = document
+          .querySelector("#username")
+          .value.trim()
+          .toLowerCase();
+
         const password = document.querySelector("#password").value;
 
-        if (!firstName || !lastName) {
+        if (!/^[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle$/.test(username)) {
           message.textContent =
-            "Please enter a valid first name and last name.";
+            "Enter your complete username, ending in .mathcircle.";
           return;
         }
-
-        const username = `${firstName}.${lastName}.mathcircle`;
 
         message.textContent = "Signing in...";
         button.disabled = true;
@@ -157,9 +152,7 @@ const apiUrl = "https://api.montrealmathcircle.com";
           }
 
           message.textContent =
-            result.error ||
-            `Login failed (HTTP ${response.status}).`;
-
+            result.error || `Login failed (HTTP ${response.status}).`;
         } catch (error) {
           message.textContent =
             "Unable to connect to the login service. Please try again.";
@@ -171,4 +164,3 @@ const apiUrl = "https://api.montrealmathcircle.com";
     </script>
   </body>
 </html>
-

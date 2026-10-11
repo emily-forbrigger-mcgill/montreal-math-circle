@@ -5,41 +5,47 @@ const title = "Members | Montreal Math Circle";
 
 <html lang="en">
   <head>
-       <!-- Same fonts as the main website -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Mali:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  />
+    <!-- Same fonts as the main website -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Mali:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+
     <style>
       :root {
         font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         color: #18181b;
         background: #e6e6fa;
-            }
-            /* Match the main website headings */
+      }
+
       h1, h2, h3, h4 {
         font-family: 'Mali', cursive, system-ui, sans-serif;
         font-weight: 700;
       }
-      
-      /* Match the main website buttons and form controls */
+
       button, input, select {
         font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       }
-      * { box-sizing: border-box; }
 
+      * { box-sizing: border-box; }
       body { margin: 0; }
       main { max-width: 1100px; margin: 4vh auto; padding: 24px; }
       h1 { margin-bottom: 8px; }
       h2 { margin-top: 0; }
       .subtitle { color: #596579; margin-bottom: 28px; }
       .muted { color: #596579; line-height: 1.6; }
-      .sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+
+      .sections {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
       .panel {
         background: white;
         border-radius: 12px;
@@ -47,8 +53,10 @@ const title = "Members | Montreal Math Circle";
         box-shadow: 0 4px 24px #172b4d12;
         min-width: 0;
       }
+
       .panel p { color: #596579; line-height: 1.6; }
       .wide { grid-column: 1 / -1; }
+
       .button, button {
         display: inline-block;
         background: #203e65;
@@ -61,18 +69,22 @@ const title = "Members | Montreal Math Circle";
         font-size: 14px;
         font-weight: 600;
       }
+
       .button:hover, button:hover { background: #315785; }
       button:disabled { opacity: .55; cursor: wait; }
+
       .secondary {
         background: white;
         color: #203e65;
         border: 1px solid #ccd3dd;
       }
+
       .secondary:hover { background: #edf2f7; }
       .danger { background: #a12828; }
       .danger:hover { background: #821e1e; }
       .field { display: grid; gap: 6px; margin: 14px 0; }
       label { font-size: 14px; font-weight: 600; }
+
       input, select {
         width: 100%;
         padding: 11px;
@@ -81,18 +93,35 @@ const title = "Members | Montreal Math Circle";
         font: inherit;
         background: white;
       }
+
       input[type="checkbox"] { width: auto; }
-      .checkrow { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+
+      .checkrow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 12px 0;
+      }
+
       .checkrow label { font-weight: 400; }
-      .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 14px 0;
+      }
+
       .item {
         padding: 14px 0;
         border-top: 1px solid #e1e6ed;
         overflow-wrap: anywhere;
       }
+
       .item:first-child { border-top: 0; }
       .item-title { font-weight: 700; margin-bottom: 6px; }
       .meta { color: #596579; font-size: 13px; line-height: 1.6; }
+
       .badge {
         display: inline-block;
         border-radius: 20px;
@@ -102,6 +131,7 @@ const title = "Members | Montreal Math Circle";
         font-size: 12px;
         margin: 3px 0;
       }
+
       .notice {
         margin: 16px 0;
         padding: 12px;
@@ -109,25 +139,142 @@ const title = "Members | Montreal Math Circle";
         background: #edf2f7;
         line-height: 1.5;
       }
+
       .notice:empty { display: none; }
       .logout-area { margin-top: 26px; }
       #status:empty { display: none; }
       .hidden { display: none !important; }
       .small { font-size: 13px; }
-      .folder-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 16px 0; }
-      .folder-tile { text-align: left; background: #edf2f7; color: #203e65; border: 1px solid #ccd3dd; }
+
+      .folder-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+        margin: 16px 0;
+      }
+
+      .folder-tile {
+        text-align: left;
+        background: #edf2f7;
+        color: #203e65;
+        border: 1px solid #ccd3dd;
+      }
+
       .folder-tile:hover { background: #dfeaf4; }
       .folder-tile.selected { background: #203e65; color: white; }
-      .folder-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+
+      .folder-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
       .folder-controls select { width: auto; max-width: 260px; }
       #folder-form input { max-width: 400px; }
       .folder-heading { margin-top: 22px; }
+
+      /* Compact, clearly separated published documents */
+
+      #published-files .document-card {
+        margin: 9px 0;
+        padding: 13px 15px;
+        border: 1px solid #ddd4eb;
+        border-left: 4px solid #ae96d0;
+        border-radius: 9px;
+        background: #fff;
+        transition: background-color .15s, border-color .15s;
+      }
+
+      #published-files .document-card:hover {
+        background: #fcfaff;
+        border-left-color: #a81b24;
+      }
+
+      #published-files .document-title {
+        font-size: 14px;
+        line-height: 1.45;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
+
+      #published-files .document-details {
+        margin-top: 3px;
+        font-size: 11px;
+        line-height: 1.4;
+        color: #687488;
+      }
+
+      #published-files .document-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-top: 11px;
+        padding-top: 10px;
+        border-top: 1px solid #eeeaf4;
+      }
+
+      #published-files .document-download {
+        padding: 7px 12px;
+        font-size: 12px;
+        background: #a81b24;
+        color: white;
+      }
+
+      #published-files .document-download:hover {
+        background: #881720;
+      }
+
+      #published-files .document-admin-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-left: auto;
+      }
+
+      #published-files .document-move-label {
+        font-size: 11px;
+        color: #687488;
+      }
+
+      #published-files .document-folder-select {
+        width: auto;
+        min-width: 125px;
+        max-width: 180px;
+        padding: 7px;
+        font-size: 12px;
+      }
+
+      #published-files .document-delete {
+        padding: 7px 11px;
+        font-size: 12px;
+        color: #a81b24;
+        background: white;
+        border: 1px solid #e3b4b9;
+      }
+
+      #published-files .document-delete:hover {
+        background: #fcf1f2;
+      }
 
       @media (max-width: 680px) {
         main { margin: 2vh auto; padding: 16px; }
         .sections { grid-template-columns: 1fr; }
         .wide { grid-column: auto; }
         .panel { padding: 20px; }
+
+        #published-files .document-admin-actions {
+          margin-left: 0;
+          width: 100%;
+        }
+
+        #published-files .document-folder-select {
+          flex: 1;
+          max-width: none;
+        }
       }
     </style>
   </head>
@@ -161,18 +308,23 @@ const title = "Members | Montreal Math Circle";
           <section class="panel wide">
             <h2>Shared Files</h2>
             <p>Published documents and resources available to signed-in members.</p>
+
             <div class="toolbar">
               <button id="refresh-files" type="button">Refresh files</button>
             </div>
+
             <div id="folder-admin" class="hidden">
               <h3>Manage Document Folders</h3>
+
               <form id="folder-form" class="toolbar">
                 <label for="folder-name">New folder name</label>
                 <input id="folder-name" maxlength="80" required placeholder="e.g. Number Theory" />
                 <button type="submit">Create folder</button>
               </form>
+
               <div id="folder-status" class="notice" role="status" aria-live="polite"></div>
             </div>
+
             <div id="folder-navigation" class="folder-grid" aria-label="Document folders"></div>
             <div id="published-files" aria-live="polite">Loading published files…</div>
           </section>
@@ -180,6 +332,7 @@ const title = "Members | Montreal Math Circle";
           <section id="upload-panel" class="panel hidden">
             <h2>Submit a File</h2>
             <p>Uploads are sent for publisher review before they become available to all members. Maximum file size: 20 MB.</p>
+
             <form id="upload-form">
               <div class="field">
                 <label for="upload-file">Choose a file</label>
@@ -187,6 +340,7 @@ const title = "Members | Montreal Math Circle";
               </div>
               <button id="upload-button" type="submit">Upload for review</button>
             </form>
+
             <div id="upload-status" class="notice" role="status" aria-live="polite"></div>
           </section>
 
@@ -199,9 +353,11 @@ const title = "Members | Montreal Math Circle";
           <section id="publisher-panel" class="panel wide hidden">
             <h2>Publisher Review</h2>
             <p>Review pending submissions. Publishing makes a file available to all signed-in members.</p>
+
             <div class="toolbar">
               <button id="refresh-review" type="button">Refresh submissions</button>
             </div>
+
             <div id="review-list">Loading submissions…</div>
           </section>
 
@@ -210,6 +366,7 @@ const title = "Members | Montreal Math Circle";
             <p>Create member accounts with individual passwords and assign permissions.</p>
 
             <h3>Create a member account</h3>
+
             <form id="create-account-form">
               <div class="field">
                 <label for="new-name">Member's full name</label>
@@ -258,12 +415,14 @@ const title = "Members | Montreal Math Circle";
 
               <button id="create-account-button" type="submit">Create account</button>
             </form>
+
             <div id="create-account-status" class="notice" role="status" aria-live="polite"></div>
 
             <hr />
 
             <h3>Manage an existing account's roles</h3>
             <p class="small">Enter the member's exact username. Role changes take effect on the server. This form does not list all accounts automatically because the current Worker has no member-list endpoint.</p>
+
             <form id="role-form">
               <div class="field">
                 <label for="target-username">Member username</label>
@@ -274,28 +433,34 @@ const title = "Members | Montreal Math Circle";
                 <input id="role-contributor" type="checkbox" />
                 <label for="role-contributor">Contributor — upload and manage own unpublished submissions</label>
               </div>
+
               <div class="checkrow">
                 <input id="role-publisher" type="checkbox" />
                 <label for="role-publisher">Publisher — review submissions and manage files</label>
               </div>
+
               <div class="checkrow">
                 <input id="role-admin" type="checkbox" />
                 <label for="role-admin">Site administrator — manage accounts and roles</label>
               </div>
+
               <div class="toolbar">
                 <button id="save-roles-button" type="submit">Save selected roles</button>
               </div>
             </form>
+
             <div id="role-status" class="notice" role="status" aria-live="polite"></div>
 
             <hr />
 
             <h3>Activate or deactivate a member</h3>
+
             <form id="active-form">
               <div class="field">
                 <label for="active-username">Member username</label>
                 <input id="active-username" required maxlength="100" placeholder="first.last.mathcircle" pattern="[a-z0-9]+([.-][a-z0-9]+)*\.mathcircle" />
               </div>
+
               <div class="field">
                 <label for="active-value">Account status</label>
                 <select id="active-value">
@@ -303,8 +468,10 @@ const title = "Members | Montreal Math Circle";
                   <option value="false">Inactive</option>
                 </select>
               </div>
+
               <button id="save-active-button" type="submit">Update account status</button>
             </form>
+
             <div id="active-status" class="notice" role="status" aria-live="polite"></div>
           </section>
         </div>
@@ -394,17 +561,24 @@ const title = "Members | Montreal Math Circle";
         const container = document.querySelector("#published-files");
         container.replaceChildren();
         addText(container, "p", "Loading published files…", "muted");
+
         try {
           const [folderResult, fileResult] = await Promise.all([
             api("/files/folders"),
             api("/files/published")
           ]);
+
           folders = folderResult.folders || [];
           publishedFiles = fileResult.files || [];
-          if (selectedFolder !== "all" && selectedFolder !== "unfiled" &&
-              !folders.some(f => String(f.id) === selectedFolder)) {
+
+          if (
+            selectedFolder !== "all" &&
+            selectedFolder !== "unfiled" &&
+            !folders.some(f => String(f.id) === selectedFolder)
+          ) {
             selectedFolder = "all";
           }
+
           renderPublishedFiles();
         } catch (error) {
           container.replaceChildren();
@@ -423,128 +597,245 @@ const title = "Members | Montreal Math Circle";
             selectedFolder = id;
             renderPublishedFiles();
           }, "folder-tile" + (selectedFolder === id ? " selected" : ""));
+
           button.setAttribute("aria-pressed", String(selectedFolder === id));
         }
+
         tile("all", "📁 All documents", publishedFiles.length);
+
         for (const folder of folders) {
-          const count = publishedFiles.filter(f => Number(f.folderId) === Number(folder.id) && f.folderId != null).length;
+          const count = publishedFiles.filter(file =>
+            file.folderId != null &&
+            Number(file.folderId) === Number(folder.id)
+          ).length;
+
           tile(String(folder.id), `📁 ${folder.name}`, count);
         }
-        const unfiledCount = publishedFiles.filter(f => f.folderId == null).length;
-        tile("unfiled", "📄 Unfiled Documents", unfiledCount);
 
-        if (roles.siteAdministrator && selectedFolder !== "all" && selectedFolder !== "unfiled") {
+        tile(
+          "unfiled",
+          "📄 Unfiled Documents",
+          publishedFiles.filter(file => file.folderId == null).length
+        );
+
+        // Administrator folder management.
+        if (
+          roles.siteAdministrator &&
+          selectedFolder !== "all" &&
+          selectedFolder !== "unfiled"
+        ) {
           const folder = folders.find(f => String(f.id) === selectedFolder);
+
           if (folder) {
             const controls = document.createElement("div");
             controls.className = "folder-controls";
+
             addButton(controls, "Rename this folder", async () => {
               const name = prompt("New folder name:", folder.name);
               if (name === null) return;
+
               if (!name.trim() || name.trim().length > 80) {
                 setMessage("folder-status", "Folder names must be 1–80 characters.");
                 return;
               }
+
               try {
                 await api(`/files/folders/${folder.id}`, {
-                  method: "POST", headers: { "Content-Type": "application/json" },
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ name: name.trim() })
                 });
+
                 setMessage("folder-status", "Folder renamed.");
                 await loadPublishedFiles();
-              } catch (error) { setMessage("folder-status", error.message); }
+              } catch (error) {
+                setMessage("folder-status", error.message);
+              }
             });
+
             addButton(controls, "Delete this folder", async () => {
-              if (!confirm(`Delete folder "${folder.name}"? Its files will become Unfiled; the files will NOT be deleted.`)) return;
+              if (!confirm(
+                `Delete folder "${folder.name}"? Its files will become Unfiled; the files will NOT be deleted.`
+              )) return;
+
               try {
-                await api(`/files/folders/${folder.id}`, { method: "DELETE" });
+                await api(`/files/folders/${folder.id}`, {
+                  method: "DELETE"
+                });
+
                 selectedFolder = "unfiled";
                 setMessage("folder-status", "Folder deleted. Its files are now Unfiled.");
                 await loadPublishedFiles();
-              } catch (error) { setMessage("folder-status", error.message); }
+              } catch (error) {
+                setMessage("folder-status", error.message);
+              }
             }, "danger");
+
             container.appendChild(controls);
           }
         }
 
         const visible = publishedFiles.filter(file =>
           selectedFolder === "all" ||
-          (selectedFolder === "unfiled" && file.folderId == null) ||
-          (selectedFolder !== "unfiled" && selectedFolder !== "all" && String(file.folderId) === selectedFolder)
+          (
+            selectedFolder === "unfiled" &&
+            file.folderId == null
+          ) ||
+          (
+            selectedFolder !== "unfiled" &&
+            selectedFolder !== "all" &&
+            String(file.folderId) === selectedFolder
+          )
         );
-        const heading = selectedFolder === "all" ? "All Documents" :
-          selectedFolder === "unfiled" ? "Unfiled Documents" :
-          folders.find(f => String(f.id) === selectedFolder)?.name || "Documents";
+
+        const heading = selectedFolder === "all"
+          ? "All Documents"
+          : selectedFolder === "unfiled"
+            ? "Unfiled Documents"
+            : folders.find(f => String(f.id) === selectedFolder)?.name || "Documents";
+
         addText(container, "h3", heading, "folder-heading");
+
         if (!visible.length) {
           addText(container, "p", "There are no published documents here yet.", "muted");
           return;
         }
+
+        // Each document has its own compact bordered row.
         for (const file of visible) {
-          const item = document.createElement("div");
-          item.className = "item";
+          const card = document.createElement("div");
+          card.className = "document-card";
+
           const filename = file.filename || "Untitled file";
-          addText(item, "div", filename, "item-title");
-          const folderName = folders.find(f => Number(f.id) === Number(file.folderId) && file.folderId != null)?.name || "Unfiled";
+
+          addText(card, "div", `📄 ${filename}`, "document-title");
+
+          // Small, simple metadata.
+          const publishedDate = file.publishedAt
+            ? new Date(file.publishedAt)
+            : null;
+
+          const dateText = (
+            publishedDate &&
+            !Number.isNaN(publishedDate.getTime())
+          )
+            ? publishedDate.toLocaleDateString()
+            : "";
+
           const details = [
-            selectedFolder === "all" ? `Folder: ${folderName}` : "",
-            file.ownerUsername ? `Submitted by ${file.ownerUsername}` : "",
             formatSize(file.sizeBytes),
-            file.publishedAt ? `Published ${formatDate(file.publishedAt)}` : ""
+            dateText
           ].filter(Boolean).join(" · ");
-          addText(item, "div", details, "meta");
+
+          addText(card, "div", details, "document-details");
+
           const actions = document.createElement("div");
-          actions.className = "folder-controls";
+          actions.className = "document-actions";
+
+          // Download button.
           const download = document.createElement("a");
-          download.className = "button";
+          download.className = "button document-download";
           download.textContent = "Download";
           download.href = `${API}/files/download/${encodeURIComponent(file.id)}`;
           download.setAttribute("aria-label", `Download ${filename}`);
           actions.appendChild(download);
+
+          // File organization and deletion are administrator-only.
           if (roles.siteAdministrator) {
+            const adminActions = document.createElement("div");
+            adminActions.className = "document-admin-actions";
+
+            const label = document.createElement("label");
             const select = document.createElement("select");
+            const selectId = `file-folder-${file.id}`;
+
+            label.htmlFor = selectId;
+            label.textContent = "Move to:";
+            label.className = "document-move-label";
+
+            select.id = selectId;
+            select.className = "document-folder-select";
             select.setAttribute("aria-label", `Folder for ${filename}`);
+
             const unfiled = document.createElement("option");
             unfiled.value = "";
             unfiled.textContent = "Unfiled";
             select.appendChild(unfiled);
+
             for (const folder of folders) {
               const option = document.createElement("option");
               option.value = String(folder.id);
               option.textContent = folder.name;
               select.appendChild(option);
             }
-            select.value = file.folderId == null ? "" : String(file.folderId);
+
+            select.value = file.folderId == null
+              ? ""
+              : String(file.folderId);
+
             const initial = select.value;
+
             select.addEventListener("change", async () => {
               select.disabled = true;
+
               try {
-                await api(`/files/submissions/${encodeURIComponent(file.id)}/folder`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ folderId: select.value === "" ? null : Number(select.value) })
-                });
+                await api(
+                  `/files/submissions/${encodeURIComponent(file.id)}/folder`,
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      folderId: select.value === ""
+                        ? null
+                        : Number(select.value)
+                    })
+                  }
+                );
+
                 setMessage("folder-status", `Moved "${filename}".`);
                 await loadPublishedFiles();
               } catch (error) {
                 select.value = initial;
-                setMessage("folder-status", `Could not move file: ${error.message}`);
-              } finally { select.disabled = false; }
+                setMessage(
+                  "folder-status",
+                  `Could not move file: ${error.message}`
+                );
+              } finally {
+                select.disabled = false;
+              }
             });
-            actions.appendChild(select);
-            addButton(actions, "Delete published file", async () => {
-              if (!confirm(`Permanently delete "${filename}"? This cannot be undone.`)) return;
+
+            adminActions.appendChild(label);
+            adminActions.appendChild(select);
+
+            addButton(adminActions, "Delete", async () => {
+              if (!confirm(
+                `Permanently delete "${filename}"? This cannot be undone.`
+              )) return;
+
               try {
-                await api(`/files/submissions/${encodeURIComponent(file.id)}`, { method: "DELETE" });
+                await api(
+                  `/files/submissions/${encodeURIComponent(file.id)}`,
+                  { method: "DELETE" }
+                );
+
                 setMessage("folder-status", `Deleted "${filename}".`);
                 await loadPublishedFiles();
                 await loadMySubmissions();
                 await loadReviewQueue();
-              } catch (error) { setMessage("folder-status", `Could not delete file: ${error.message}`); }
-            }, "danger");
+              } catch (error) {
+                setMessage(
+                  "folder-status",
+                  `Could not delete file: ${error.message}`
+                );
+              }
+            }, "document-delete");
+
+            actions.appendChild(adminActions);
           }
-          item.appendChild(actions);
-          container.appendChild(item);
+
+          card.appendChild(actions);
+          container.appendChild(card);
         }
       }
 
@@ -555,6 +846,7 @@ const title = "Members | Montreal Math Circle";
           await api(`/files/submissions/${encodeURIComponent(id)}`, {
             method: "DELETE"
           });
+
           setMessage(statusId, "Submission deleted.");
           await reloadFunction();
           await loadPublishedFiles();
@@ -579,6 +871,7 @@ const title = "Members | Montreal Math Circle";
           for (const submission of submissions) {
             const item = document.createElement("div");
             item.className = "item";
+
             addText(item, "div", submission.filename || "Untitled file", "item-title");
             addText(item, "span", submission.status || "pending", "badge");
             addText(
@@ -592,7 +885,11 @@ const title = "Members | Montreal Math Circle";
               addButton(
                 item,
                 "Delete submission",
-                () => deleteSubmission(submission.id, "upload-status", loadMySubmissions),
+                () => deleteSubmission(
+                  submission.id,
+                  "upload-status",
+                  loadMySubmissions
+                ),
                 "danger"
               );
             }
@@ -623,8 +920,14 @@ const title = "Members | Montreal Math Circle";
           for (const submission of submissions) {
             const item = document.createElement("div");
             item.className = "item";
+
             addText(item, "div", submission.filename || "Untitled file", "item-title");
-            addText(item, "div", `Submitted by ${submission.ownerUsername || "unknown"}`, "meta");
+            addText(
+              item,
+              "div",
+              `Submitted by ${submission.ownerUsername || "unknown"}`,
+              "meta"
+            );
             addText(
               item,
               "div",
@@ -639,6 +942,7 @@ const title = "Members | Montreal Math Circle";
                   headers: { "Content-Type": "application/json" },
                   body: "{}"
                 });
+
                 setMessage("role-status", "");
                 await loadReviewQueue();
                 await loadPublishedFiles();
@@ -650,12 +954,14 @@ const title = "Members | Montreal Math Circle";
 
             addButton(item, "Reject", async () => {
               if (!confirm("Reject this submission?")) return;
+
               try {
                 await api(`/files/submissions/${submission.id}/reject`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: "{}"
                 });
+
                 await loadReviewQueue();
                 await loadMySubmissions();
               } catch (error) {
@@ -666,7 +972,11 @@ const title = "Members | Montreal Math Circle";
             addButton(
               item,
               "Delete",
-              () => deleteSubmission(submission.id, "role-status", loadReviewQueue),
+              () => deleteSubmission(
+                submission.id,
+                "role-status",
+                loadReviewQueue
+              ),
               "danger"
             );
 
@@ -726,207 +1036,250 @@ const title = "Members | Montreal Math Circle";
         }
       }
 
-      document.querySelector("#refresh-files").addEventListener("click", loadPublishedFiles);
-      document.querySelector("#folder-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        const input = document.querySelector("#folder-name");
-        const name = input.value.trim();
-        if (!name || name.length > 80) {
-          setMessage("folder-status", "Folder names must be 1–80 characters.");
-          return;
-        }
-        try {
-          const result = await api("/files/folders", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name })
-          });
-          input.value = "";
-          selectedFolder = String(result.folder.id);
-          setMessage("folder-status", `Created folder "${name}".`);
-          await loadPublishedFiles();
-        } catch (error) { setMessage("folder-status", `Could not create folder: ${error.message}`); }
-      });
-      document.querySelector("#refresh-review").addEventListener("click", loadReviewQueue);
+      document.querySelector("#refresh-files")
+        .addEventListener("click", loadPublishedFiles);
 
-      document.querySelector("#upload-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        const input = document.querySelector("#upload-file");
-        const button = document.querySelector("#upload-button");
-        const file = input.files && input.files[0];
+      document.querySelector("#folder-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
 
-        if (!file) {
-          setMessage("upload-status", "Choose a file first.");
-          return;
-        }
+          const input = document.querySelector("#folder-name");
+          const name = input.value.trim();
 
-        if (file.size > 20 * 1024 * 1024) {
-          setMessage("upload-status", "The maximum file size is 20 MB.");
-          return;
-        }
-
-        const form = new FormData();
-        form.append("file", file);
-        button.disabled = true;
-        setMessage("upload-status", "Uploading…");
-
-        try {
-          const result = await api("/files/upload", {
-            method: "POST",
-            body: form
-          });
-          setMessage(
-            "upload-status",
-            `Uploaded ${result.submission?.filename || file.name}. It is pending publisher review.`
-          );
-          input.value = "";
-          await loadMySubmissions();
-        } catch (error) {
-          setMessage("upload-status", `Upload failed: ${error.message}`);
-        } finally {
-          button.disabled = false;
-        }
-      });
-
-      document.querySelector("#create-account-form").addEventListener("submit", async event => {
-        event.preventDefault();
-
-        const button = document.querySelector("#create-account-button");
-        const name = document.querySelector("#new-name").value.trim();
-        const username = document.querySelector("#new-username").value.trim().toLowerCase();
-        const password = document.querySelector("#new-password").value;
-        const confirmPassword = document.querySelector("#confirm-password").value;
-
-        if (password.length < 12) {
-          setMessage("create-account-status", "The password must be at least 12 characters long.");
-          return;
-        }
-
-        if (password.length > 256) {
-          setMessage("create-account-status", "The password cannot exceed 256 characters.");
-          return;
-        }
-
-        if (password !== confirmPassword) {
-          setMessage("create-account-status", "The passwords do not match. Please check them and try again.");
-          return;
-        }
-
-        button.disabled = true;
-        setMessage("create-account-status", "Creating account…");
-
-        try {
-          const result = await api("/admin/create-member-account", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, username, password })
-          });
-
-          setMessage(
-            "create-account-status",
-            `Created ${result.name} (${result.username}) with an individual password.`
-          );
-
-          document.querySelector("#create-account-form").reset();
-        } catch (error) {
-          setMessage("create-account-status", `Could not create account: ${error.message}`);
-        } finally {
-          button.disabled = false;
-        }
-      });
-
-      document.querySelector("#role-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        const button = document.querySelector("#save-roles-button");
-        const username = document.querySelector("#target-username").value.trim().toLowerCase();
-        const selected = {
-          contributor: document.querySelector("#role-contributor").checked,
-          publisher: document.querySelector("#role-publisher").checked,
-          administrator: document.querySelector("#role-admin").checked
-        };
-
-        button.disabled = true;
-        setMessage("role-status", "Saving roles…");
-
-        try {
-          for (const [field, value] of Object.entries(selected)) {
-            const route = field === "contributor"
-              ? "/admin/set-file-contributor"
-              : field === "publisher"
-                ? "/admin/set-file-publisher"
-                : "/admin/set-site-administrator";
-
-            await api(route, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username, [field]: value })
-            });
-          }
-
-          setMessage("role-status", `Saved roles for ${username}.`);
-
-          if (username === currentMember.username) {
-            setMessage(
-              "role-status",
-              "Saved roles for your account. Refresh the page to update the visible controls."
-            );
-          }
-        } catch (error) {
-          setMessage(
-            "role-status",
-            `Role update stopped: ${error.message}. Some earlier role changes may already have been saved. Review the account before trying again.`
-          );
-        } finally {
-          button.disabled = false;
-        }
-      });
-
-      document.querySelector("#active-form").addEventListener("submit", async event => {
-        event.preventDefault();
-        const button = document.querySelector("#save-active-button");
-        const username = document.querySelector("#active-username").value.trim().toLowerCase();
-        const active = document.querySelector("#active-value").value === "true";
-
-        if (!active && username === currentMember.username) {
-          if (!confirm("You are about to deactivate your own account and end future access. Continue only if another active administrator can restore access.")) {
+          if (!name || name.length > 80) {
+            setMessage("folder-status", "Folder names must be 1–80 characters.");
             return;
           }
-        }
 
-        button.disabled = true;
-        setMessage("active-status", "Updating account…");
+          try {
+            const result = await api("/files/folders", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name })
+            });
 
-        try {
-          await api("/admin/set-member-active", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, active })
-          });
+            input.value = "";
+            selectedFolder = String(result.folder.id);
+            setMessage("folder-status", `Created folder "${name}".`);
+            await loadPublishedFiles();
+          } catch (error) {
+            setMessage("folder-status", `Could not create folder: ${error.message}`);
+          }
+        });
 
-          setMessage("active-status", `Updated ${username}: ${active ? "active" : "inactive"}.`);
+      document.querySelector("#refresh-review")
+        .addEventListener("click", loadReviewQueue);
+
+      document.querySelector("#upload-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const input = document.querySelector("#upload-file");
+          const button = document.querySelector("#upload-button");
+          const file = input.files && input.files[0];
+
+          if (!file) {
+            setMessage("upload-status", "Choose a file first.");
+            return;
+          }
+
+          if (file.size > 20 * 1024 * 1024) {
+            setMessage("upload-status", "The maximum file size is 20 MB.");
+            return;
+          }
+
+          const form = new FormData();
+          form.append("file", file);
+
+          button.disabled = true;
+          setMessage("upload-status", "Uploading…");
+
+          try {
+            const result = await api("/files/upload", {
+              method: "POST",
+              body: form
+            });
+
+            setMessage(
+              "upload-status",
+              `Uploaded ${result.submission?.filename || file.name}. It is pending publisher review.`
+            );
+
+            input.value = "";
+            await loadMySubmissions();
+          } catch (error) {
+            setMessage("upload-status", `Upload failed: ${error.message}`);
+          } finally {
+            button.disabled = false;
+          }
+        });
+
+      document.querySelector("#create-account-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const button = document.querySelector("#create-account-button");
+          const name = document.querySelector("#new-name").value.trim();
+          const username = document.querySelector("#new-username").value.trim().toLowerCase();
+          const password = document.querySelector("#new-password").value;
+          const confirmPassword = document.querySelector("#confirm-password").value;
+
+          if (password.length < 12) {
+            setMessage(
+              "create-account-status",
+              "The password must be at least 12 characters long."
+            );
+            return;
+          }
+
+          if (password.length > 256) {
+            setMessage(
+              "create-account-status",
+              "The password cannot exceed 256 characters."
+            );
+            return;
+          }
+
+          if (password !== confirmPassword) {
+            setMessage(
+              "create-account-status",
+              "The passwords do not match. Please check them and try again."
+            );
+            return;
+          }
+
+          button.disabled = true;
+          setMessage("create-account-status", "Creating account…");
+
+          try {
+            const result = await api("/admin/create-member-account", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, username, password })
+            });
+
+            setMessage(
+              "create-account-status",
+              `Created ${result.name} (${result.username}) with an individual password.`
+            );
+
+            document.querySelector("#create-account-form").reset();
+          } catch (error) {
+            setMessage(
+              "create-account-status",
+              `Could not create account: ${error.message}`
+            );
+          } finally {
+            button.disabled = false;
+          }
+        });
+
+      document.querySelector("#role-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const button = document.querySelector("#save-roles-button");
+          const username = document.querySelector("#target-username").value.trim().toLowerCase();
+
+          const selected = {
+            contributor: document.querySelector("#role-contributor").checked,
+            publisher: document.querySelector("#role-publisher").checked,
+            administrator: document.querySelector("#role-admin").checked
+          };
+
+          button.disabled = true;
+          setMessage("role-status", "Saving roles…");
+
+          try {
+            for (const [field, value] of Object.entries(selected)) {
+              const route = field === "contributor"
+                ? "/admin/set-file-contributor"
+                : field === "publisher"
+                  ? "/admin/set-file-publisher"
+                  : "/admin/set-site-administrator";
+
+              await api(route, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, [field]: value })
+              });
+            }
+
+            setMessage("role-status", `Saved roles for ${username}.`);
+
+            if (username === currentMember.username) {
+              setMessage(
+                "role-status",
+                "Saved roles for your account. Refresh the page to update the visible controls."
+              );
+            }
+          } catch (error) {
+            setMessage(
+              "role-status",
+              `Role update stopped: ${error.message}. Some earlier role changes may already have been saved. Review the account before trying again.`
+            );
+          } finally {
+            button.disabled = false;
+          }
+        });
+
+      document.querySelector("#active-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const button = document.querySelector("#save-active-button");
+          const username = document.querySelector("#active-username").value.trim().toLowerCase();
+          const active = document.querySelector("#active-value").value === "true";
 
           if (!active && username === currentMember.username) {
-            window.location.replace("/members/login");
+            if (!confirm(
+              "You are about to deactivate your own account and end future access. Continue only if another active administrator can restore access."
+            )) {
+              return;
+            }
           }
-        } catch (error) {
-          setMessage("active-status", `Could not update account: ${error.message}`);
-        } finally {
-          button.disabled = false;
-        }
-      });
 
-      document.querySelector("#logout").addEventListener("click", async () => {
-        const button = document.querySelector("#logout");
-        button.disabled = true;
+          button.disabled = true;
+          setMessage("active-status", "Updating account…");
 
-        try {
-          await api("/logout", { method: "POST" });
-          window.location.replace("/members/login");
-        } catch (error) {
-          statusBox.textContent = `Sign-out failed: ${error.message}`;
-          button.disabled = false;
-        }
-      });
+          try {
+            await api("/admin/set-member-active", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username, active })
+            });
+
+            setMessage(
+              "active-status",
+              `Updated ${username}: ${active ? "active" : "inactive"}.`
+            );
+
+            if (!active && username === currentMember.username) {
+              window.location.replace("/members/login");
+            }
+          } catch (error) {
+            setMessage(
+              "active-status",
+              `Could not update account: ${error.message}`
+            );
+          } finally {
+            button.disabled = false;
+          }
+        });
+
+      document.querySelector("#logout")
+        .addEventListener("click", async () => {
+          const button = document.querySelector("#logout");
+          button.disabled = true;
+
+          try {
+            await api("/logout", { method: "POST" });
+            window.location.replace("/members/login");
+          } catch (error) {
+            statusBox.textContent = `Sign-out failed: ${error.message}`;
+            button.disabled = false;
+          }
+        });
 
       checkSession();
     </script>

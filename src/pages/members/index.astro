@@ -714,100 +714,20 @@ const title = "Members | Montreal Math Circle";
         <div class="sections">
           
           <!-- Members Discussion Board -->
-          <section class="panel wide" id="discussion-panel">
-            <h2>Discussion Board</h2>
-            <p>Ask questions, share ideas, and discuss Montreal Math Circle activities.</p>
-
-            <div id="discussion-topic-view">
-              <div class="toolbar">
-                <button id="discussion-new-button" type="button">
-                  Start a Discussion
-                </button>
-                <button id="discussion-refresh" type="button" class="secondary">
-                  Refresh
-                </button>
-              </div>
-
-              <div id="discussion-topic-list" aria-live="polite">
-                Loading discussions…
-              </div>
-            </div>
-
-            <!-- Create a new discussion -->
-            <div id="discussion-new-panel" class="hidden">
-              <h3>Start a Discussion</h3>
-
-              <form id="discussion-new-form">
-                <div class="field">
-                  <label for="discussion-new-title">Topic title</label>
-                  <input
-                    id="discussion-new-title"
-                    required
-                    minlength="3"
-                    maxlength="150"
-                    placeholder="What would you like to discuss?"
-                  />
-                </div>
-
-                <div class="field">
-                  <label for="discussion-new-body">Message</label>
-                  <textarea
-                    id="discussion-new-body"
-                    required
-                    maxlength="10000"
-                    rows="5"
-                    style="width:100%;padding:11px;border:1px solid #ccd3dd;border-radius:6px;font:inherit;"
-                  ></textarea>
-                </div>
-
-                <div class="link-form-actions">
-                  <button id="discussion-create" type="submit">
-                    Post Discussion
-                  </button>
-                  <button id="discussion-new-cancel" type="button" class="secondary">
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <!-- View a topic and its replies -->
-            <div id="discussion-detail-panel" class="hidden">
-              <button id="discussion-back" type="button" class="secondary">
-                ← All Discussions
-              </button>
-
-              <div id="discussion-detail"></div>
-
-              <div id="discussion-replies"></div>
-
-              <form id="discussion-reply-form">
-                <div class="field">
-                  <label for="discussion-reply-body">Write a reply</label>
-                  <textarea
-                    id="discussion-reply-body"
-                    required
-                    maxlength="10000"
-                    rows="4"
-                    style="width:100%;padding:11px;border:1px solid #ccd3dd;border-radius:6px;font:inherit;"
-                  ></textarea>
-                </div>
-                <button id="discussion-reply-submit" type="submit">
-                  Post Reply
-                </button>
-              </form>
-            </div>
-
-            <div
-              id="discussion-status"
-              class="notice"
-              role="status"
-              aria-live="polite"
-            ></div>
-          </section>
-
-
           
+<!-- Members Discussion Board -->
+<section class="panel">
+  <h2>Discussion Board</h2>
+
+  <p>
+    Ask questions, share ideas, and discuss
+    Montreal Math Circle activities.
+  </p>
+
+  <a class="button" href="/members/discussions/">
+    Open Discussion Board →
+  </a>
+</section>
           <!-- Members Calendar -->
           <section class="panel wide" id="calendar-panel">
             <h2>Calendar</h2>
@@ -2663,13 +2583,14 @@ if (
 
           
           
-          await Promise.all([
-            loadPublishedFiles(),
-            loadImportantLinks(),
-            loadMemberDirectory(),
-            loadCalendarEvents(),
-            loadDiscussionTopics()
-          ]);
+              
+await Promise.all([
+  loadPublishedFiles(),
+  loadImportantLinks(),
+  loadMemberDirectory(),
+  loadCalendarEvents()
+]);
+
 
 
         } catch (error) {
@@ -2922,276 +2843,6 @@ if (
           }
         });
        
-      // DISCUSSION BOARD — DISPLAY TOPICS
-
-      let selectedDiscussionId = null;
-
-      const discussionElement = id =>
-        document.getElementById(id);
-
-      function discussionShow(view) {
-        discussionElement("discussion-topic-view")
-          .classList.toggle("hidden", view !== "list");
-
-        discussionElement("discussion-new-panel")
-          .classList.toggle("hidden", view !== "new");
-
-        discussionElement("discussion-detail-panel")
-          .classList.toggle("hidden", view !== "detail");
-      }
-
-      function discussionMessage(message) {
-        discussionElement("discussion-status").textContent = message;
-      }
-
-      async function loadDiscussionTopics() {
-        const container = discussionElement("discussion-topic-list");
-        container.replaceChildren();
-        discussionMessage("");
-
-        try {
-          const result = await api("/discussion/topics");
-          const topics = result.topics || [];
-
-          if (!topics.length) {
-            addText(
-              container,
-              "p",
-              "No discussions yet. Be the first to start one.",
-              "muted"
-            );
-            return;
-          }
-
-          for (const topic of topics) {
-            const card = document.createElement("div");
-            card.className = "discussion-topic";
-
-            const title = document.createElement("div");
-            title.className = "discussion-title";
-            title.textContent =
-              (topic.isPinned ? "📌 " : "") + topic.title;
-            card.appendChild(title);
-
-            addText(
-              card,
-              "div",
-              `Started by ${topic.authorName || "Member"} · ` +
-              `${topic.replyCount || 0} replies` +
-              (topic.isLocked ? " · Closed" : ""),
-              "discussion-meta"
-            );
-
-            const excerpt = document.createElement("p");
-            excerpt.className = "discussion-message";
-            excerpt.textContent =
-              topic.body.length > 250
-                ? topic.body.slice(0, 250) + "…"
-                : topic.body;
-            card.appendChild(excerpt);
-
-            addButton(
-              card,
-              "Read Discussion →",
-              () => openDiscussion(topic.id)
-            );
-
-            container.appendChild(card);
-          }
-        } catch (error) {
-          discussionMessage(
-            `Could not load discussions: ${error.message}`
-          );
-        }
-      }
-
-      async function openDiscussion(topicId) {
-        selectedDiscussionId = topicId;
-        discussionShow("detail");
-        discussionMessage("");
-
-        const detail = discussionElement("discussion-detail");
-        const replies = discussionElement("discussion-replies");
-
-        detail.replaceChildren();
-        replies.replaceChildren();
-
-        try {
-          const result = await api(
-            `/discussion/topics/${topicId}`
-          );
-
-          const topic = result.topic;
-
-          addText(
-            detail,
-            "h3",
-            topic.title,
-            "discussion-title"
-          );
-
-          addText(
-            detail,
-            "div",
-            `Started by ${topic.authorName || "Member"}` +
-            (topic.isLocked ? " · Closed to replies" : ""),
-            "discussion-meta"
-          );
-
-          addText(
-            detail,
-            "p",
-            topic.body,
-            "discussion-message"
-          );
-
-          addText(
-            replies,
-            "h3",
-            `Replies (${result.replies.length})`
-          );
-
-          for (const reply of result.replies) {
-            const card = document.createElement("div");
-            card.className = "discussion-reply";
-
-            addText(
-              card,
-              "div",
-              reply.authorName || "Member",
-              "discussion-meta"
-            );
-
-            addText(
-              card,
-              "p",
-              reply.body,
-              "discussion-message"
-            );
-
-            replies.appendChild(card);
-          }
-
-          discussionElement("discussion-reply-form")
-            .classList.toggle("hidden", Boolean(topic.isLocked));
-
-        } catch (error) {
-          discussionMessage(
-            `Could not open discussion: ${error.message}`
-          );
-        }
-      }
-
-      discussionElement("discussion-new-button")
-        .addEventListener("click", () => {
-          discussionShow("new");
-          discussionMessage("");
-        });
-
-      discussionElement("discussion-new-cancel")
-        .addEventListener("click", () => {
-          discussionShow("list");
-        });
-
-      discussionElement("discussion-refresh")
-        .addEventListener("click", loadDiscussionTopics);
-
-      discussionElement("discussion-back")
-        .addEventListener("click", async () => {
-          selectedDiscussionId = null;
-          discussionShow("list");
-          await loadDiscussionTopics();
-        });
-       
-      // DISCUSSION BOARD — CREATE TOPIC
-
-      discussionElement("discussion-new-form")
-        .addEventListener("submit", async event => {
-          event.preventDefault();
-
-          const button = discussionElement("discussion-create");
-          const title = discussionElement("discussion-new-title").value.trim();
-          const body = discussionElement("discussion-new-body").value.trim();
-
-          if (title.length < 3 || !body) {
-            discussionMessage("Enter a title and message.");
-            return;
-          }
-
-          button.disabled = true;
-          discussionMessage("Posting discussion…");
-
-          try {
-            const result = await api("/discussion/topics", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ title, body })
-            });
-
-            discussionElement("discussion-new-form").reset();
-            discussionMessage("");
-
-            await loadDiscussionTopics();
-
-            if (result.topic?.id) {
-              await openDiscussion(result.topic.id);
-            } else {
-              discussionShow("list");
-            }
-          } catch (error) {
-            discussionMessage(
-              `Could not post discussion: ${error.message}`
-            );
-          } finally {
-            button.disabled = false;
-          }
-        });
-
-      // DISCUSSION BOARD — POST REPLY
-
-      discussionElement("discussion-reply-form")
-        .addEventListener("submit", async event => {
-          event.preventDefault();
-
-          if (!selectedDiscussionId) {
-            discussionMessage("Choose a discussion first.");
-            return;
-          }
-
-          const button = discussionElement("discussion-reply-submit");
-          const input = discussionElement("discussion-reply-body");
-          const body = input.value.trim();
-
-          if (!body) {
-            discussionMessage("Write a reply before posting.");
-            return;
-          }
-
-          button.disabled = true;
-          discussionMessage("Posting reply…");
-
-          try {
-            await api(
-              `/discussion/topics/${selectedDiscussionId}/replies`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ body })
-              }
-            );
-
-            input.value = "";
-            await openDiscussion(selectedDiscussionId);
-            discussionMessage("Your reply was posted.");
-          } catch (error) {
-            discussionMessage(
-              `Could not post reply: ${error.message}`
-            );
-          } finally {
-            button.disabled = false;
-          }
-        });
-
       checkSession();
     </script>
   </body>

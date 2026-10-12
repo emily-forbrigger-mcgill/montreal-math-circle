@@ -502,12 +502,17 @@ await loadDiscussionTopics();
           // but members cannot post new replies.
           replyForm.hidden = Boolean(topic.isLocked);
 
-        } catch (error) {
-          replyForm.hidden = true;
-          discussionMessage(
-            `Could not open discussion: ${error.message}`
-          );
-        }
+        
+          } catch (error) {
+            replyForm.hidden = true;
+          
+            detail.textContent = "Unable to load this discussion.";
+          
+            discussionMessage(
+              `Could not open discussion: ${error.message}`
+            );
+}
+
       }
       
       // DISCUSSION BOARD — CREATE NEW TOPICS

@@ -1,1 +1,104 @@
 
+---
+const pageTitle = "Discussion Board | Montreal Math Circle";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+  </head>
+
+  <body>
+    <main>
+      <a href="/members/">← Back to Members Page</a>
+
+      <h1>Discussion Board</h1>
+      <p>
+        Ask questions, share ideas, and discuss
+        Montreal Math Circle activities.
+      </p>
+
+      <div id="discussion-board">
+        <p>The discussion board is being set up.</p>
+      </div>
+    </main>
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f7f8fa;
+        color: #263238;
+      }
+
+      main {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 24px;
+      }
+
+      h1 {
+        color: #762d42;
+      }
+
+      a {
+        color: #762d42;
+      }
+
+      #discussion-board {
+        margin-top: 24px;
+        padding: 24px;
+        background: white;
+        border: 1px solid #dce1e8;
+        border-radius: 10px;
+      }
+    </style>
+    
+    <script>
+      const API_BASE = "https://api.montrealmathcircle.com";
+
+      async function checkDiscussionSession() {
+        const board = document.getElementById("discussion-board");
+
+        try {
+          const response = await fetch(`${API_BASE}/me`, {
+            method: "GET",
+            credentials: "include",
+            cache: "no-store"
+          });
+
+          if (response.status === 401) {
+            window.location.replace("/members/login");
+            return;
+          }
+
+          if (!response.ok) {
+            throw new Error("Unable to verify your member session.");
+          }
+
+          const result = await response.json();
+
+          if (!result.signedIn || !result.member) {
+            window.location.replace("/members/login");
+            return;
+          }
+
+          board.textContent =
+            `Welcome, ${result.member.name.split(/\s+/)[0]}. ` +
+            "Your discussion board is ready.";
+
+        } catch (error) {
+          board.textContent =
+            "Could not verify your sign-in. Please try refreshing the page.";
+        }
+      }
+
+      checkDiscussionSession();
+    </script>
+
+  </body>
+</html>
+

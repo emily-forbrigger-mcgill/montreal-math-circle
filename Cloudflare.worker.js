@@ -1523,6 +1523,838 @@ export default {
         request
       );
     }
+    
+    // MEMBERS CALENDAR
+    // Members can view events; site administrators manage them.
+
+    if (
+      path === "/calendar-events" ||
+      path.startsWith("/calendar-events/")
+    ) {
+      if (
+        ["POST", "DELETE"].includes(request.method) &&
+        !validFileRequestOrigin(request)
+      ) {
+        return json({ error: "Invalid request origin" }, 403, request);
+      }
+
+      let member;
+
+      try {
+        member = await getSignedInMember(request, env);
+      } catch (error) {
+        console.error("Calendar authentication error:", error);
+        return json({ error: "Could not verify session" }, 500, request);
+      }
+
+      if (!member) {
+        return json({ error: "Sign in required" }, 401, request);
+      }
+
+      // Get all calendar events.
+      if (path === "/calendar-events" && request.method === "GET") {
+        try {
+          const result = await env.DB.prepare(`
+            SELECT
+              id,
+              title,
+              event_date AS eventDate,
+              start_time AS startTime,
+              end_time AS endTime,
+              location,
+              description
+            FROM calendar_events
+            ORDER BY event_date ASC, start_time ASC, id ASC
+          `).all();
+
+          return json(
+            { events: result.results || [] },
+            200,
+            request
+          );
+        } catch (error) {
+          console.error("Calendar loading error:", error);
+          return json(
+            { error: "Could not load calendar events" },
+            500,
+            request
+          );
+        }
+      }
+
+      if (!["POST", "DELETE"].includes(request.method)) {
+        return json({ error: "Method not allowed" }, 405, request);
+      }
+
+      // Only administrators may change events.
+      try {
+        if (!await isSiteAdministrator(member.id, env)) {
+          return json(
+            { error: "Administrator permission required" },
+            403,
+            request
+          );
+        }
+      } catch (error) {
+        console.error("Calendar permission error:", error);
+        return json(
+          { error: "Could not verify administrator permissions" },
+          500,
+          request
+        );
+      }
+
+      const match = path.match(/^\/calendar-events\/([0-9]+)$/);
+
+      // Delete an event.
+      if (request.method === "DELETE" && match) {
+        try {
+          const result = await env.DB.prepare(`
+            DELETE FROM calendar_events
+            WHERE id = ?
+          `).bind(Number(match[1])).run();
+
+          if (!result.meta.changes) {
+            return json({ error: "Event not found" }, 404, request);
+          }
+
+          return json({ success: true }, 200, request);
+        } catch (error) {
+          console.error("Calendar deletion error:", error);
+          return json(
+            { error: "Could not delete calendar event" },
+            500,
+            request
+          );
+        }
+      }
+
+      // Add or edit an event.
+      if (
+        request.method === "POST" &&
+        (path === "/calendar-events" || match)
+      ) {
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const body = parsed.body || {};
+
+        const limits = {
+          title: 150,
+          eventDate: 10,
+          startTime: 5,
+          endTime: 5,
+          location: 200,
+          description: 2000
+        };
+
+        const values = {};
+
+        for (const [field, limit] of Object.entries(limits)) {
+          if (
+            body[field] !== undefined &&
+            typeof body[field] !== "string"
+          ) {
+            return json(
+              { error: `Invalid ${field}` },
+              400,
+              request
+            );
+          }
+
+          values[field] = (body[field] || "").trim();
+
+          if (
+            values[field].length > limit ||
+            /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(values[field])
+          ) {
+            return json(
+              { error: `Invalid ${field}` },
+              400,
+              request
+            );
+          }
+        }
+
+        if (!values.title) {
+          return json(
+            { error: "Event title is required" },
+            400,
+            request
+          );
+        }
+
+        const validDate = /^\d{4}-\d{2}-\d{2}$/.test(values.eventDate);
+        const parsedDate = new Date(values.eventDate + "T12:00:00Z");
+
+        if (
+          !validDate ||
+          Number.isNaN(parsedDate.getTime()) ||
+          parsedDate.toISOString().slice(0, 10) !== values.eventDate
+        ) {
+          return json(
+            { error: "Enter a valid event date" },
+            400,
+            request
+          );
+        }
+
+        const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+        if (
+          (values.startTime && !timePattern.test(values.startTime)) ||
+          (values.endTime && !timePattern.test(values.endTime))
+        ) {
+          return json(
+            { error: "Times must use HH:MM format" },
+            400,
+            request
+          );
+        }
+
+        if (
+          values.endTime &&
+          !values.startTime
+        ) {
+          return json(
+            { error: "Enter a start time before an end time" },
+            400,
+            request
+          );
+        }
+
+        if (
+          values.startTime &&
+          values.endTime &&
+          values.endTime <= values.startTime
+        ) {
+          return json(
+            { error: "End time must be after start time" },
+            400,
+            request
+          );
+        }
+
+        const params = [
+          values.title,
+          values.eventDate,
+          values.startTime,
+          values.endTime,
+          values.location,
+          values.description
+        ];
+
+        try {
+          if (match) {
+            const result = await env.DB.prepare(`
+              UPDATE calendar_events
+              SET title = ?,
+                  event_date = ?,
+                  start_time = ?,
+                  end_time = ?,
+                  location = ?,
+                  description = ?
+              WHERE id = ?
+            `).bind(...params, Number(match[1])).run();
+
+            if (!result.meta.changes) {
+              return json({ error: "Event not found" }, 404, request);
+            }
+
+            return json({ success: true }, 200, request);
+          }
+
+          const result = await env.DB.prepare(`
+            INSERT INTO calendar_events
+              (title, event_date, start_time,
+               end_time, location, description)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `).bind(...params).run();
+
+          return json(
+            {
+              success: true,
+              event: { id: result.meta.last_row_id }
+            },
+            201,
+            request
+          );
+        } catch (error) {
+          console.error("Calendar saving error:", error);
+          return json(
+            { error: "Could not save calendar event" },
+            500,
+            request
+          );
+        }
+      }
+
+      return json(
+        { error: "Calendar route not found" },
+        404,
+        request
+      );
+    }
+    
+    // MEMBERS DISCUSSION BOARD
+    // Only signed-in members can access discussions.
+
+    if (
+      path === "/discussion/topics" ||
+      path.startsWith("/discussion/topics/")
+    ) {
+      // Protect requests that change data.
+      if (
+        ["POST", "DELETE"].includes(request.method) &&
+        !validFileRequestOrigin(request)
+      ) {
+        return json(
+          { error: "Invalid request origin" },
+          403,
+          request
+        );
+      }
+
+      let member;
+
+      try {
+        member = await getSignedInMember(request, env);
+      } catch (error) {
+        console.error("Discussion authentication error:", error);
+        return json(
+          { error: "Could not verify your session" },
+          500,
+          request
+        );
+      }
+
+      if (!member) {
+        return json(
+          { error: "Sign in required" },
+          401,
+          request
+        );
+      }
+
+      // List discussions, newest activity first.
+      if (
+        path === "/discussion/topics" &&
+        request.method === "GET"
+      ) {
+        try {
+          const result = await env.DB.prepare(`
+            SELECT
+              t.id,
+              t.title,
+              t.body,
+              t.author_id AS authorId,
+              m.name AS authorName,
+              t.is_pinned AS isPinned,
+              t.is_locked AS isLocked,
+              t.created_at AS createdAt,
+              t.updated_at AS updatedAt,
+              (
+                SELECT COUNT(*)
+                FROM discussion_replies r
+                WHERE r.topic_id = t.id
+              ) AS replyCount
+            FROM discussion_topics t
+            JOIN members m ON m.id = t.author_id
+            ORDER BY
+              t.is_pinned DESC,
+              t.updated_at DESC,
+              t.id DESC
+            LIMIT 200
+          `).all();
+
+          return json(
+            { topics: result.results || [] },
+            200,
+            request
+          );
+        } catch (error) {
+          console.error("Discussion listing error:", error);
+          return json(
+            { error: "Could not load discussions" },
+            500,
+            request
+          );
+        }
+      }
+
+      // Create a new discussion topic.
+      if (
+        path === "/discussion/topics" &&
+        request.method === "POST"
+      ) {
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const body = parsed.body || {};
+
+        if (
+          typeof body.title !== "string" ||
+          typeof body.body !== "string"
+        ) {
+          return json(
+            { error: "Title and message are required" },
+            400,
+            request
+          );
+        }
+
+        const title = body.title.trim();
+        const message = body.body.trim();
+
+        if (
+          title.length < 3 ||
+          title.length > 150 ||
+          message.length < 1 ||
+          message.length > 10000
+        ) {
+          return json(
+            {
+              error:
+                "Title must be 3–150 characters and message 1–10000 characters"
+            },
+            400,
+            request
+          );
+        }
+
+        try {
+          // Limit each member to one new topic per minute.
+          const recent = await env.DB.prepare(`
+            SELECT id
+            FROM discussion_topics
+            WHERE author_id = ?
+              AND created_at >= datetime('now', '-1 minute')
+            LIMIT 1
+          `).bind(member.id).first();
+
+          if (recent) {
+            return json(
+              { error: "Please wait a minute before starting another topic" },
+              429,
+              request
+            );
+          }
+
+          const result = await env.DB.prepare(`
+            INSERT INTO discussion_topics
+              (author_id, title, body)
+            VALUES (?, ?, ?)
+          `).bind(
+            member.id,
+            title,
+            message
+          ).run();
+
+          return json(
+            {
+              success: true,
+              topic: { id: result.meta.last_row_id }
+            },
+            201,
+            request
+          );
+        } catch (error) {
+          console.error("Discussion creation error:", error);
+          return json(
+            { error: "Could not create discussion" },
+            500,
+            request
+          );
+        }
+      }
+      
+      // DISCUSSION MODERATION
+      // Administrators manage topics.
+      // Members may delete their own replies.
+
+      const moderateMatch = path.match(
+        /^\/discussion\/topics\/([0-9]+)\/moderate$/
+      );
+
+      // Pin, unpin, lock, or unlock a discussion.
+      if (moderateMatch && request.method === "POST") {
+        const isAdmin = await isSiteAdministrator(member.id, env);
+
+        if (!isAdmin) {
+          return json(
+            { error: "Administrator permission required" },
+            403,
+            request
+          );
+        }
+
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const action = parsed.body?.action;
+        const allowed = ["pin", "unpin", "lock", "unlock"];
+
+        if (!allowed.includes(action)) {
+          return json(
+            { error: "Invalid moderation action" },
+            400,
+            request
+          );
+        }
+
+        const topicId = Number(moderateMatch[1]);
+
+        try {
+          let result;
+
+          if (action === "pin" || action === "unpin") {
+            result = await env.DB.prepare(`
+              UPDATE discussion_topics
+              SET is_pinned = ?
+              WHERE id = ?
+            `).bind(action === "pin" ? 1 : 0, topicId).run();
+          } else {
+            result = await env.DB.prepare(`
+              UPDATE discussion_topics
+              SET is_locked = ?
+              WHERE id = ?
+            `).bind(action === "lock" ? 1 : 0, topicId).run();
+          }
+
+          if (!result.meta.changes) {
+            return json(
+              { error: "Discussion not found" },
+              404,
+              request
+            );
+          }
+
+          return json({ success: true }, 200, request);
+        } catch (error) {
+          console.error("Discussion moderation error:", error);
+          return json(
+            { error: "Could not update discussion" },
+            500,
+            request
+          );
+        }
+      }
+
+      // Delete an entire discussion and its replies.
+      const deleteTopicMatch = path.match(
+        /^\/discussion\/topics\/([0-9]+)$/
+      );
+
+      if (deleteTopicMatch && request.method === "DELETE") {
+        const isAdmin = await isSiteAdministrator(member.id, env);
+
+        if (!isAdmin) {
+          return json(
+            { error: "Administrator permission required" },
+            403,
+            request
+          );
+        }
+
+        const topicId = Number(deleteTopicMatch[1]);
+
+        try {
+          const existing = await env.DB.prepare(`
+            SELECT id
+            FROM discussion_topics
+            WHERE id = ?
+          `).bind(topicId).first();
+
+          if (!existing) {
+            return json(
+              { error: "Discussion not found" },
+              404,
+              request
+            );
+          }
+
+          // D1 batch applies both deletions transactionally.
+          await env.DB.batch([
+            env.DB.prepare(`
+              DELETE FROM discussion_replies
+              WHERE topic_id = ?
+            `).bind(topicId),
+
+            env.DB.prepare(`
+              DELETE FROM discussion_topics
+              WHERE id = ?
+            `).bind(topicId)
+          ]);
+
+          return json({ success: true }, 200, request);
+        } catch (error) {
+          console.error("Discussion deletion error:", error);
+          return json(
+            { error: "Could not delete discussion" },
+            500,
+            request
+          );
+        }
+      }
+
+      // Delete a reply.
+      // Reply authors can delete their own replies.
+      // Site administrators can delete any reply.
+
+      const deleteReplyMatch = path.match(
+        /^\/discussion\/topics\/([0-9]+)\/replies\/([0-9]+)$/
+      );
+
+      if (deleteReplyMatch && request.method === "DELETE") {
+        const topicId = Number(deleteReplyMatch[1]);
+        const replyId = Number(deleteReplyMatch[2]);
+
+        try {
+          const reply = await env.DB.prepare(`
+            SELECT id, author_id AS authorId
+            FROM discussion_replies
+            WHERE id = ? AND topic_id = ?
+          `).bind(replyId, topicId).first();
+
+          if (!reply) {
+            return json(
+              { error: "Reply not found" },
+              404,
+              request
+            );
+          }
+
+          const isAuthor =
+            Number(reply.authorId) === Number(member.id);
+
+          const isAdmin = await isSiteAdministrator(member.id, env);
+
+          if (!isAuthor && !isAdmin) {
+            return json(
+              { error: "You cannot delete this reply" },
+              403,
+              request
+            );
+          }
+
+          await env.DB.prepare(`
+            DELETE FROM discussion_replies
+            WHERE id = ? AND topic_id = ?
+          `).bind(replyId, topicId).run();
+
+          return json({ success: true }, 200, request);
+        } catch (error) {
+          console.error("Reply deletion error:", error);
+          return json(
+            { error: "Could not delete reply" },
+            500,
+            request
+          );
+        }
+      }
+     
+  // VIEW ONE DISCUSSION AND ITS REPLIES
+
+      const discussionMatch = path.match(
+        /^\/discussion\/topics\/([0-9]+)$/
+      );
+
+      if (discussionMatch && request.method === "GET") {
+        const topicId = Number(discussionMatch[1]);
+
+        try {
+          const topic = await env.DB.prepare(`
+            SELECT
+              t.id,
+              t.title,
+              t.body,
+              t.author_id AS authorId,
+              m.name AS authorName,
+              t.is_pinned AS isPinned,
+              t.is_locked AS isLocked,
+              t.created_at AS createdAt,
+              t.updated_at AS updatedAt
+            FROM discussion_topics t
+            JOIN members m ON m.id = t.author_id
+            WHERE t.id = ?
+          `).bind(topicId).first();
+
+          if (!topic) {
+            return json(
+              { error: "Discussion not found" },
+              404,
+              request
+            );
+          }
+
+          const result = await env.DB.prepare(`
+            SELECT
+              r.id,
+              r.topic_id AS topicId,
+              r.author_id AS authorId,
+              m.name AS authorName,
+              r.body,
+              r.created_at AS createdAt,
+              r.updated_at AS updatedAt
+            FROM discussion_replies r
+            JOIN members m ON m.id = r.author_id
+            WHERE r.topic_id = ?
+            ORDER BY r.created_at ASC, r.id ASC
+            LIMIT 500
+          `).bind(topicId).all();
+
+          return json(
+            {
+              topic,
+              replies: result.results || []
+            },
+            200,
+            request
+          );
+        } catch (error) {
+          console.error("Discussion loading error:", error);
+
+          return json(
+            { error: "Could not load discussion" },
+            500,
+            request
+          );
+        }
+      }
+
+    
+      
+  // POST A REPLY TO A DISCUSSION
+
+      const replyMatch = path.match(
+        /^\/discussion\/topics\/([0-9]+)\/replies$/
+      );
+
+      if (replyMatch && request.method === "POST") {
+        const topicId = Number(replyMatch[1]);
+
+        const parsed = await readJson(request);
+        if (parsed.error) return parsed.error;
+
+        const body = parsed.body || {};
+
+        if (typeof body.body !== "string") {
+          return json(
+            { error: "Reply text is required" },
+            400,
+            request
+          );
+        }
+
+        const message = body.body.trim();
+
+        if (message.length < 1 || message.length > 10000) {
+          return json(
+            { error: "Reply must contain 1–10000 characters" },
+            400,
+            request
+          );
+        }
+
+        try {
+          const topic = await env.DB.prepare(`
+            SELECT id, is_locked AS isLocked
+            FROM discussion_topics
+            WHERE id = ?
+          `).bind(topicId).first();
+
+          if (!topic) {
+            return json(
+              { error: "Discussion not found" },
+              404,
+              request
+            );
+          }
+
+          if (topic.isLocked) {
+            return json(
+              { error: "This discussion is closed to new replies" },
+              403,
+              request
+            );
+          }
+
+          // Basic spam prevention:
+          // one reply per member every 15 seconds.
+
+          const recent = await env.DB.prepare(`
+            SELECT id
+            FROM discussion_replies
+            WHERE author_id = ?
+              AND created_at >= datetime('now', '-15 seconds')
+            LIMIT 1
+          `).bind(member.id).first();
+
+          if (recent) {
+            return json(
+              { error: "Please wait 15 seconds before replying again" },
+              429,
+              request
+            );
+          }
+
+          const results = await env.DB.batch([
+            env.DB.prepare(`
+              INSERT INTO discussion_replies
+                (topic_id, author_id, body)
+              VALUES (?, ?, ?)
+            `).bind(
+              topicId,
+              member.id,
+              message
+            ),
+
+            env.DB.prepare(`
+              UPDATE discussion_topics
+              SET updated_at = CURRENT_TIMESTAMP
+              WHERE id = ?
+                AND is_locked = 0
+            `).bind(topicId)
+          ]);
+
+          if (!results[1]?.meta?.changes) {
+            return json(
+              { error: "Discussion is no longer open" },
+              409,
+              request
+            );
+          }
+
+          return json(
+            {
+              success: true,
+              reply: {
+                id: results[0].meta.last_row_id
+              }
+            },
+            201,
+            request
+          );
+        } catch (error) {
+          console.error("Discussion reply error:", error);
+
+          return json(
+            { error: "Could not post reply" },
+            500,
+            request
+          );
+        }
+      }
+
+
+      return json(
+        { error: "Discussion route not found" },
+        404,
+        request
+      );
+    }
+
+    
 
 
     if (path.startsWith("/files/")) {
@@ -1673,6 +2505,10 @@ export default {
           ).bind(folderId).first();
 
           if (!folder) {
+
+      
+    
+
             return json({
               error: "Folder not found"
             }, 404, request);
@@ -2297,4 +3133,5 @@ export default {
     }, 404, request);
   }
 };
+
 

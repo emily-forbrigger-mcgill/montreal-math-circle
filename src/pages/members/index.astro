@@ -2464,7 +2464,10 @@ if (
           currentMember = result.member;
           roles = result.roles || roles;
 
-          memberName.textContent = currentMember.name;
+          
+          memberName.textContent =
+            (currentMember.name || "").trim().split(/\s+/)[0];
+
           roleSummary.textContent = [
             roles.siteAdministrator ? "Site administrator" : "",
             roles.filePublisher ? "File publisher" : "",

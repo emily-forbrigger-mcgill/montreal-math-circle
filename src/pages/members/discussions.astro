@@ -21,9 +21,82 @@ const pageTitle = "Discussion Board | Montreal Math Circle";
         Montreal Math Circle activities.
       </p>
 
-      <div id="discussion-board">
-        <p>The discussion board is being set up.</p>
+      
+<div id="discussion-board">
+  <p id="discussion-welcome">Checking your sign-in…</p>
+
+  <div id="discussion-content" hidden>
+    <div id="discussion-topic-view">
+      <div class="discussion-toolbar">
+        <button id="discussion-new-button" type="button">
+          Start a Discussion
+        </button>
+        <button id="discussion-refresh" type="button">
+          Refresh
+        </button>
       </div>
+
+      <div id="discussion-topic-list">
+        Loading discussions…
+      </div>
+    </div>
+
+    <div id="discussion-new-panel" hidden>
+      <h2>Start a Discussion</h2>
+
+      <form id="discussion-new-form">
+        <label for="discussion-new-title">Topic title</label>
+        <input
+          id="discussion-new-title"
+          required
+          minlength="3"
+          maxlength="150"
+        />
+
+        <label for="discussion-new-body">Message</label>
+        <textarea
+          id="discussion-new-body"
+          required
+          maxlength="10000"
+          rows="6"
+        ></textarea>
+
+        <button id="discussion-create" type="submit">
+          Post Discussion
+        </button>
+        <button id="discussion-new-cancel" type="button">
+          Cancel
+        </button>
+      </form>
+    </div>
+
+    <div id="discussion-detail-panel" hidden>
+      <button id="discussion-back" type="button">
+        ← All Discussions
+      </button>
+
+      <div id="discussion-detail"></div>
+      <div id="discussion-replies"></div>
+
+      <form id="discussion-reply-form">
+        <label for="discussion-reply-body">Your reply</label>
+        <textarea
+          id="discussion-reply-body"
+          required
+          maxlength="10000"
+          rows="5"
+        ></textarea>
+
+        <button id="discussion-reply-submit" type="submit">
+          Post Reply
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <p id="discussion-status" role="status" aria-live="polite"></p>
+</div>
+
     </main>
 
     <style>
@@ -55,6 +128,142 @@ const pageTitle = "Discussion Board | Montreal Math Circle";
         border: 1px solid #dce1e8;
         border-radius: 10px;
       }
+
+      
+      /* Discussion Board layout */
+
+      [hidden] {
+        display: none !important;
+      }
+
+      #discussion-welcome {
+        color: #596579;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+
+      .discussion-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 15px 0 24px;
+      }
+
+      #discussion-board button {
+        display: inline-block;
+        background: #203e65;
+        color: white;
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 5px 8px 5px 0;
+      }
+
+      #discussion-board button:hover {
+        background: #315785;
+      }
+
+      #discussion-board button:disabled {
+        opacity: 0.55;
+        cursor: wait;
+      }
+
+      #discussion-board input,
+      #discussion-board textarea {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 11px;
+        margin: 7px 0 18px;
+        border: 1px solid #ccd3dd;
+        border-radius: 6px;
+        background: white;
+        font: inherit;
+      }
+
+      #discussion-board textarea {
+        resize: vertical;
+        min-height: 110px;
+      }
+
+      #discussion-board label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 14px;
+      }
+
+      #discussion-topic-list .discussion-topic,
+      #discussion-replies .discussion-reply {
+        padding: 18px 20px;
+        margin: 16px 0;
+        border: 1px solid #ddd4eb;
+        border-left: 4px solid #ad96cc;
+        border-radius: 9px;
+        background: white;
+      }
+
+      #discussion-topic-list .discussion-topic h3,
+      #discussion-detail .discussion-title {
+        color: #a81b24;
+        font-size: 18px;
+        line-height: 1.5;
+        margin: 0 0 8px;
+      }
+
+      #discussion-board .discussion-meta {
+        color: #687488;
+        font-size: 11px;
+        line-height: 1.5;
+        margin: 5px 0 10px;
+      }
+
+      #discussion-board .discussion-message {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.65;
+        margin: 12px 0;
+      }
+
+      #discussion-detail-panel {
+        margin-top: 16px;
+      }
+
+      #discussion-replies {
+        margin: 25px 0;
+      }
+
+      #discussion-reply-form {
+        border-top: 1px solid #e6e1ee;
+        padding-top: 20px;
+        margin-top: 24px;
+      }
+
+      #discussion-status {
+        color: #762d42;
+        font-size: 14px;
+        margin-top: 15px;
+      }
+
+      @media (max-width: 680px) {
+        main {
+          padding: 16px;
+          margin: 16px auto;
+        }
+
+        #discussion-board {
+          padding: 16px;
+        }
+
+        #discussion-topic-list .discussion-topic,
+        #discussion-replies .discussion-reply {
+          padding: 14px;
+        }
+      }
+
     </style>
     
     <script>
@@ -86,15 +295,313 @@ const pageTitle = "Discussion Board | Montreal Math Circle";
             return;
           }
 
-          board.textContent =
-            `Welcome, ${result.member.name.split(/\s+/)[0]}. ` +
-            "Your discussion board is ready.";
+          
+document.getElementById("discussion-welcome").textContent =
+  `Welcome, ${(result.member.name || "").trim().split(/\s+/)[0]}.`;
+
+document.getElementById("discussion-content").hidden = false;
+
+await loadDiscussionTopics();
+
 
         } catch (error) {
           board.textContent =
             "Could not verify your sign-in. Please try refreshing the page.";
         }
       }
+      
+      // DISCUSSION BOARD — TOPIC LIST
+
+      let selectedDiscussionId = null;
+
+      const discussionElement = id =>
+        document.getElementById(id);
+
+      function discussionShow(view) {
+        discussionElement("discussion-topic-view").hidden =
+          view !== "list";
+
+        discussionElement("discussion-new-panel").hidden =
+          view !== "new";
+
+        discussionElement("discussion-detail-panel").hidden =
+          view !== "detail";
+      }
+
+      function discussionMessage(message) {
+        discussionElement("discussion-status").textContent =
+          message || "";
+      }
+
+      async function discussionApi(path, options = {}) {
+        const response = await fetch(API_BASE + path, {
+          credentials: "include",
+          ...options
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            result.error || `Request failed (${response.status})`
+          );
+        }
+
+        return result;
+      }
+
+      async function loadDiscussionTopics() {
+        const container = discussionElement("discussion-topic-list");
+        container.replaceChildren();
+        discussionMessage("");
+
+        try {
+          const result = await discussionApi("/discussion/topics");
+          const topics = result.topics || [];
+
+          if (!topics.length) {
+            const message = document.createElement("p");
+            message.textContent =
+              "No discussions yet. Be the first to start one.";
+            container.appendChild(message);
+            return;
+          }
+
+          for (const topic of topics) {
+            const card = document.createElement("div");
+            card.className = "discussion-topic";
+
+            const title = document.createElement("h3");
+            title.textContent =
+              (topic.isPinned ? "📌 " : "") + topic.title;
+            card.appendChild(title);
+
+            const meta = document.createElement("p");
+            meta.className = "discussion-meta";
+            meta.textContent =
+              `Started by ${topic.authorName || "Member"} · ` +
+              `${topic.replyCount || 0} replies` +
+              (topic.isLocked ? " · Closed" : "");
+            card.appendChild(meta);
+
+            const excerpt = document.createElement("p");
+            excerpt.textContent =
+              (topic.body || "").slice(0, 250) +
+              ((topic.body || "").length > 250 ? "…" : "");
+            card.appendChild(excerpt);
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = "Read Discussion →";
+            button.addEventListener("click", () =>
+              openDiscussion(topic.id)
+            );
+            card.appendChild(button);
+
+            container.appendChild(card);
+          }
+        } catch (error) {
+          discussionMessage(
+            `Could not load discussions: ${error.message}`
+          );
+        }
+      }
+
+      discussionElement("discussion-new-button")
+        .addEventListener("click", () => {
+          discussionShow("new");
+          discussionMessage("");
+        });
+
+      discussionElement("discussion-new-cancel")
+        .addEventListener("click", () => {
+          discussionShow("list");
+          discussionMessage("");
+        });
+
+      discussionElement("discussion-refresh")
+        .addEventListener("click", loadDiscussionTopics);
+
+      discussionElement("discussion-back")
+        .addEventListener("click", async () => {
+          selectedDiscussionId = null;
+          discussionShow("list");
+          await loadDiscussionTopics();
+        });
+       
+      // DISCUSSION BOARD — VIEW A TOPIC AND ITS REPLIES
+
+      async function openDiscussion(topicId) {
+        selectedDiscussionId = topicId;
+        discussionShow("detail");
+        discussionMessage("");
+
+        const detail = discussionElement("discussion-detail");
+        const replies = discussionElement("discussion-replies");
+        const replyForm = discussionElement("discussion-reply-form");
+
+        detail.replaceChildren();
+        replies.replaceChildren();
+
+        try {
+          const result = await discussionApi(
+            `/discussion/topics/${topicId}`
+          );
+
+          const topic = result.topic;
+
+          const title = document.createElement("h2");
+          title.className = "discussion-title";
+          title.textContent =
+            (topic.isPinned ? "📌 " : "") + topic.title;
+          detail.appendChild(title);
+
+          const meta = document.createElement("p");
+          meta.className = "discussion-meta";
+          meta.textContent =
+            `Started by ${topic.authorName || "Member"}` +
+            (topic.isLocked ? " · Closed to replies" : "");
+          detail.appendChild(meta);
+
+          const message = document.createElement("p");
+          message.className = "discussion-message";
+          message.textContent = topic.body;
+          detail.appendChild(message);
+
+          const heading = document.createElement("h3");
+          heading.textContent =
+            `Replies (${result.replies.length})`;
+          replies.appendChild(heading);
+
+          if (!result.replies.length) {
+            const empty = document.createElement("p");
+            empty.textContent =
+              "No replies yet. Be the first to reply.";
+            replies.appendChild(empty);
+          }
+
+          for (const reply of result.replies) {
+            const card = document.createElement("div");
+            card.className = "discussion-reply";
+
+            const author = document.createElement("p");
+            author.className = "discussion-meta";
+            author.textContent =
+              reply.authorName || "Member";
+            card.appendChild(author);
+
+            const body = document.createElement("p");
+            body.className = "discussion-message";
+            body.textContent = reply.body;
+            card.appendChild(body);
+
+            replies.appendChild(card);
+          }
+
+          // A locked discussion can still be read,
+          // but members cannot post new replies.
+          replyForm.hidden = Boolean(topic.isLocked);
+
+        } catch (error) {
+          replyForm.hidden = true;
+          discussionMessage(
+            `Could not open discussion: ${error.message}`
+          );
+        }
+      }
+      
+      // DISCUSSION BOARD — CREATE NEW TOPICS
+
+      discussionElement("discussion-new-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const titleInput = discussionElement("discussion-new-title");
+          const bodyInput = discussionElement("discussion-new-body");
+          const button = discussionElement("discussion-create");
+
+          const title = titleInput.value.trim();
+          const body = bodyInput.value.trim();
+
+          if (title.length < 3 || !body) {
+            discussionMessage("Please enter a title and message.");
+            return;
+          }
+
+          button.disabled = true;
+          discussionMessage("Posting discussion…");
+
+          try {
+            const result = await discussionApi("/discussion/topics", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ title, body })
+            });
+
+            discussionElement("discussion-new-form").reset();
+
+            if (result.topic?.id) {
+              await openDiscussion(result.topic.id);
+            } else {
+              discussionShow("list");
+              await loadDiscussionTopics();
+            }
+
+            discussionMessage("Discussion posted successfully.");
+          } catch (error) {
+            discussionMessage(
+              `Could not post discussion: ${error.message}`
+            );
+          } finally {
+            button.disabled = false;
+          }
+        });
+
+      // DISCUSSION BOARD — POST REPLIES
+
+      discussionElement("discussion-reply-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          if (!selectedDiscussionId) {
+            discussionMessage("Please select a discussion first.");
+            return;
+          }
+
+          const input = discussionElement("discussion-reply-body");
+          const button = discussionElement("discussion-reply-submit");
+          const body = input.value.trim();
+
+          if (!body) {
+            discussionMessage("Please write a reply.");
+            return;
+          }
+
+          button.disabled = true;
+          discussionMessage("Posting reply…");
+
+          try {
+            await discussionApi(
+              `/discussion/topics/${selectedDiscussionId}/replies`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ body })
+              }
+            );
+
+            input.value = "";
+
+            await openDiscussion(selectedDiscussionId);
+            discussionMessage("Reply posted successfully.");
+          } catch (error) {
+            discussionMessage(
+              `Could not post reply: ${error.message}`
+            );
+          } finally {
+            button.disabled = false;
+          }
+        });
 
       checkDiscussionSession();
     </script>

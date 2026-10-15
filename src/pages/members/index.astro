@@ -1923,7 +1923,7 @@ const title = "Members | Montreal Math Circle";
             );
           }
 
-          if (roles.siteAdministrator) {
+          if (roles.siteAdministrator || roles.filePublisher) {
             const actions = document.createElement("div");
             actions.className = "link-actions";
 
@@ -2578,11 +2578,12 @@ if (
             document.querySelector("#folder-admin").classList.remove("hidden");
             document.querySelector("#links-admin").classList.remove("hidden");
             document.querySelector("#directory-admin").classList.remove("hidden");
-            document.querySelector("#calendar-admin").classList.remove("hidden");
           }
 
           
-          
+          if (roles.siteAdministrator || roles.filePublisher) {
+  document.querySelector("#calendar-admin").classList.remove("hidden");
+}
               
 await Promise.all([
   loadPublishedFiles(),

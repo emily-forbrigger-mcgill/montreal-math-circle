@@ -1586,11 +1586,12 @@ export default {
         return json({ error: "Method not allowed" }, 405, request);
       }
 
-      // Only administrators may change events.
+     
+      // Publishers and site administrators may manage calendar events.
       try {
-        if (!await isSiteAdministrator(member.id, env)) {
+        if (!await isFilePublisher(member.id, env)) {
           return json(
-            { error: "Administrator permission required" },
+            { error: "Publisher permission required" },
             403,
             request
           );
@@ -1598,11 +1599,14 @@ export default {
       } catch (error) {
         console.error("Calendar permission error:", error);
         return json(
-          { error: "Could not verify administrator permissions" },
+          { error: "Could not verify publisher permissions" },
           500,
           request
         );
       }
+
+
+
 
       const match = path.match(/^\/calendar-events\/([0-9]+)$/);
 
@@ -3133,5 +3137,4 @@ export default {
     }, 404, request);
   }
 };
-
 

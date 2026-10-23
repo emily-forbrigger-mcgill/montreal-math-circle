@@ -19,6 +19,7 @@ This repository powers [montrealmathcircle.com](https://montrealmathcircle.com/)
 /
 ├── public/
 │   ├── mmc-logo-v1.png          # Main organization logo & brand graphic
+│   ├── mmc-logo-header.png      # Main organization logo & brand graphic
 │   └── favicon.svg              # Browser tab icon (configured in Layout.astro)
 ├── src/
 │   ├── components/              # Modular UI components (cards, badges, grids)

@@ -34,6 +34,8 @@ This repository powers [montrealmathcircle.com](https://montrealmathcircle.com/)
 ├── package.json
 └── astro.config.mjs
 
+```
+
 ## 🛠️ Maintainer's Guide: How to Update Content
 
 This guide provides ready-to-use code snippets for future webmasters and organizers to update schedules, problem sets, team profiles, and brand styling.
@@ -124,3 +126,4 @@ This guide provides ready-to-use code snippets for future webmasters and organiz
     --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
     --font-mono: 'Fira Code', monospace;
 }
+```

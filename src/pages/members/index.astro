@@ -695,6 +695,78 @@ const title = "Members | Montreal Math Circle";
     margin-top: 12px;
   }
 
+  /* Organizer Portal accordion menus */
+
+.portal-accordion {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid #d8d5e8;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px #172b4d12;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.portal-accordion > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 19px 22px;
+  cursor: pointer;
+  list-style: none;
+  color: #203e65;
+  font-family: 'Mali', cursive, system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.portal-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.portal-accordion > summary::after {
+  content: '+';
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.portal-accordion[open] > summary::after {
+  content: '−';
+}
+
+.portal-accordion > summary:hover {
+  background: #f7f6fc;
+}
+
+.portal-accordion > summary:focus-visible {
+  outline: 3px solid #8b79bd;
+  outline-offset: -3px;
+}
+
+.portal-accordion > .panel {
+  border-radius: 0;
+  box-shadow: none;
+  border-top: 1px solid #e7e4ef;
+  padding: 20px 22px 24px;
+}
+
+.portal-accordion > .panel > h2 {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .portal-accordion > summary {
+    padding: 16px;
+    font-size: 18px;
+  }
+
+  .portal-accordion > .panel {
+    padding: 16px;
+  }
+}
+
     </style>
   </head>
 
@@ -716,18 +788,20 @@ const title = "Members | Montreal Math Circle";
           <!-- Members Discussion Board -->
           
 <!-- Members Discussion Board -->
-<section class="panel">
-  <h2>Discussion Board</h2>
+<details class="portal-accordion">
+  <summary>Discussion Board</summary>
 
-  <p>
-    Ask questions, share ideas, and discuss
-    Montreal Math Circle activities.
-  </p>
+  <section class="panel">
+    <p>
+      Ask questions, share ideas, and discuss
+      Montreal Math Circle activities.
+    </p>
 
-  <a class="button" href="/members/discussions/">
-    Open Discussion Board →
-  </a>
-</section>
+    <a class="button" href="/members/discussions/">
+      Open Discussion Board →
+    </a>
+  </section>
+</details>
           <!-- Members Calendar -->
           <section class="panel wide" id="calendar-panel">
             <h2>Calendar</h2>
@@ -831,9 +905,12 @@ const title = "Members | Montreal Math Circle";
             </div>
           </section>
 
-           
-          <!-- Important Links: visible to all signed-in members -->
-          <section class="panel wide" id="important-links-panel">
+             <!-- Important Links: visible to all signed-in members -->
+<details class="portal-accordion wide">
+  <summary>Important Links</summary>
+
+  <section class="panel" id="important-links-panel">
+
             <h2>Important Links</h2>
             <p>Useful websites and resources for Montreal Math Circle members.</p>
 
@@ -904,10 +981,14 @@ const title = "Members | Montreal Math Circle";
                 aria-live="polite"
               ></div>
             </div>
-          </section>
-           
-          <!-- Member Directory -->
-          <section class="panel wide" id="member-directory-panel">
+      </section>
+          </details>
+
+         <!-- Member Directory -->
+<details class="portal-accordion wide">
+  <summary>Member Directory</summary>
+
+  <section class="panel" id="member-directory-panel">
             <h2>Member Directory</h2>
             <p>Contact information for Montreal Math Circle members.</p>
 
@@ -989,9 +1070,12 @@ const title = "Members | Montreal Math Circle";
           </section>
 
 
+         </details>
+          <details class="portal-accordion wide">
+  <summary>Shared Files</summary>
 
-          <section class="panel wide">
-            <h2>Shared Files</h2>
+  <section class="panel">
+    <h2>Shared Files</h2>
             <p>Published documents and resources available to signed-in members.</p>
 
             <div class="toolbar">
@@ -1013,6 +1097,9 @@ const title = "Members | Montreal Math Circle";
             <div id="folder-navigation" class="folder-grid" aria-label="Document folders"></div>
             <div id="published-files" aria-live="polite">Loading published files…</div>
           </section>
+
+                      
+            </details>
 
           <section id="upload-panel" class="panel hidden">
             <h2>Submit a File</h2>

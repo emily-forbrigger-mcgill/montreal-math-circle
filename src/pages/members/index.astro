@@ -415,9 +415,8 @@ const title = "Members | Montreal Math Circle";
       }
 
       .calendar-day.has-event .calendar-event-dot {
-        background: none;
-      }
-
+  background: #ffffff;
+}
         
       .calendar-day.selected {
         border: 2px solid #a81b24;
@@ -429,16 +428,18 @@ const title = "Members | Montreal Math Circle";
       }
 
       .calendar-event-dot {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 18px;
-        height: 20px;
-        margin-top: 0;
-        background: none;
-        font-size: 18px;
-        line-height: 1;
-      }
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          margin-top: 0;
+          background: #ffffff;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+          font-size: 17px;
+          line-height: 1;
+          }
 
       .calendar-event-dot::before {
         content: "★";
@@ -550,13 +551,27 @@ const title = "Members | Montreal Math Circle";
       :global(.calendar-day-event-dots) {
         display: flex;
         flex-wrap: wrap;
-        gap: 3px;
+        gap: 6px;
         margin-top: 7px;
       }
 
       :global(.calendar-day-event-dots .calendar-event-dot) {
         margin-top: 0;
       }
+
+      :global(#calendar-grid .calendar-event-dot) {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            flex: 0 0 26px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            font-size: 17px;
+            line-height: 1;
+            }
 
       :global(#calendar-event-list .calendar-event-card) {
         border-left-color: var(--event-type-color, #ad96cc);

@@ -1850,6 +1850,7 @@ const title = "Members | Montreal Math Circle";
       let calendarMonth = new Date();
       calendarMonth.setDate(1);
       let selectedCalendarDate = null;
+      let showAllMonthEvents = false;
       let editingCalendarId = null;
 
       function calendarDateString(year, month, day) {
@@ -1952,25 +1953,32 @@ const title = "Members | Montreal Math Circle";
             button.appendChild(dot);
           }
 
-          button.addEventListener("click", () => {
-            // Clicking a selected date again shows the whole month.
-            selectedCalendarDate =
-              selectedCalendarDate === dateString ? null : dateString;
+         button.addEventListener("click", () => {
+  selectedCalendarDate =
+    selectedCalendarDate === dateString ? null : dateString;
 
-            renderCalendar();
-          });
+  showAllMonthEvents = false;
+  renderCalendar();
+});
 
           grid.appendChild(button);
         }
 
-        // Show events for the selected day, or for the entire month.
-        const monthPrefix = calendarDateString(year, month, 1).slice(0, 7);
+        // Show events for a selected date, or the whole month
+// only when the user explicitly clicks "Show All Events".
+const monthPrefix = calendarDateString(year, month, 1).slice(0, 7);
 
-        const visibleEvents = calendarEvents.filter(event =>
-          selectedCalendarDate
-            ? event.eventDate === selectedCalendarDate
-            : event.eventDate.startsWith(monthPrefix)
-        );
+const visibleEvents = calendarEvents.filter(event => {
+  if (selectedCalendarDate) {
+    return event.eventDate === selectedCalendarDate;
+  }
+
+  if (showAllMonthEvents) {
+    return event.eventDate.startsWith(monthPrefix);
+  }
+
+  return false;
+});
 
         if (selectedCalendarDate) {
           addText(
@@ -1982,17 +1990,26 @@ const title = "Members | Montreal Math Circle";
         }
 
         if (!visibleEvents.length) {
-          addText(
-            list,
-            "p",
-            selectedCalendarDate
-              ? "No events scheduled for this date."
-              : "No events scheduled for this month.",
-            "muted"
-          );
-          return;
-        }
+  if (!selectedCalendarDate && !showAllMonthEvents) {
+    addText(
+      list,
+      "p",
+      "Select a date to view its events, or click Show All Events This Month.",
+      "muted"
+    );
+  } else {
+    addText(
+      list,
+      "p",
+      selectedCalendarDate
+        ? "No events scheduled for this date."
+        : "No events scheduled for this month.",
+      "muted"
+    );
+  }
 
+  return;
+}
         for (const event of visibleEvents) {
           const card = document.createElement("div");
           card.className = "calendar-event-card";
@@ -2137,24 +2154,27 @@ const title = "Members | Montreal Math Circle";
       }
       
       document.querySelector("#calendar-show-all")
-        .addEventListener("click", () => {
-          selectedCalendarDate = null;
-          renderCalendar();
-        });
+  .addEventListener("click", () => {
+    selectedCalendarDate = null;
+    showAllMonthEvents = true;
+    renderCalendar();
+  });
 
       document.querySelector("#calendar-prev")
-        .addEventListener("click", () => {
-          calendarMonth.setMonth(calendarMonth.getMonth() - 1);
-          selectedCalendarDate = null;
-          renderCalendar();
-        });
+  .addEventListener("click", () => {
+    calendarMonth.setMonth(calendarMonth.getMonth() - 1);
+    selectedCalendarDate = null;
+    showAllMonthEvents = false;
+    renderCalendar();
+  });
 
       document.querySelector("#calendar-next")
-        .addEventListener("click", () => {
-          calendarMonth.setMonth(calendarMonth.getMonth() + 1);
-          selectedCalendarDate = null;
-          renderCalendar();
-        });
+  .addEventListener("click", () => {
+    calendarMonth.setMonth(calendarMonth.getMonth() + 1);
+    selectedCalendarDate = null;
+    showAllMonthEvents = false;
+    renderCalendar();
+  });
 
       document.querySelector("#calendar-cancel")
         .addEventListener("click", resetCalendarForm);

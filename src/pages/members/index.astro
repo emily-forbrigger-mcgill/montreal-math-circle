@@ -560,18 +560,20 @@ const title = "Members | Montreal Math Circle";
       }
 
       :global(#calendar-grid .calendar-event-dot) {
-            display: inline-flex;
+            display: inline-flex !important;
             align-items: center;
             justify-content: center;
             width: 26px;
             height: 26px;
+            min-width: 26px;
             flex: 0 0 26px;
             border-radius: 50%;
-            background: #ffffff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            background-color: #ffffff !important;
+            background: #ffffff !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
             font-size: 17px;
             line-height: 1;
-            }
+          }
 
       :global(#calendar-event-list .calendar-event-card) {
         border-left-color: var(--event-type-color, #ad96cc);

@@ -476,6 +476,32 @@ const title = "Members | Montreal Math Circle";
         white-space: pre-wrap;
       }
 
+      .calendar-description-toggle {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.calendar-description-toggle summary {
+  color: #a81b24;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.calendar-description-toggle summary:hover {
+  text-decoration: underline;
+}
+
+.calendar-description-toggle[open] summary {
+  margin-bottom: 8px;
+}
+
+.calendar-description-toggle .calendar-event-description {
+  margin-top: 0;
+  color: #596579;
+  line-height: 1.6;
+}
+
       #calendar-admin {
         margin-top: 24px;
         padding-top: 18px;
@@ -2001,14 +2027,24 @@ const title = "Members | Montreal Math Circle";
             "calendar-event-meta"
           );
 
-          if (event.description) {
-            addText(
-              card,
-              "div",
-              event.description,
-              "calendar-event-description"
-            );
-          }
+         if (event.description) {
+  const descriptionDetails = document.createElement("details");
+  descriptionDetails.className = "calendar-description-toggle";
+
+  const summary = document.createElement("summary");
+  summary.textContent = "Show description";
+
+  descriptionDetails.appendChild(summary);
+
+  addText(
+    descriptionDetails,
+    "div",
+    event.description,
+    "calendar-event-description"
+  );
+
+  card.appendChild(descriptionDetails);
+}
 
           if (roles.siteAdministrator || roles.filePublisher) {
             const actions = document.createElement("div");

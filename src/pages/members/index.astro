@@ -415,7 +415,7 @@ const title = "Members | Montreal Math Circle";
       }
 
       .calendar-day.has-event .calendar-event-dot {
-        background: #2563a6;
+        background: none;
       }
 
         
@@ -429,12 +429,20 @@ const title = "Members | Montreal Math Circle";
       }
 
       .calendar-event-dot {
-        display: block;
-        width: 7px;
-        height: 7px;
-        margin-top: 7px;
-        border-radius: 50%;
-        background: #a81b24;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 20px;
+        margin-top: 0;
+        background: none;
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      .calendar-event-dot::before {
+        content: "★";
+        color: inherit;
       }
 
       .calendar-empty {
@@ -679,12 +687,20 @@ const title = "Members | Montreal Math Circle";
       }
 
       :global(#calendar-grid .calendar-event-dot) {
-        display: block;
-        width: 7px;
-        height: 7px;
-        margin-top: 7px;
-        border-radius: 50%;
-        background: #2563a6;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 20px;
+        margin-top: 0;
+        background: none;
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      :global(#calendar-grid .calendar-event-dot::before) {
+        content: "★";
+        color: inherit;
       }
 
       :global(#calendar-grid .calendar-empty) {
@@ -2205,7 +2221,7 @@ const title = "Members | Montreal Math Circle";
             for (const color of colors) {
               const dot = document.createElement("span");
               dot.className = "calendar-event-dot";
-              dot.style.backgroundColor = color;
+              dot.style.color = color;
               dots.appendChild(dot);
             }
 
@@ -3316,5 +3332,6 @@ await Promise.all([
     </script>
   </body>
 </html>
+
 
 

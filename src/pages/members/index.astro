@@ -2152,11 +2152,16 @@ const visibleEvents = calendarEvents.filter(event => {
           );
         }
       }
-      
       document.querySelector("#calendar-show-all")
   .addEventListener("click", () => {
     selectedCalendarDate = null;
-    showAllMonthEvents = true;
+    showAllMonthEvents = !showAllMonthEvents;
+
+    document.querySelector("#calendar-show-all").textContent =
+      showAllMonthEvents
+        ? "Hide All Events This Month"
+        : "Show All Events This Month";
+
     renderCalendar();
   });
 

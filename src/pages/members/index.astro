@@ -1,6 +1,6 @@
 
 ---
-const title = "Organizer and Volunteer Portal | Montreal Math Circle";
+const title = "Members | Montreal Math Circle";
 ---
 
 <html lang="en">
@@ -512,6 +512,95 @@ const title = "Organizer and Volunteer Portal | Montreal Math Circle";
         max-width: 650px;
       }
 
+      :global(#calendar-event-type-legend) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px 16px;
+        margin: 14px 0 18px;
+        padding: 12px 14px;
+        border: 1px solid #e2dbea;
+        border-radius: 8px;
+        background: #fbf9fd;
+      }
+
+      :global(.calendar-type-key-item),
+      :global(.calendar-type-row) {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+      }
+
+      :global(.calendar-type-swatch) {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        flex: 0 0 12px;
+        border-radius: 3px;
+      }
+
+      :global(.calendar-day-event-dots) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 3px;
+        margin-top: 7px;
+      }
+
+      :global(.calendar-day-event-dots .calendar-event-dot) {
+        margin-top: 0;
+      }
+
+      :global(#calendar-event-list .calendar-event-card) {
+        border-left-color: var(--event-type-color, #ad96cc);
+      }
+
+      :global(#calendar-event-list .calendar-event-type-label) {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 7px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        color: #344054;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      :global(#calendar-type-admin) {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid #e8e0f1;
+      }
+
+      :global(#calendar-type-form) {
+        max-width: 420px;
+      }
+
+      :global(#calendar-type-color) {
+        width: 64px;
+        height: 40px;
+        padding: 3px;
+        border: 1px solid #ccd3dd;
+        border-radius: 6px;
+        background: #fff;
+      }
+
+      :global(#calendar-type-list) {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      :global(#calendar-type-list .calendar-type-row) {
+        justify-content: space-between;
+        flex-wrap: wrap;
+        padding: 9px 11px;
+        border: 1px solid #e2dbea;
+        border-radius: 7px;
+        background: #fff;
+      }
+
       @media (max-width: 680px) {
         .calendar-day,
         .calendar-empty {
@@ -799,7 +888,7 @@ const title = "Organizer and Volunteer Portal | Montreal Math Circle";
   <body>
     <main>
       <h1>Montreal Math Circle</h1>
-      <p class="subtitle">Organizer and Volunteer Portal</p>
+      <p class="subtitle">Members' area</p>
 
       <p id="status" class="notice" role="status" aria-live="polite">
         Checking your sign-in…
@@ -851,6 +940,8 @@ const title = "Organizer and Volunteer Portal | Montreal Math Circle";
               >Next →</button>
             </div>
 
+            <div id="calendar-event-type-legend" class="calendar-event-type-legend" aria-label="Calendar event types"></div>
+
             <div
               id="calendar-grid"
               class="calendar-grid"
@@ -898,6 +989,13 @@ const title = "Organizer and Volunteer Portal | Montreal Math Circle";
                 </div>
 
                 <div class="field">
+                  <label for="calendar-event-type">Event type</label>
+                  <select id="calendar-event-type">
+                    <option value="">No category</option>
+                  </select>
+                </div>
+
+                <div class="field">
                   <label for="calendar-location">Location (optional)</label>
                   <input id="calendar-location" maxlength="200" />
                 </div>
@@ -928,6 +1026,29 @@ const title = "Organizer and Volunteer Portal | Montreal Math Circle";
                 role="status"
                 aria-live="polite"
               ></div>
+
+              <section id="calendar-type-admin" class="calendar-type-admin hidden">
+                <h3>Manage Event Types</h3>
+                <p class="muted">Create categories and choose a color. Changing a category's color updates all events assigned to it.</p>
+
+                <form id="calendar-type-form">
+                  <div class="field">
+                    <label for="calendar-type-name">Event type name</label>
+                    <input id="calendar-type-name" maxlength="60" required placeholder="e.g. Workshop" />
+                  </div>
+                  <div class="field">
+                    <label for="calendar-type-color">Event color</label>
+                    <input id="calendar-type-color" type="color" value="#3979C9" />
+                  </div>
+                  <div class="link-form-actions">
+                    <button type="submit" id="calendar-type-save">Add event type</button>
+                    <button type="button" id="calendar-type-cancel" class="secondary hidden">Cancel edit</button>
+                  </div>
+                </form>
+
+                <div id="calendar-type-list" class="calendar-type-list" aria-live="polite"></div>
+                <div id="calendar-type-status" class="notice" role="status" aria-live="polite"></div>
+              </section>
             </div>
           </section>
 
@@ -1847,6 +1968,8 @@ const title = "Organizer and Volunteer Portal | Montreal Math Circle";
       // MEMBERS CALENDAR
 
       let calendarEvents = [];
+      let calendarEventTypes = [];
+      let editingCalendarEventTypeId = null;
       let calendarMonth = new Date();
       calendarMonth.setDate(1);
       let selectedCalendarDate = null;
@@ -1879,10 +2002,129 @@ const title = "Organizer and Volunteer Portal | Montreal Math Circle";
       function resetCalendarForm() {
         editingCalendarId = null;
         document.querySelector("#calendar-form").reset();
+        document.querySelector("#calendar-event-type").value = "";
         document.querySelector("#calendar-form-heading").textContent =
           "Add an Event";
         document.querySelector("#calendar-save").textContent = "Add event";
         document.querySelector("#calendar-cancel").classList.add("hidden");
+      }
+
+      function renderCalendarEventTypeLegend() {
+        const legend = document.querySelector("#calendar-event-type-legend");
+        legend.replaceChildren();
+
+        if (!calendarEventTypes.length) {
+          addText(legend, "span", "No event types have been created yet.", "muted");
+          return;
+        }
+
+        for (const type of calendarEventTypes) {
+          const item = document.createElement("span");
+          item.className = "calendar-type-key-item";
+
+          const swatch = document.createElement("span");
+          swatch.className = "calendar-type-swatch";
+          swatch.style.backgroundColor = type.color;
+          swatch.setAttribute("aria-hidden", "true");
+
+          item.append(swatch, document.createTextNode(type.name));
+          legend.appendChild(item);
+        }
+      }
+
+      function populateCalendarEventTypeSelect(selectedId = "") {
+        const select = document.querySelector("#calendar-event-type");
+        select.replaceChildren();
+
+        const none = document.createElement("option");
+        none.value = "";
+        none.textContent = "No category";
+        select.appendChild(none);
+
+        for (const type of calendarEventTypes) {
+          const option = document.createElement("option");
+          option.value = String(type.id);
+          option.textContent = type.name;
+          select.appendChild(option);
+        }
+
+        select.value = selectedId ? String(selectedId) : "";
+      }
+
+      function resetCalendarEventTypeForm() {
+        editingCalendarEventTypeId = null;
+        document.querySelector("#calendar-type-form").reset();
+        document.querySelector("#calendar-type-color").value = "#3979C9";
+        document.querySelector("#calendar-type-save").textContent = "Add event type";
+        document.querySelector("#calendar-type-cancel").classList.add("hidden");
+      }
+
+      function renderCalendarEventTypesAdmin() {
+        const list = document.querySelector("#calendar-type-list");
+        list.replaceChildren();
+
+        if (!calendarEventTypes.length) {
+          addText(list, "p", "No event types yet.", "muted");
+          return;
+        }
+
+        for (const type of calendarEventTypes) {
+          const row = document.createElement("div");
+          row.className = "calendar-type-row";
+
+          const label = document.createElement("span");
+          label.className = "calendar-type-key-item";
+
+          const swatch = document.createElement("span");
+          swatch.className = "calendar-type-swatch";
+          swatch.style.backgroundColor = type.color;
+          swatch.setAttribute("aria-hidden", "true");
+
+          label.append(swatch, document.createTextNode(type.name));
+          row.appendChild(label);
+
+          const actions = document.createElement("div");
+          actions.className = "link-actions";
+
+          addButton(actions, "Edit", () => {
+            editingCalendarEventTypeId = type.id;
+            document.querySelector("#calendar-type-name").value = type.name;
+            document.querySelector("#calendar-type-color").value = type.color;
+            document.querySelector("#calendar-type-save").textContent = "Save changes";
+            document.querySelector("#calendar-type-cancel").classList.remove("hidden");
+            document.querySelector("#calendar-type-name").focus();
+          });
+
+          addButton(actions, "Delete", async () => {
+            if (!confirm(
+              `Delete the event type "${type.name}"? Events using it will become uncategorized.`
+            )) return;
+
+            try {
+              await api(`/calendar-event-types/${encodeURIComponent(type.id)}`, {
+                method: "DELETE"
+              });
+              await loadCalendarEventTypes();
+              await loadCalendarEvents();
+              setMessage("calendar-type-status", "Event type deleted. Existing events were kept.");
+            } catch (error) {
+              setMessage("calendar-type-status", `Could not delete event type: ${error.message}`);
+            }
+          }, "danger");
+
+          row.append(actions);
+          list.appendChild(row);
+        }
+      }
+
+      async function loadCalendarEventTypes() {
+        const result = await api("/calendar-event-types");
+        calendarEventTypes = result.eventTypes || [];
+        renderCalendarEventTypeLegend();
+        populateCalendarEventTypeSelect();
+        if (roles.siteAdministrator) {
+          renderCalendarEventTypesAdmin();
+        }
       }
 
       function renderCalendar() {
@@ -1900,6 +2142,11 @@ const title = "Organizer and Volunteer Portal | Montreal Math Circle";
           "en-CA",
           { month: "long", year: "numeric" }
         );
+
+        document.querySelector("#calendar-show-all").textContent =
+          showAllMonthEvents
+            ? "Hide All Events This Month"
+            : "Show All Events This Month";
 
         // Weekday headings.
         for (const dayName of ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]) {
@@ -1947,10 +2194,22 @@ const title = "Organizer and Volunteer Portal | Montreal Math Circle";
           addText(button, "span", String(day), "calendar-day-number");
 
           if (eventsToday.length) {
-            const dot = document.createElement("span");
-            dot.className = "calendar-event-dot";
-            dot.setAttribute("aria-hidden", "true");
-            button.appendChild(dot);
+            const dots = document.createElement("span");
+            dots.className = "calendar-day-event-dots";
+            dots.setAttribute("aria-hidden", "true");
+
+            const colors = [...new Set(eventsToday.map(event =>
+              event.eventTypeColor || "#2563a6"
+            ))].slice(0, 4);
+
+            for (const color of colors) {
+              const dot = document.createElement("span");
+              dot.className = "calendar-event-dot";
+              dot.style.backgroundColor = color;
+              dots.appendChild(dot);
+            }
+
+            button.appendChild(dots);
           }
 
          button.addEventListener("click", () => {
@@ -2013,6 +2272,9 @@ const visibleEvents = calendarEvents.filter(event => {
         for (const event of visibleEvents) {
           const card = document.createElement("div");
           card.className = "calendar-event-card";
+          if (event.eventTypeColor) {
+            card.style.setProperty("--event-type-color", event.eventTypeColor);
+          }
 
           addText(
             card,
@@ -2020,6 +2282,18 @@ const visibleEvents = calendarEvents.filter(event => {
             event.title,
             "calendar-event-title"
           );
+
+          if (event.eventTypeName) {
+            const typeLabel = document.createElement("span");
+            typeLabel.className = "calendar-event-type-label";
+
+            const swatch = document.createElement("span");
+            swatch.className = "calendar-type-swatch";
+            swatch.style.backgroundColor = event.eventTypeColor || "#777777";
+
+            typeLabel.append(swatch, document.createTextNode(event.eventTypeName));
+            card.appendChild(typeLabel);
+          }
 
           const details = [formatCalendarDate(event.eventDate)];
 
@@ -2080,6 +2354,7 @@ const visibleEvents = calendarEvents.filter(event => {
                 event.endTime || "";
               document.querySelector("#calendar-location").value =
                 event.location || "";
+              populateCalendarEventTypeSelect(event.eventTypeId || "");
               document.querySelector("#calendar-description").value =
                 event.description || "";
 
@@ -2152,18 +2427,13 @@ const visibleEvents = calendarEvents.filter(event => {
           );
         }
       }
+      
       document.querySelector("#calendar-show-all")
-  .addEventListener("click", () => {
-    selectedCalendarDate = null;
-    showAllMonthEvents = !showAllMonthEvents;
-
-    document.querySelector("#calendar-show-all").textContent =
-      showAllMonthEvents
-        ? "Hide All Events This Month"
-        : "Show All Events This Month";
-
-    renderCalendar();
-  });
+        .addEventListener("click", () => {
+          selectedCalendarDate = null;
+          showAllMonthEvents = !showAllMonthEvents;
+          renderCalendar();
+        });
 
       document.querySelector("#calendar-prev")
   .addEventListener("click", () => {
@@ -2184,6 +2454,49 @@ const visibleEvents = calendarEvents.filter(event => {
       document.querySelector("#calendar-cancel")
         .addEventListener("click", resetCalendarForm);
 
+      document.querySelector("#calendar-type-cancel")
+        .addEventListener("click", resetCalendarEventTypeForm);
+
+      document.querySelector("#calendar-type-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const data = {
+            name: document.querySelector("#calendar-type-name").value.trim(),
+            color: document.querySelector("#calendar-type-color").value
+          };
+
+          const wasEditing = editingCalendarEventTypeId !== null;
+          const path = wasEditing
+            ? `/calendar-event-types/${encodeURIComponent(editingCalendarEventTypeId)}`
+            : "/calendar-event-types";
+
+          const button = document.querySelector("#calendar-type-save");
+          button.disabled = true;
+
+          try {
+            await api(path, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data)
+            });
+
+            resetCalendarEventTypeForm();
+            await loadCalendarEventTypes();
+            await loadCalendarEvents();
+            setMessage(
+              "calendar-type-status",
+              wasEditing
+                ? "Event type updated."
+                : "Event type added."
+            );
+          } catch (error) {
+            setMessage("calendar-type-status", `Could not save event type: ${error.message}`);
+          } finally {
+            button.disabled = false;
+          }
+        });
+
       document.querySelector("#calendar-form")
         .addEventListener("submit", async event => {
           event.preventDefault();
@@ -2194,6 +2507,9 @@ const visibleEvents = calendarEvents.filter(event => {
             startTime: document.querySelector("#calendar-start").value,
             endTime: document.querySelector("#calendar-end").value,
             location: document.querySelector("#calendar-location").value.trim(),
+            eventTypeId: document.querySelector("#calendar-event-type").value
+              ? Number(document.querySelector("#calendar-event-type").value)
+              : null,
             description:
               document.querySelector("#calendar-description").value.trim()
           };
@@ -2732,11 +3048,15 @@ if (
           if (roles.siteAdministrator || roles.filePublisher) {
   document.querySelector("#calendar-admin").classList.remove("hidden");
 }
+if (roles.siteAdministrator) {
+  document.querySelector("#calendar-type-admin").classList.remove("hidden");
+}
               
 await Promise.all([
   loadPublishedFiles(),
   loadImportantLinks(),
   loadMemberDirectory(),
+  loadCalendarEventTypes(),
   loadCalendarEvents()
 ]);
 
@@ -2996,4 +3316,5 @@ await Promise.all([
     </script>
   </body>
 </html>
+
 

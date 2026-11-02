@@ -373,6 +373,32 @@ const title = "Members | Montreal Math Circle";
         margin: 14px 0 24px;
       }
 
+      .calendar-content-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(340px, 1.4fr);
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+}
+
+.calendar-month-view,
+.calendar-selected-events {
+  min-width: 0;
+}
+
+.calendar-selected-events {
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+@media (max-width: 760px) {
+  .calendar-content-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
       .calendar-weekday {
         text-align: center;
         font-size: 12px;
@@ -966,26 +992,34 @@ const title = "Members | Montreal Math Circle";
 
             <div id="calendar-event-type-legend" class="calendar-event-type-legend" aria-label="Calendar event types"></div>
 
-            <div
-              id="calendar-grid"
-              class="calendar-grid"
-              aria-label="Monthly calendar"
-            ></div>
+            <div class="calendar-content-layout">
 
-            <h3>Events</h3>
-            
-            <button
-              id="calendar-show-all"
-              type="button"
-              class="secondary"
-            >
-              Show All Events This Month
-            </button>
+  <div class="calendar-month-view">
+    <div
+      id="calendar-grid"
+      class="calendar-grid"
+      aria-label="Monthly calendar"
+    ></div>
+  </div>
 
-            <div
-              id="calendar-event-list"
-              aria-live="polite"
-            >Loading events…</div>
+  <div class="calendar-selected-events">
+    <h3>Events</h3>
+
+    <button
+      id="calendar-show-all"
+      type="button"
+      class="secondary"
+    >
+      Show All Events This Month
+    </button>
+
+    <div
+      id="calendar-event-list"
+      aria-live="polite"
+    >Loading events…</div>
+  </div>
+
+</div>
 
             <!-- Visible only to site administrators -->
             <div id="calendar-admin" class="hidden">

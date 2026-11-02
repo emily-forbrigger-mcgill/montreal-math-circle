@@ -395,14 +395,13 @@ const title = "Members | Montreal Math Circle";
       }
 
       .calendar-day:hover {
-        background: #f2edf9;
+        background: #eeeeef;
       }
 
-      
       .calendar-day.has-event {
-        background: #EAF0F5;
-        border-color: #6699cc;
-        color: #173b65;
+        background: #f2f3f4;
+        border-color: #cbd0d6;
+        color: #203e65;
       }
 
       .calendar-day.has-event:hover {
@@ -410,13 +409,14 @@ const title = "Members | Montreal Math Circle";
       }
 
       .calendar-day.has-event.selected {
-        background: #a9cef5;
+        background: #fceff0;
         border: 2px solid #a81b24;
       }
 
       .calendar-day.has-event .calendar-event-dot {
-  background: #ffffff;
-}
+        background: none;
+      }
+
         
       .calendar-day.selected {
         border: 2px solid #a81b24;
@@ -428,18 +428,16 @@ const title = "Members | Montreal Math Circle";
       }
 
       .calendar-event-dot {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 26px;
-          height: 26px;
-          border-radius: 50%;
-          margin-top: 0;
-          background: #ffffff;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-          font-size: 17px;
-          line-height: 1;
-          }
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 20px;
+        margin-top: 0;
+        background: none;
+        font-size: 18px;
+        line-height: 1;
+      }
 
       .calendar-event-dot::before {
         content: "★";
@@ -473,9 +471,9 @@ const title = "Members | Montreal Math Circle";
       
       .calendar-event-meta {
         margin-top: 6px;
-        font-size: 11px;
-        font-weight: 400;
-        color: #687488;
+        font-size: 17px;
+        font-weight: 600;
+        color: #526176;
         line-height: 1.5;
       }
 
@@ -551,29 +549,13 @@ const title = "Members | Montreal Math Circle";
       :global(.calendar-day-event-dots) {
         display: flex;
         flex-wrap: wrap;
-        gap: 6px;
+        gap: 3px;
         margin-top: 7px;
       }
 
       :global(.calendar-day-event-dots .calendar-event-dot) {
         margin-top: 0;
       }
-
-      :global(#calendar-grid .calendar-event-dot) {
-            display: inline-flex !important;
-            align-items: center;
-            justify-content: center;
-            width: 26px;
-            height: 26px;
-            min-width: 26px;
-            flex: 0 0 26px;
-            border-radius: 50%;
-            background-color: #ffffff !important;
-            background: #ffffff !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-            font-size: 17px;
-            line-height: 1;
-          }
 
       :global(#calendar-event-list .calendar-event-card) {
         border-left-color: var(--event-type-color, #ad96cc);
@@ -676,17 +658,17 @@ const title = "Members | Montreal Math Circle";
       }
 
       :global(#calendar-grid .calendar-day:hover) {
-        background: #f2edf9;
+        background: #eeeeef;
       }
 
       :global(#calendar-grid .calendar-day.has-event) {
-        background: #c5dff8;
-        border: 2px solid #2563a6;
-        color: #173b65;
+        background: #f2f3f4;
+        border: 2px solid #cbd0d6;
+        color: #203e65;
       }
 
       :global(#calendar-grid .calendar-day.has-event:hover) {
-        background: #a9cef5;
+        background: #e8eaed;
       }
 
       :global(#calendar-grid .calendar-day.selected) {
@@ -695,7 +677,7 @@ const title = "Members | Montreal Math Circle";
       }
 
       :global(#calendar-grid .calendar-day.has-event.selected) {
-        background: #93c5fd;
+        background: #fceff0;
         border: 2px solid #a81b24;
       }
 
@@ -742,10 +724,17 @@ const title = "Members | Montreal Math Circle";
 
       :global(#calendar-event-list .calendar-event-meta) {
         margin-top: 6px;
-        font-size: 11px;
-        font-weight: 400;
-        color: #687488;
+        font-size: 17px;
+        font-weight: 600;
+        color: #526176;
         line-height: 1.5;
+      }
+
+      :global(#calendar-event-list .calendar-description-toggle summary) {
+        font-size: 12px;
+        font-weight: 400;
+        color: #667085;
+        cursor: pointer;
       }
 
       :global(#calendar-event-list .calendar-event-description) {
@@ -3349,6 +3338,5 @@ await Promise.all([
     </script>
   </body>
 </html>
-
 
 

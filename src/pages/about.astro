@@ -4,14 +4,29 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="About">
-    <!-- Hero / Header Section -->
+    <!-- Our Story Section -->
     <header class="our-story">
-        <div class="story-content">
-            <span class="meta-tag">About Us / Our Mission</span>
-            <h1>Our Story</h1>
-            <p class="subtitle">
-                [Insert mission statement or overview of why and how we are changing math education in Montreal].
-            </p>
+        <span class="meta-tag">About Us / Our Mission</span>
+        <div class="about-content">
+            <div class="story-content">
+                <h1>Our Story</h1>
+                <p>
+                    A math circle is a learning model that was developed in the mid 20th century Soviet Union with an aim to inspire and train primary and secondary-aged students to excel in mathematical problem solving. Over the years, math circles have expanded to many other locations, iterations, and age-groups.<br><br>
+                    If the standard classroom model for teaching mathematics is likened to a theatre play with occasional opportunities for audience participation - then a math circle is improv theatre. In a math circle there is no separation between the performers (teachers/facilitator) and audience (students).
+                    In the Montreal Math Circle we ask that students take a front seat in their mathematical exploration - with facilitators there to gently guide and encourage students as they arrive at a rigorous mathematical solution. As facilitators, we believe in the “follow the child” philosophy of teaching mathematics.
+                </p>
+            </div>
+                        <div class="story-content">
+                <img src="/public/mmc-logo-v1.png" alt="Our Story Image" class="story-image">
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero / Header Section -->
+    <header class="about-quote">
+        <div class="quote-content">
+            <h1>“We believe that students can learn to enjoy mathematics for its own sake.”</h1>
+            <p class="quote-author">- Aislinn Smith, Founder</p>
         </div>
     </header>
 
@@ -22,7 +37,7 @@ import Layout from '../layouts/Layout.astro';
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
             </div>
             <h3>Our Mission</h3>
-            <p>[Insert details about core educational goals, accessibility initiatives, or non-competitive problem-solving focus].</p>
+            <p>To inspire students to flourish with the excitement of mathematical discovery.</p>
         </article>
 
         <article class="about-card">
@@ -30,7 +45,7 @@ import Layout from '../layouts/Layout.astro';
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             </div>
             <h3>Community & Mentorship</h3>
-            <p>[Insert details about university mentorship programs, high school/CEGEP involvement, and workshop culture].</p>
+            <p>We are run by a collective of university students and volunteers in the Montreal area.</p>
         </article>
     </section>
 
@@ -112,20 +127,64 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <style>
-    /* Hero Story Header */
+    /* Hero Hook Header */
+    .about-quote {
+        background: #1b386f;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 1rem 3rem;
+        margin: 0 auto 2rem auto;
+        align-self: center;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    }
+
+    .quote-content {
+        max-width: 800px;
+        margin: 0 auto;
+        color: var(--primary-light);
+    }
+
+    .quote-author{
+        font-size: 0.95rem;
+        color: var(--primary-light);
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Our Story Header */
     .our-story {
         background: #ffffff;
         border: 1px solid var(--border-color);
         border-radius: 14px;
         padding: 3.5rem 2rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
         text-align: center;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     }
 
-    .story-content {
-        max-width: 720px;
+    .about-content {
+        max-width: 940px;
         margin: 0 auto;
+        display: flex;
+        justify-content: flex-start;
+        padding: 1rem 1.5rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+
+    .story-content {
+        align-content: left;
+        text-align: left;
+    }
+
+    .story-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        place-self: center;
+        padding-top: 1rem;
     }
 
     .our-story h1 {
@@ -228,7 +287,7 @@ import Layout from '../layouts/Layout.astro';
 
     .team-card:hover {
         transform: translateY(-3px);
-        border-color: rgba(168, 27, 36, 0.3);
+        border-color: rgba(27, 34, 168, 0.3);
     }
 
     .team-headshot {
@@ -291,7 +350,12 @@ import Layout from '../layouts/Layout.astro';
         .our-story {
             padding: 2rem 1.25rem;
         }
-
+        
+        .about-content {
+            flex-direction: column;
+            padding: 1rem 1rem;
+            gap: 2rem;
+        }
         .our-story h1 {
             font-size: 1.85rem;
         }

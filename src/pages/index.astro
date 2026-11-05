@@ -10,22 +10,22 @@ import Layout from '../layouts/Layout.astro';
             <span class="meta-tag">Youth Math Program</span>
             <h1>Exploring Math from New Perspectives</h1>
             <p class="subtitle">
-                An interactive program connecting motivated high school and CEGEP students with advanced mathematical concepts, problem-solving workshops, and dynamic university mentors.
+                An after-school program providing primary, secondary, and CEGEP students with open-ended, collaborative, and exciting mathematics.
             </p>
             <div class="hero-cta-group">
-                <a href="#logistics" class="primary-btn">View Event Details</a>
-                <a href="/programs" class="secondary-btn">Explore Programs</a>
+                <a href="/programs" class="secondary-btn">View Our Programs</a>
             </div>
         </div>
     </header>
 
     <!-- Conference / Featured Event Highlight -->
+<section class="math-for-all-banner">
     <section class="banner-card">
         <div class="banner-body">
             <span class="meta-tag">Featured Event</span>
             <h2>Math for All 2027</h2>
             <p>
-                Join us for our flagship regional mathematics conference hosted in collaboration with researchers and educators.
+                Join us for our flagship regional mathematics conference hosted in collaboration with international researchers and educators.
             </p>
         </div>
         <div class="banner-action">
@@ -74,8 +74,10 @@ import Layout from '../layouts/Layout.astro';
             </div>
         </div>
     </section>
+</section>
 
     <!-- Information Split Grid -->
+     <h2 class="section-title">Why Join MMC?</h2> 
     <section class="info-grid">
         <article class="info-card">
             <div class="card-header">
@@ -176,16 +178,20 @@ import Layout from '../layouts/Layout.astro';
     }
 
     /* Featured Event Banner */
-    .banner-card {
-        background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+
+    .math-for-all-banner {
+        background: linear-gradient(135deg, #1e1e2a 0%, #27272a 100%);
         color: #ffffff;
         border-radius: 14px;
         padding: 2rem;
         margin-bottom: 2.5rem;
+    }
+
+    .banner-card {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 1.5rem;
+        gap: 1.2rem;
         flex-wrap: wrap;
     }
 
@@ -196,10 +202,10 @@ import Layout from '../layouts/Layout.astro';
     }
 
     .banner-body p {
-        color: #a1a1aa;
+        color: #bcbcc7;
         margin: 0;
         font-size: 0.95rem;
-        max-width: 550px;
+        max-width: 800px;
     }
 
     .external-link {
@@ -221,12 +227,12 @@ import Layout from '../layouts/Layout.astro';
 
     /* Logistics Section */
     .logistics-section {
-        margin-bottom: 3rem;
+        margin-bottom: 1rem;
     }
 
     .section-title {
         font-size: 1.4rem;
-        color: var(--dark);
+        color: var(--light-dark);
         margin-bottom: 1.25rem;
     }
 
@@ -244,12 +250,12 @@ import Layout from '../layouts/Layout.astro';
         display: flex;
         align-items: flex-start;
         gap: 1rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
     }
 
     .logistics-card.highlight-card {
         background: var(--primary-light);
-        border-color: rgba(168, 27, 36, 0.25);
+        border-color: rgba(39, 27, 168, 0.25);
     }
 
     .card-icon {

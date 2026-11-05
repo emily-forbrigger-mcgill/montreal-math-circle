@@ -100,6 +100,28 @@ import Layout from '../layouts/Layout.astro';
         </article>
     </section>
 
+    <!-- Newsletter Signup -->
+    <section class="newsletter-section" aria-labelledby="newsletter-title">
+        <div class="newsletter-content">
+            <span class="meta-tag">Stay Connected</span>
+            <h2 id="newsletter-title"> Want to get involved with the Montreal Math Circle? </h2>
+            <p>
+                Click the button below to recieve email announcements about upcoming workshops, meetings, facilitator/volunteer activities,
+                and other Montreal Math Circle events.
+            </p>
+            <a
+                href="https://eepurl.com/8bj9uLxQK1"
+                class="newsletter-btn"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Sign Up Here (opens in a new tab)"
+            >
+                Sign Up Here for More Info <span aria-hidden="true">↗</span>
+            </a>
+            <p class="newsletter-note">You can unsubscribe from email updates at any time.</p>
+        </div>
+    </section>
+
     <!-- Sponsor / Partner Strip -->
     <section class="sponsor-footer">
         <p class="sponsor-title">Supported by Academic Partners</p>
@@ -339,6 +361,57 @@ import Layout from '../layouts/Layout.astro';
 
     .text-link:hover {
         text-decoration: underline;
+    }
+
+    /* Newsletter Signup */
+    .newsletter-section {
+        margin: 2.5rem 0;
+        padding: 2.5rem 2rem;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        background: var(--primary-light);
+        text-align: center;
+    }
+
+    .newsletter-content {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    .newsletter-section h2 {
+        margin: 0.75rem 0;
+        color: var(--dark);
+        font-size: 1.8rem;
+    }
+
+    .newsletter-section p {
+        color: var(--text-muted);
+        line-height: 1.65;
+    }
+
+    .newsletter-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        padding: 0.85rem 1.35rem;
+        border-radius: 8px;
+        background: var(--primary);
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .newsletter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .newsletter-note {
+        margin: 0.9rem 0 0;
+        font-size: 0.8rem;
     }
 
     /* Sponsor & Partner Section */

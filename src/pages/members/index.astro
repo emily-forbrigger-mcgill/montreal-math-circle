@@ -364,6 +364,15 @@ const title = "Members | Montreal Math Circle";
         margin: 0;
         color: #203e65;
         text-align: center;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .calendar-instructions {
+        margin: 0 0 16px;
+        color: #526176;
+        font-size: 14px;
+        line-height: 1.6;
       }
 
       .calendar-grid {
@@ -372,6 +381,36 @@ const title = "Members | Montreal Math Circle";
         gap: 5px;
         margin: 14px 0 24px;
       }
+
+      .calendar-content-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr);
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+}
+
+.calendar-month-view,
+.calendar-selected-events {
+  min-width: 0;
+}
+
+.calendar-selected-events {
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+@media (max-width: 760px) {
+  .calendar-content-layout {
+    grid-template-columns: 1fr;
+  }
+}
 
       .calendar-weekday {
         text-align: center;
@@ -395,30 +434,28 @@ const title = "Members | Montreal Math Circle";
       }
 
       .calendar-day:hover {
-        background: #f2edf9;
+        background: #eeeeef;
       }
 
-      
       .calendar-day.has-event {
-        background: #dceafa;
-        border-color: #6699cc;
-        color: #173b65;
-      }
+          background: #EAF0F5;
+          border-color: #cbd0d6;
+          color: #203e65;
+        }
 
       .calendar-day.has-event:hover {
-        background: #c5dff8;
-      }
+          background: #E1EAF2;
+        }
 
       .calendar-day.has-event.selected {
-        background: #a9cef5;
+        background: #fceff0;
         border: 2px solid #a81b24;
       }
 
       .calendar-day.has-event .calendar-event-dot {
-        background: #2563a6;
-      }
-
-        
+          background: #ffffff !important;
+        }
+                
       .calendar-day.selected {
         border: 2px solid #a81b24;
         background: #fceff0;
@@ -429,12 +466,20 @@ const title = "Members | Montreal Math Circle";
       }
 
       .calendar-event-dot {
-        display: block;
-        width: 7px;
-        height: 7px;
-        margin-top: 7px;
-        border-radius: 50%;
-        background: #a81b24;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 20px;
+        margin-top: 0;
+        background: none;
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      .calendar-event-dot::before {
+        content: "★";
+        color: inherit;
       }
 
       .calendar-empty {
@@ -454,7 +499,7 @@ const title = "Members | Montreal Math Circle";
 
       
       .calendar-event-title {
-        font-size: 17px;
+        font-size: 19px;
         font-weight: 700;
         color: #a81b24;
         line-height: 1.5;
@@ -464,9 +509,9 @@ const title = "Members | Montreal Math Circle";
       
       .calendar-event-meta {
         margin-top: 6px;
-        font-size: 11px;
-        font-weight: 400;
-        color: #687488;
+        font-size: 17px;
+        font-weight: 600;
+        color: #526176;
         line-height: 1.5;
       }
 
@@ -476,6 +521,32 @@ const title = "Members | Montreal Math Circle";
         white-space: pre-wrap;
       }
 
+      .calendar-description-toggle {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.calendar-description-toggle summary {
+  color: #a81b24;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.calendar-description-toggle summary:hover {
+  text-decoration: underline;
+}
+
+.calendar-description-toggle[open] summary {
+  margin-bottom: 8px;
+}
+
+.calendar-description-toggle .calendar-event-description {
+  margin-top: 0;
+  color: #596579;
+  line-height: 1.6;
+}
+
       #calendar-admin {
         margin-top: 24px;
         padding-top: 18px;
@@ -484,6 +555,95 @@ const title = "Members | Montreal Math Circle";
 
       #calendar-form {
         max-width: 650px;
+      }
+
+      :global(#calendar-event-type-legend) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px 16px;
+        margin: 14px 0 18px;
+        padding: 12px 14px;
+        border: 1px solid #e2dbea;
+        border-radius: 8px;
+        background: #fbf9fd;
+      }
+
+      :global(.calendar-type-key-item),
+      :global(.calendar-type-row) {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+      }
+
+      :global(.calendar-type-swatch) {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        flex: 0 0 12px;
+        border-radius: 3px;
+      }
+
+      :global(.calendar-day-event-dots) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 3px;
+        margin-top: 7px;
+      }
+
+      :global(.calendar-day-event-dots .calendar-event-dot) {
+        margin-top: 0;
+      }
+
+      :global(#calendar-event-list .calendar-event-card) {
+        border-left-color: var(--event-type-color, #ad96cc);
+      }
+
+      :global(#calendar-event-list .calendar-event-type-label) {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 7px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        color: #344054;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      :global(#calendar-type-admin) {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid #e8e0f1;
+      }
+
+      :global(#calendar-type-form) {
+        max-width: 420px;
+      }
+
+      :global(#calendar-type-color) {
+        width: 64px;
+        height: 40px;
+        padding: 3px;
+        border: 1px solid #ccd3dd;
+        border-radius: 6px;
+        background: #fff;
+      }
+
+      :global(#calendar-type-list) {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      :global(#calendar-type-list .calendar-type-row) {
+        justify-content: space-between;
+        flex-wrap: wrap;
+        padding: 9px 11px;
+        border: 1px solid #e2dbea;
+        border-radius: 7px;
+        background: #fff;
       }
 
       @media (max-width: 680px) {
@@ -536,17 +696,17 @@ const title = "Members | Montreal Math Circle";
       }
 
       :global(#calendar-grid .calendar-day:hover) {
-        background: #f2edf9;
+        background: #eeeeef;
       }
 
       :global(#calendar-grid .calendar-day.has-event) {
-        background: #c5dff8;
-        border: 2px solid #2563a6;
-        color: #173b65;
+        background: #F5F8FB;
+        border: 2px solid #cbd0d6;
+        color: #203e65;
       }
 
       :global(#calendar-grid .calendar-day.has-event:hover) {
-        background: #a9cef5;
+        background: #e8eaed;
       }
 
       :global(#calendar-grid .calendar-day.selected) {
@@ -555,8 +715,8 @@ const title = "Members | Montreal Math Circle";
       }
 
       :global(#calendar-grid .calendar-day.has-event.selected) {
-        background: #93c5fd;
-        border: 2px solid #a81b24;
+        background: #F3EFF9;
+        border: 2px solid #B9A3D5;
       }
 
       :global(#calendar-grid .calendar-day-number) {
@@ -564,12 +724,23 @@ const title = "Members | Montreal Math Circle";
       }
 
       :global(#calendar-grid .calendar-event-dot) {
-        display: block;
-        width: 7px;
-        height: 7px;
-        margin-top: 7px;
-        border-radius: 50%;
-        background: #2563a6;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 26px;
+          height: 26px;
+          min-width: 26px;
+          flex: 0 0 26px;
+          border-radius: 50%;
+          background: #ffffff !important;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+          font-size: 17px;
+          line-height: 1;
+          }
+
+      :global(#calendar-grid .calendar-event-dot::before) {
+        content: "★";
+        color: inherit;
       }
 
       :global(#calendar-grid .calendar-empty) {
@@ -594,10 +765,17 @@ const title = "Members | Montreal Math Circle";
 
       :global(#calendar-event-list .calendar-event-meta) {
         margin-top: 6px;
-        font-size: 11px;
-        font-weight: 400;
-        color: #687488;
+        font-size: 17px;
+        font-weight: 600;
+        color: #526176;
         line-height: 1.5;
+      }
+
+      :global(#calendar-event-list .calendar-description-toggle summary) {
+        font-size: 12px;
+        font-weight: 400;
+        color: #667085;
+        cursor: pointer;
       }
 
       :global(#calendar-event-list .calendar-event-description) {
@@ -695,13 +873,85 @@ const title = "Members | Montreal Math Circle";
     margin-top: 12px;
   }
 
+  /* Organizer Portal accordion menus */
+
+.portal-accordion {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid #d8d5e8;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px #172b4d12;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.portal-accordion > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 19px 22px;
+  cursor: pointer;
+  list-style: none;
+  color: #203e65;
+  font-family: 'Mali', cursive, system-ui, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.portal-accordion > summary::-webkit-details-marker {
+  display: none;
+}
+
+.portal-accordion > summary::after {
+  content: '+';
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.portal-accordion[open] > summary::after {
+  content: '−';
+}
+
+.portal-accordion > summary:hover {
+  background: #f7f6fc;
+}
+
+.portal-accordion > summary:focus-visible {
+  outline: 3px solid #8b79bd;
+  outline-offset: -3px;
+}
+
+.portal-accordion > .panel {
+  border-radius: 0;
+  box-shadow: none;
+  border-top: 1px solid #e7e4ef;
+  padding: 20px 22px 24px;
+}
+
+.portal-accordion > .panel > h2 {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .portal-accordion > summary {
+    padding: 16px;
+    font-size: 18px;
+  }
+
+  .portal-accordion > .panel {
+    padding: 16px;
+  }
+}
+
     </style>
   </head>
 
   <body>
     <main>
       <h1>Montreal Math Circle</h1>
-      <p class="subtitle">Members' area</p>
+      <p class="subtitle">Organizers' Dashboard</p>
 
       <p id="status" class="notice" role="status" aria-live="polite">
         Checking your sign-in…
@@ -716,18 +966,20 @@ const title = "Members | Montreal Math Circle";
           <!-- Members Discussion Board -->
           
 <!-- Members Discussion Board -->
-<section class="panel">
-  <h2>Discussion Board</h2>
+<details class="portal-accordion">
+  <summary>Discussion Board</summary>
 
-  <p>
-    Ask questions, share ideas, and discuss
-    Montreal Math Circle activities.
-  </p>
+  <section class="panel">
+    <p>
+      Ask questions, share ideas, and discuss
+      Montreal Math Circle activities.
+    </p>
 
-  <a class="button" href="/members/discussions/">
-    Open Discussion Board →
-  </a>
-</section>
+    <a class="button" href="/members/discussions/">
+      Open Discussion Board →
+    </a>
+  </section>
+</details>
           <!-- Members Calendar -->
           <section class="panel wide" id="calendar-panel">
             <h2>Calendar</h2>
@@ -751,26 +1003,36 @@ const title = "Members | Montreal Math Circle";
               >Next →</button>
             </div>
 
-            <div
-              id="calendar-grid"
-              class="calendar-grid"
-              aria-label="Monthly calendar"
-            ></div>
+            <div id="calendar-event-type-legend" class="calendar-event-type-legend" aria-label="Calendar event types"></div>
 
-            <h3>Events</h3>
-            
-            <button
-              id="calendar-show-all"
-              type="button"
-              class="secondary"
-            >
-              Show All Events This Month
-            </button>
+           <div class="calendar-content-layout">
 
-            <div
-              id="calendar-event-list"
-              aria-live="polite"
-            >Loading events…</div>
+  <div class="calendar-month-view">
+    <div
+      id="calendar-grid"
+      class="calendar-grid"
+      aria-label="Monthly calendar"
+    ></div>
+  </div>
+
+  <div class="calendar-selected-events">
+    <h3>Events</h3>
+
+    <button
+      id="calendar-show-all"
+      type="button"
+      class="secondary"
+    >
+      Show All Events This Month
+    </button>
+
+    <div
+      id="calendar-event-list"
+      aria-live="polite"
+    >Loading events…</div>
+  </div>
+
+</div>
 
             <!-- Visible only to site administrators -->
             <div id="calendar-admin" class="hidden">
@@ -795,6 +1057,13 @@ const title = "Members | Montreal Math Circle";
                 <div class="field">
                   <label for="calendar-end">End time (optional)</label>
                   <input id="calendar-end" type="time" />
+                </div>
+
+                <div class="field">
+                  <label for="calendar-event-type">Event type</label>
+                  <select id="calendar-event-type">
+                    <option value="">No category</option>
+                  </select>
                 </div>
 
                 <div class="field">
@@ -828,12 +1097,38 @@ const title = "Members | Montreal Math Circle";
                 role="status"
                 aria-live="polite"
               ></div>
+
+              <section id="calendar-type-admin" class="calendar-type-admin hidden">
+                <h3>Manage Event Types</h3>
+                <p class="muted">Create categories and choose a color. Changing a category's color updates all events assigned to it.</p>
+
+                <form id="calendar-type-form">
+                  <div class="field">
+                    <label for="calendar-type-name">Event type name</label>
+                    <input id="calendar-type-name" maxlength="60" required placeholder="e.g. Workshop" />
+                  </div>
+                  <div class="field">
+                    <label for="calendar-type-color">Event color</label>
+                    <input id="calendar-type-color" type="color" value="#3979C9" />
+                  </div>
+                  <div class="link-form-actions">
+                    <button type="submit" id="calendar-type-save">Add event type</button>
+                    <button type="button" id="calendar-type-cancel" class="secondary hidden">Cancel edit</button>
+                  </div>
+                </form>
+
+                <div id="calendar-type-list" class="calendar-type-list" aria-live="polite"></div>
+                <div id="calendar-type-status" class="notice" role="status" aria-live="polite"></div>
+              </section>
             </div>
           </section>
 
-           
-          <!-- Important Links: visible to all signed-in members -->
-          <section class="panel wide" id="important-links-panel">
+             <!-- Important Links: visible to all signed-in members -->
+<details class="portal-accordion wide">
+  <summary>Important Links</summary>
+
+  <section class="panel" id="important-links-panel">
+
             <h2>Important Links</h2>
             <p>Useful websites and resources for Montreal Math Circle members.</p>
 
@@ -904,12 +1199,16 @@ const title = "Members | Montreal Math Circle";
                 aria-live="polite"
               ></div>
             </div>
-          </section>
-           
-          <!-- Member Directory -->
-          <section class="panel wide" id="member-directory-panel">
-            <h2>Member Directory</h2>
-            <p>Contact information for Montreal Math Circle members.</p>
+      </section>
+          </details>
+
+         <!-- Member Directory -->
+<details class="portal-accordion wide">
+  <summary>Organizers Directory</summary>
+
+  <section class="panel" id="member-directory-panel">
+            <h2>Organizers Directory</h2>
+            <p>Contact information for Montreal Math Circle Organizers.</p>
 
             <div
               id="directory-list"
@@ -989,9 +1288,12 @@ const title = "Members | Montreal Math Circle";
           </section>
 
 
+         </details>
+          <details class="portal-accordion wide">
+  <summary>Shared Files</summary>
 
-          <section class="panel wide">
-            <h2>Shared Files</h2>
+  <section class="panel">
+    <h2>Shared Files</h2>
             <p>Published documents and resources available to signed-in members.</p>
 
             <div class="toolbar">
@@ -1013,6 +1315,9 @@ const title = "Members | Montreal Math Circle";
             <div id="folder-navigation" class="folder-grid" aria-label="Document folders"></div>
             <div id="published-files" aria-live="polite">Loading published files…</div>
           </section>
+
+                      
+            </details>
 
           <section id="upload-panel" class="panel hidden">
             <h2>Submit a File</h2>
@@ -1734,9 +2039,12 @@ const title = "Members | Montreal Math Circle";
       // MEMBERS CALENDAR
 
       let calendarEvents = [];
+      let calendarEventTypes = [];
+      let editingCalendarEventTypeId = null;
       let calendarMonth = new Date();
       calendarMonth.setDate(1);
       let selectedCalendarDate = null;
+      let showAllMonthEvents = false;
       let editingCalendarId = null;
 
       function calendarDateString(year, month, day) {
@@ -1765,10 +2073,129 @@ const title = "Members | Montreal Math Circle";
       function resetCalendarForm() {
         editingCalendarId = null;
         document.querySelector("#calendar-form").reset();
+        document.querySelector("#calendar-event-type").value = "";
         document.querySelector("#calendar-form-heading").textContent =
           "Add an Event";
         document.querySelector("#calendar-save").textContent = "Add event";
         document.querySelector("#calendar-cancel").classList.add("hidden");
+      }
+
+      function renderCalendarEventTypeLegend() {
+        const legend = document.querySelector("#calendar-event-type-legend");
+        legend.replaceChildren();
+
+        if (!calendarEventTypes.length) {
+          addText(legend, "span", "No event types have been created yet.", "muted");
+          return;
+        }
+
+        for (const type of calendarEventTypes) {
+          const item = document.createElement("span");
+          item.className = "calendar-type-key-item";
+
+          const swatch = document.createElement("span");
+          swatch.className = "calendar-type-swatch";
+          swatch.style.backgroundColor = type.color;
+          swatch.setAttribute("aria-hidden", "true");
+
+          item.append(swatch, document.createTextNode(type.name));
+          legend.appendChild(item);
+        }
+      }
+
+      function populateCalendarEventTypeSelect(selectedId = "") {
+        const select = document.querySelector("#calendar-event-type");
+        select.replaceChildren();
+
+        const none = document.createElement("option");
+        none.value = "";
+        none.textContent = "No category";
+        select.appendChild(none);
+
+        for (const type of calendarEventTypes) {
+          const option = document.createElement("option");
+          option.value = String(type.id);
+          option.textContent = type.name;
+          select.appendChild(option);
+        }
+
+        select.value = selectedId ? String(selectedId) : "";
+      }
+
+      function resetCalendarEventTypeForm() {
+        editingCalendarEventTypeId = null;
+        document.querySelector("#calendar-type-form").reset();
+        document.querySelector("#calendar-type-color").value = "#3979C9";
+        document.querySelector("#calendar-type-save").textContent = "Add event type";
+        document.querySelector("#calendar-type-cancel").classList.add("hidden");
+      }
+
+      function renderCalendarEventTypesAdmin() {
+        const list = document.querySelector("#calendar-type-list");
+        list.replaceChildren();
+
+        if (!calendarEventTypes.length) {
+          addText(list, "p", "No event types yet.", "muted");
+          return;
+        }
+
+        for (const type of calendarEventTypes) {
+          const row = document.createElement("div");
+          row.className = "calendar-type-row";
+
+          const label = document.createElement("span");
+          label.className = "calendar-type-key-item";
+
+          const swatch = document.createElement("span");
+          swatch.className = "calendar-type-swatch";
+          swatch.style.backgroundColor = type.color;
+          swatch.setAttribute("aria-hidden", "true");
+
+          label.append(swatch, document.createTextNode(type.name));
+          row.appendChild(label);
+
+          const actions = document.createElement("div");
+          actions.className = "link-actions";
+
+          addButton(actions, "Edit", () => {
+            editingCalendarEventTypeId = type.id;
+            document.querySelector("#calendar-type-name").value = type.name;
+            document.querySelector("#calendar-type-color").value = type.color;
+            document.querySelector("#calendar-type-save").textContent = "Save changes";
+            document.querySelector("#calendar-type-cancel").classList.remove("hidden");
+            document.querySelector("#calendar-type-name").focus();
+          });
+
+          addButton(actions, "Delete", async () => {
+            if (!confirm(
+              `Delete the event type "${type.name}"? Events using it will become uncategorized.`
+            )) return;
+
+            try {
+              await api(`/calendar-event-types/${encodeURIComponent(type.id)}`, {
+                method: "DELETE"
+              });
+              await loadCalendarEventTypes();
+              await loadCalendarEvents();
+              setMessage("calendar-type-status", "Event type deleted. Existing events were kept.");
+            } catch (error) {
+              setMessage("calendar-type-status", `Could not delete event type: ${error.message}`);
+            }
+          }, "danger");
+
+          row.append(actions);
+          list.appendChild(row);
+        }
+      }
+
+      async function loadCalendarEventTypes() {
+        const result = await api("/calendar-event-types");
+        calendarEventTypes = result.eventTypes || [];
+        renderCalendarEventTypeLegend();
+        populateCalendarEventTypeSelect();
+        if (roles.siteAdministrator) {
+          renderCalendarEventTypesAdmin();
+        }
       }
 
       function renderCalendar() {
@@ -1786,6 +2213,11 @@ const title = "Members | Montreal Math Circle";
           "en-CA",
           { month: "long", year: "numeric" }
         );
+
+        document.querySelector("#calendar-show-all").textContent =
+          showAllMonthEvents
+            ? "Hide All Events This Month"
+            : "Show All Events This Month";
 
         // Weekday headings.
         for (const dayName of ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]) {
@@ -1833,31 +2265,50 @@ const title = "Members | Montreal Math Circle";
           addText(button, "span", String(day), "calendar-day-number");
 
           if (eventsToday.length) {
-            const dot = document.createElement("span");
-            dot.className = "calendar-event-dot";
-            dot.setAttribute("aria-hidden", "true");
-            button.appendChild(dot);
+            const dots = document.createElement("span");
+            dots.className = "calendar-day-event-dots";
+            dots.setAttribute("aria-hidden", "true");
+
+            const colors = [...new Set(eventsToday.map(event =>
+              event.eventTypeColor || "#2563a6"
+            ))].slice(0, 4);
+
+            for (const color of colors) {
+              const dot = document.createElement("span");
+              dot.className = "calendar-event-dot";
+              dot.style.color = color;
+              dots.appendChild(dot);
+            }
+
+            button.appendChild(dots);
           }
 
-          button.addEventListener("click", () => {
-            // Clicking a selected date again shows the whole month.
-            selectedCalendarDate =
-              selectedCalendarDate === dateString ? null : dateString;
+         button.addEventListener("click", () => {
+  selectedCalendarDate =
+    selectedCalendarDate === dateString ? null : dateString;
 
-            renderCalendar();
-          });
+  showAllMonthEvents = false;
+  renderCalendar();
+});
 
           grid.appendChild(button);
         }
 
-        // Show events for the selected day, or for the entire month.
-        const monthPrefix = calendarDateString(year, month, 1).slice(0, 7);
+        // Show events for a selected date, or the whole month
+// only when the user explicitly clicks "Show All Events".
+const monthPrefix = calendarDateString(year, month, 1).slice(0, 7);
 
-        const visibleEvents = calendarEvents.filter(event =>
-          selectedCalendarDate
-            ? event.eventDate === selectedCalendarDate
-            : event.eventDate.startsWith(monthPrefix)
-        );
+const visibleEvents = calendarEvents.filter(event => {
+  if (selectedCalendarDate) {
+    return event.eventDate === selectedCalendarDate;
+  }
+
+  if (showAllMonthEvents) {
+    return event.eventDate.startsWith(monthPrefix);
+  }
+
+  return false;
+});
 
         if (selectedCalendarDate) {
           addText(
@@ -1869,20 +2320,32 @@ const title = "Members | Montreal Math Circle";
         }
 
         if (!visibleEvents.length) {
-          addText(
-            list,
-            "p",
-            selectedCalendarDate
-              ? "No events scheduled for this date."
-              : "No events scheduled for this month.",
-            "muted"
-          );
-          return;
-        }
+  if (!selectedCalendarDate && !showAllMonthEvents) {
+    addText(
+      list,
+      "p",
+      "Select a calendar date to view its events",
+      "muted"
+    );
+  } else {
+    addText(
+      list,
+      "p",
+      selectedCalendarDate
+        ? "No events scheduled for this date."
+        : "No events scheduled for this month.",
+      "muted"
+    );
+  }
 
+  return;
+}
         for (const event of visibleEvents) {
           const card = document.createElement("div");
           card.className = "calendar-event-card";
+          if (event.eventTypeColor) {
+            card.style.setProperty("--event-type-color", event.eventTypeColor);
+          }
 
           addText(
             card,
@@ -1890,6 +2353,18 @@ const title = "Members | Montreal Math Circle";
             event.title,
             "calendar-event-title"
           );
+
+          if (event.eventTypeName) {
+            const typeLabel = document.createElement("span");
+            typeLabel.className = "calendar-event-type-label";
+
+            const swatch = document.createElement("span");
+            swatch.className = "calendar-type-swatch";
+            swatch.style.backgroundColor = event.eventTypeColor || "#777777";
+
+            typeLabel.append(swatch, document.createTextNode(event.eventTypeName));
+            card.appendChild(typeLabel);
+          }
 
           const details = [formatCalendarDate(event.eventDate)];
 
@@ -1914,14 +2389,24 @@ const title = "Members | Montreal Math Circle";
             "calendar-event-meta"
           );
 
-          if (event.description) {
-            addText(
-              card,
-              "div",
-              event.description,
-              "calendar-event-description"
-            );
-          }
+         if (event.description) {
+  const descriptionDetails = document.createElement("details");
+  descriptionDetails.className = "calendar-description-toggle";
+
+  const summary = document.createElement("summary");
+  summary.textContent = "Show description";
+
+  descriptionDetails.appendChild(summary);
+
+  addText(
+    descriptionDetails,
+    "div",
+    event.description,
+    "calendar-event-description"
+  );
+
+  card.appendChild(descriptionDetails);
+}
 
           if (roles.siteAdministrator || roles.filePublisher) {
             const actions = document.createElement("div");
@@ -1940,6 +2425,7 @@ const title = "Members | Montreal Math Circle";
                 event.endTime || "";
               document.querySelector("#calendar-location").value =
                 event.location || "";
+              populateCalendarEventTypeSelect(event.eventTypeId || "");
               document.querySelector("#calendar-description").value =
                 event.description || "";
 
@@ -2016,25 +2502,71 @@ const title = "Members | Montreal Math Circle";
       document.querySelector("#calendar-show-all")
         .addEventListener("click", () => {
           selectedCalendarDate = null;
+          showAllMonthEvents = !showAllMonthEvents;
           renderCalendar();
         });
 
       document.querySelector("#calendar-prev")
-        .addEventListener("click", () => {
-          calendarMonth.setMonth(calendarMonth.getMonth() - 1);
-          selectedCalendarDate = null;
-          renderCalendar();
-        });
+  .addEventListener("click", () => {
+    calendarMonth.setMonth(calendarMonth.getMonth() - 1);
+    selectedCalendarDate = null;
+    showAllMonthEvents = false;
+    renderCalendar();
+  });
 
       document.querySelector("#calendar-next")
-        .addEventListener("click", () => {
-          calendarMonth.setMonth(calendarMonth.getMonth() + 1);
-          selectedCalendarDate = null;
-          renderCalendar();
-        });
+  .addEventListener("click", () => {
+    calendarMonth.setMonth(calendarMonth.getMonth() + 1);
+    selectedCalendarDate = null;
+    showAllMonthEvents = false;
+    renderCalendar();
+  });
 
       document.querySelector("#calendar-cancel")
         .addEventListener("click", resetCalendarForm);
+
+      document.querySelector("#calendar-type-cancel")
+        .addEventListener("click", resetCalendarEventTypeForm);
+
+      document.querySelector("#calendar-type-form")
+        .addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const data = {
+            name: document.querySelector("#calendar-type-name").value.trim(),
+            color: document.querySelector("#calendar-type-color").value
+          };
+
+          const wasEditing = editingCalendarEventTypeId !== null;
+          const path = wasEditing
+            ? `/calendar-event-types/${encodeURIComponent(editingCalendarEventTypeId)}`
+            : "/calendar-event-types";
+
+          const button = document.querySelector("#calendar-type-save");
+          button.disabled = true;
+
+          try {
+            await api(path, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data)
+            });
+
+            resetCalendarEventTypeForm();
+            await loadCalendarEventTypes();
+            await loadCalendarEvents();
+            setMessage(
+              "calendar-type-status",
+              wasEditing
+                ? "Event type updated."
+                : "Event type added."
+            );
+          } catch (error) {
+            setMessage("calendar-type-status", `Could not save event type: ${error.message}`);
+          } finally {
+            button.disabled = false;
+          }
+        });
 
       document.querySelector("#calendar-form")
         .addEventListener("submit", async event => {
@@ -2046,6 +2578,9 @@ const title = "Members | Montreal Math Circle";
             startTime: document.querySelector("#calendar-start").value,
             endTime: document.querySelector("#calendar-end").value,
             location: document.querySelector("#calendar-location").value.trim(),
+            eventTypeId: document.querySelector("#calendar-event-type").value
+              ? Number(document.querySelector("#calendar-event-type").value)
+              : null,
             description:
               document.querySelector("#calendar-description").value.trim()
           };
@@ -2584,11 +3119,15 @@ if (
           if (roles.siteAdministrator || roles.filePublisher) {
   document.querySelector("#calendar-admin").classList.remove("hidden");
 }
+if (roles.siteAdministrator) {
+  document.querySelector("#calendar-type-admin").classList.remove("hidden");
+}
               
 await Promise.all([
   loadPublishedFiles(),
   loadImportantLinks(),
   loadMemberDirectory(),
+  loadCalendarEventTypes(),
   loadCalendarEvents()
 ]);
 
@@ -2848,4 +3387,5 @@ await Promise.all([
     </script>
   </body>
 </html>
+
 

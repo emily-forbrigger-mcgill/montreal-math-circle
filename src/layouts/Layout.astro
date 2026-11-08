@@ -94,12 +94,12 @@ const { title } = Astro.props;
 
 <style is:global>
     :root { 
-        --primary: #2c98d7;
-        --primary-light: #e7f6ff;
-        --primary-accent: #bee6fd;
-        --dark: #18181b;
-        --text-muted: #415b7e;
-        --border-color: #5e89be;
+        --primary: #34559B;
+        --primary-light: #fefefe;
+        --primary-accent: #A9CCF2;
+        --dark: #16224A;
+        --text-muted: #2B3858;
+        --border-color: #16224A;
         
         /* Font Variables */
         --font-heading: 'Mali', cursive, system-ui, sans-serif;
@@ -112,7 +112,7 @@ const { title } = Astro.props;
         font-family: var(--font-body); 
         font-size: 1rem;
         color: var(--dark);
-        background-color: #fafbfc;
+        background-color: #FBFCFF;
         line-height: 1.6;
     }
 
@@ -158,7 +158,7 @@ const { title } = Astro.props;
     .content-area { 
         flex: 1; 
         padding: 2.5rem 1.5rem; 
-        max-width: 1200px; 
+        max-width: 1370px; 
         margin: 0 auto; 
         width: 100%; 
         box-sizing: border-box; 
@@ -252,7 +252,7 @@ const { title } = Astro.props;
     }
 
     .bento-card {
-        background: #ffffff;
+        background: #FBFCFF;
         border: 1px solid var(--border-color);
         border-radius: 12px;
         padding: 1.5rem;
@@ -277,9 +277,9 @@ const { title } = Astro.props;
         font-family: var(--font-mono);
         font-size: 0.8rem;
         font-weight: 500;
-        color: var(--primary);
-        background: var(--primary-light);
-        border: 1px solid rgba(168, 27, 36, 0.18);
+        color: #2c52b3;
+        background: #dee9f7;
+        border: 1px solid #34559B;
         padding: 0.25rem 0.55rem;
         border-radius: 4px;
         display: inline-block;
@@ -290,8 +290,8 @@ const { title } = Astro.props;
 
     /* Footer Styles */
     .footer { 
-        background: #18181b; 
-        color: #f4f4f5; 
+        background: #16224A; 
+        color: #EEF4FC; 
         padding: 3.5rem 1.5rem 1.5rem; 
         margin-top: auto; 
     }
@@ -307,7 +307,7 @@ const { title } = Astro.props;
     .footer-brand {
         font-size: 1.25rem;
         font-weight: 700;
-        color: #ffffff;
+        color: #EEF4FC;
         margin-bottom: 0.75rem;
     }
 
@@ -322,7 +322,7 @@ const { title } = Astro.props;
 
     .affiliation {
         font-size: 0.88rem;
-        color: #a2bfeb;
+        color: #A9CCF2;
         line-height: 1.6;
         margin: 0;
     }
@@ -338,7 +338,7 @@ const { title } = Astro.props;
     }
 
     .footer-links a, .email-list a {
-        color: #7fb7c8;
+        color: #d5e4f3;
         text-decoration: none;
         font-size: 0.9rem;
         transition: color 0.2s ease;
@@ -346,7 +346,7 @@ const { title } = Astro.props;
     }
 
     .footer-links a:hover, .email-list a:hover {
-        color: #ffffff;
+        color: #F7C95C;
         text-decoration: underline;
     }
 
@@ -357,7 +357,7 @@ const { title } = Astro.props;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         text-align: center;
         font-size: 0.82rem;
-        color: #549cc6;
+        color: #FBFCFF;
     }
 
     /* Mobile Responsive Overrides */
@@ -397,7 +397,7 @@ const { title } = Astro.props;
             position: absolute;
             top: 100%;
             right: 0;
-            background: var(--primary);
+            background: #34559B;
             width: 220px;
             padding: 1rem 1.5rem;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);

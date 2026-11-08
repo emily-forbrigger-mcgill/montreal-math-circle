@@ -1,3 +1,4 @@
+
 ---
 const apiUrl = "https://api.montrealmathcircle.com";
 ---
@@ -62,6 +63,27 @@ const apiUrl = "https://api.montrealmathcircle.com";
         font-size: 0.9rem;
         line-height: 1.5;
       }
+
+      .drive-button {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        margin-top: 24px;
+        padding: 18px 20px;
+        background-color: #ffdf70;
+        color: #222;
+        text-align: center;
+        font-size: 1.15rem;
+        font-weight: 700;
+        line-height: 1.5;
+        text-decoration: none;
+        border-radius: 8px;
+        border: 1px solid #e0bd45;
+      }
+
+      .drive-button:hover {
+        background-color: #ffd34d;
+      }
     </style>
   </head>
 
@@ -89,7 +111,7 @@ const apiUrl = "https://api.montrealmathcircle.com";
           Enter your full username, including <code>.mathcircle</code>.
         </p>
 
-        <label for="password"> Password</label>
+        <label for="password">Password</label>
         <input
           id="password"
           name="password"
@@ -102,6 +124,15 @@ const apiUrl = "https://api.montrealmathcircle.com";
         <button id="login-button" type="submit">Log in</button>
         <p id="message" role="status" aria-live="polite"></p>
       </form>
+
+      <a
+        class="drive-button"
+        href="https://drive.google.com/drive/folders/1MSc2JVO_0TFANqCrrm7jYVvPSq2ZVN71?usp=sharing"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Want to access the shared Google Drive? Click here
+      </a>
     </main>
 
     <script define:vars={{ apiUrl }}>
@@ -164,3 +195,4 @@ const apiUrl = "https://api.montrealmathcircle.com";
     </script>
   </body>
 </html>
+

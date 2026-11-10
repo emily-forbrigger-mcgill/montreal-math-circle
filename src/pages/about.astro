@@ -11,9 +11,8 @@ import Layout from '../layouts/Layout.astro';
             <div class="story-content">
                 <h1>Our Story</h1>
                 <p>
-                    A math circle is a learning model that was developed in the mid 20th century Soviet Union with an aim to inspire and train primary and secondary-aged students to excel in mathematical problem solving. Over the years, math circles have expanded to many other locations, iterations, and age-groups.<br><br>
-                    If the standard classroom model for teaching mathematics is likened to a theatre play with occasional opportunities for audience participation - then a math circle is improv theatre. In a math circle there is no separation between the performers (teachers/facilitator) and audience (students).
-                    In the Montreal Math Circle we ask that students take a front seat in their mathematical exploration - with facilitators there to gently guide and encourage students as they arrive at a rigorous mathematical solution. As facilitators, we believe in the “follow the child” philosophy of teaching mathematics.
+                    The Montreal Math Circle (MMC) is a student-run organization that aims to inspire students to flourish with the excitement of mathematical discovery. We are run by a collective of university students and volunteers in the Montreal area, and we offer free math circles for upper elementary, high school, and CEGEP students. Our goal is to create a community where students can explore mathematics in a collaborative and engaging environment, fostering a love for the subject that goes beyond the classroom.
+                    <br><br>We believe that students can learn to enjoy mathematics for its own sake, and we are committed to providing opportunities for students to develop their problem-solving skills, critical thinking, and creativity through hands-on activities and discussions. Our math circles are designed to be inclusive and welcoming, encouraging students of all backgrounds and abilities to participate and thrive.
                 </p>
             </div>
             <div class="story-content">
@@ -49,12 +48,30 @@ import Layout from '../layouts/Layout.astro';
         </article>
     </section>
 
+    <details class="toggle-section">
+        <summary>What is a math circle?</summary>
+        <div class="content">
+            <p>A math circle is a learning model that was developed in the mid 20th century Soviet Union with an aim to inspire and train primary and secondary-aged students to excel in mathematical problem solving. Over the years, math circles have expanded to many other locations, iterations, and age-groups.
+                <br><br>If the standard classroom model for teaching mathematics is likened to a theatre play with occasional opportunities for audience participation - then a math circle is improv theatre. In a math circle there is no separation between the performers (teachers/facilitator) and audience (students). In the Montreal Math Circle we ask that students take a front seat in their mathematical exploration - with facilitators there to gently guide and encourage students as they arrive at a rigorous mathematical solution. As facilitators, we believe in the “follow the child” philosophy of teaching mathematics.</p>
+        </div>
+    </details>
+
+    <details class="toggle-section">
+        <summary>How do students learn in MMC?</summary>
+        <div class="content">
+            <p>Our goal is to have students practice the fundamentals of mathematical problem solving - a skill gained almost entirely through practice. In fact, almost all mathematical formulas featured in this program will be derived by the students - with our gentle guidance.
+                <br><br>When students practice doing this, they will gain the skills and understanding to go beyond prepackaged mathematical tools, and instead be able to create and discover their own toolbox.
+            </p>
+        </div>
+    </details>
+
+
     <!-- Meet the Team Section -->
     <section class="team-section">
         <div class="section-header">
             <span class="meta-tag">Leadership & Mentors</span>
             <h2>Meet the Team</h2>
-            <p class="section-subtitle">[Insert brief description about the organizers, faculty advisors, and student mentors].</p>
+            <p class="section-subtitle">Get to know the dedicated individuals who lead and support our math circle programs.</p>
         </div>
 
         <div class="team-grid">
@@ -63,7 +80,7 @@ import Layout from '../layouts/Layout.astro';
                 <img src="/team-headshots/aislinn-headshot.png" alt="Headshot of Aislinn Smith" class="team-headshot"/>
                 <div class="team-info">
                     <h3>Aislinn Smith</h3>
-                    <span class="team-role">Director of Organization</span>
+                    <span class="team-role">Director of MMC, High School Division</span>
                     <p class="team-bio">Aislinn is a PhD student in the Department of Mathematics and Statistics at McGill. She is originally from Austin, Texas (Hook 'Em!). She calls her turning point a “math circle-based” course in her junior year of college, which continually inspires her to help students experience the same joy of mathematical discovery she found there.</p>
                     <div class="team-links">
                         <a href="https://aislinnsmith.com/" target="_blank" class="team-link"> Website</a>
@@ -72,6 +89,19 @@ import Layout from '../layouts/Layout.astro';
             </article>
 
             <!-- Team Member 2 -->
+            <article class="team-card">
+                <img src="" alt="" class="team-headshot"/>
+                <div class="team-info">
+                    <h3>Benji</h3>
+                    <span class="team-role">Director of MMC, CEGEP Division</span>
+                    <p class="team-bio">Benji is a postdoctorate at UQAM.</em></p>
+                    <div class="team-links">
+                        
+                    </div>
+                </div>
+            </article>
+
+            <!-- Team Member 3 -->
             <article class="team-card">
                 <img src="" alt="" class="team-headshot"/>
                 <div class="team-info">
@@ -84,7 +114,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
             </article>
 
-            <!-- Team Member 3 -->
+            <!-- Team Member 4 -->
             <article class="team-card">
                 <img src="/team-headshots/emily-headshot.jpg" alt="Headshot of Emily Forbrigger" class="team-headshot"/>
                 <div class="team-info">
@@ -97,7 +127,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
             </article>
 
-            <!-- Team Member 4 -->
+            <!-- Team Member 5 -->
             <article class="team-card">
                 <img src="" alt="" class="team-headshot"/>
                 <div class="team-info">
@@ -110,7 +140,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
             </article>
 
-            <!-- Team Member 5 -->
+            <!-- Team Member 6 -->
             <article class="team-card">
                 <img src="" alt="" class="team-headshot"/>
                 <div class="team-info">
@@ -123,7 +153,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
             </article>
 
-             <!-- Team Member 6 -->
+             <!-- Team Member 7 -->
             <article class="team-card">
                 <img src="" alt="" class="team-headshot"/>
                 <div class="team-info">
@@ -136,7 +166,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
             </article>
 
-             <!-- Team Member 7 -->
+             <!-- Team Member 8 -->
             <article class="team-card">
                 <img src="" alt="" class="team-headshot"/>
                 <div class="team-info">
@@ -266,6 +296,35 @@ import Layout from '../layouts/Layout.astro';
         font-size: 0.95rem;
         line-height: 1.6;
         margin: 0;
+    }
+
+    /* Math Circle History Section */
+    .toggle-section {
+        background: #FBFCFF;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    }
+
+    .toggle-section summary {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dark);
+        cursor: pointer;
+        outline: none;
+    }
+
+    .toggle-section[open] summary {
+        color: var(--primary);
+    }
+
+    .toggle-section .content {
+        margin-top: 1rem;
+        font-size: 0.95rem;
+        color: #2B3858;
+        line-height: 1.55;
     }
 
     /* Meet the Team Section */
